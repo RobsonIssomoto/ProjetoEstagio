@@ -21,7 +21,7 @@
 
     <!-- ======== MENU ======== -->
     <header>
-       
+
 
         @*MENU ANTIGO*@
         @* <nav>
@@ -90,60 +90,63 @@
     </section>
 
     <!-- ======== FORMULÁRIO ======== -->
-    <div class="container-md">
-    <form class="row g-3 ">
-        <div class="col-md-12">
-            <label for="nomeEmpresa" class="form-label">Nome da Empresa</label>
-            <input type="text" class="form-control" id="nomeEmpresa" placeholder="Nome da Empresa" required>
-        </div>
-            <div class="col-md-12">
-            <label for="cnpj" class="form-label">CNPJ</label>
-            <input type="text" class="form-control" id="cnpj" placeholder="CNPJ" required>
-        </div>
-            <div class="col-md-12">
-            <label for="entradaEmail" class="form-label">Email</label>
-            <input type="email" class="form-control" id="entradaEmail" required>
-        </div>
-            <div class="col-md-12">
-            <label for="entradaSenha" class="form-label">Senha</label>
-            <input type="password" class="form-control" id="entradaSenha" required>
-        </div>
-            <div class="col-md-12">
-            <label for="entradaCep" class="form-label">CEP</label>
-            <input type="text" class="form-control" id="entradaCep" placeholder="CEP" required>
-        </div>
-            <div class="col-md-12">
-            <label for="entradaEndereco" class="form-label">Endereço</label>
-            <input type="text" class="form-control" id="entradaEndereco" placeholder="Endereço" required>
-        </div>
-            <div class="col-md-12">
-            <label for="entradaCidade" class="form-label">Cidade</label>
-            <input type="text" class="form-control" id="cidade" required>
-        </div>
-            <div class="col-md-12">
-            <label for="entradaEstado" class="form-label">Estado</label>
-            <select asp-for="Estado" class="form-control" required>
-                <option value="">Selecione um estado</option>
-                @foreach (var uf in new[] { "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO" })
-                {
-                    <option value="@uf">@uf</option>
-                }
-            </select>
-        </div>
-        <div class="col-12">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="cadastroCheck">
-                <label class="form-check-label" for="cadastroCheck">
-                    Declaro que Li e Concordo com os Termos da <a href="#">Política de Privacidade</a>
-                </label>
+
+    <div class="container mb-4">
+        <form class="row d-flex justify-content-center g-3 ">
+            <div class="col-4">
+                <div class="col">
+                    <label for="nomeEmpresa" class="form-label">Nome da Empresa</label>
+                    <input type="text" class="form-control" id="nomeEmpresa" placeholder="Nome da Empresa" required>
+                </div>
+                <div class="col">
+                    <label for="cnpj" class="form-label">CNPJ</label>
+                    <input type="text" class="form-control" id="cnpj" placeholder="CNPJ" required>
+                </div>
+                <div class="col">
+                    <label for="entradaEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="entradaEmail" required>
+                </div>
+                <div class="col">
+                    <label for="entradaSenha" class="form-label">Senha</label>
+                    <input type="password" class="form-control" id="entradaSenha" required>
+                </div>
+                <div class="col">
+                    <label for="entradaCep" class="form-label">CEP</label>
+                    <input type="text" class="form-control" id="entradaCep" placeholder="CEP" required>
+                </div>
+                <div class="col">
+                    <label for="entradaEndereco" class="form-label">Endereço</label>
+                    <input type="text" class="form-control" id="entradaEndereco" placeholder="Endereço" required>
+                </div>
+                <div class="col">
+                    <label for="entradaCidade" class="form-label">Cidade</label>
+                    <input type="text" class="form-control" id="cidade" required>
+                </div>
+                <div class="col">
+                    <label for="entradaEstado" class="form-label">Estado</label>
+                    <select asp-for="Estado" class="form-control" required>
+                        <option value="">Selecione um estado</option>
+                        @foreach (var uf in new[] { "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO" })
+                        {
+                            <option value="@uf">@uf</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="cadastroCheck">
+                        <label class="form-check-label" for="cadastroCheck">
+                            Declaro que Li e Concordo com os Termos da <a href="#">Política de Privacidade</a>
+                        </label>
+                    </div>
+                </div>
+                <div class="d-grid gap-2 mt-3 d-md-flex justify-content-md-end">
+                    <button class="btn btn-danger me-md-2" type="button">Cadastrar</button>
+                    <button class="btn btn-outline-danger" type="button">Cancelar</button>
+                </div>
             </div>
-        </div>
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <button class="btn btn-danger me-md-2" type="button">Cadastrar</button>
-            <button class="btn btn-outline-danger" type="button">Cancelar</button>
-        </div>
-    </form>
-    @*<form asp-action="@(Model.Id == 0 ? "Create" : "Edit")" asp-controller="Empresa" method="post">
+        </form>
+        @*<form asp-action="@(Model.Id == 0 ? "Create" : "Edit")" asp-controller="Empresa" method="post">
         <section id="login" class="col-6">
             <input type="hidden" asp-for="Id" />
 
@@ -273,6 +276,124 @@
     </form> *@
 
     </div>
+
+
+
+
+
+    <!-- TESTE FORMULÁRIO-->
+    <div class="container mb-4">
+        <form class="row d-flex justify-content-center" style="font-size: .75em">
+            <div class=" col-4 bg-white my-2 p-3 rounded shadow" style="min-width: 380px">
+                <h3 class="text-center mb-3">CADASTRO DE ESTAGIÁRIO</h3>
+                <!-- Nome e Sobrenome -->
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label for="nome" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="nome" placeholder="Nome" required>
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="sobrenome" class="form-label">Sobrenome</label>
+                        <input type="text" class="form-control" id="sobrenome" placeholder="Sobrenome" required>
+                    </div>
+                </div>
+                <!-- Tipo de Documento e Nº do Documento -->
+                <div class="row">
+                    <div class="col-12 col-xxl-5 mt-2">
+                        <label for="tipoDocumento" class="form-label">Documento</label>
+                        <select id="tipoDocumento" class="form-select" required>
+                            <option selected disabled value="">Selecione</option>
+                            <option value="RG">RG</option>
+                            <option value="CPF">CPF</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-xxl-7  mt-2">
+                        <label for="documento" class="form-label">Nº Documento</label>
+                        <input type="text" class="form-control" id="documento" required>
+                    </div>
+                </div>
+
+                <!-- Código de Área e Nº de Telefone -->
+                <div class="row">
+                    <div class="col-3">
+                        <label for="codigo" class="form-label mt-2">Código</label>
+                        <input type="text" class="form-control" id="codigo" placeholder="(DDD)" required>
+                    </div>
+                    <div class="col-9">
+                        <label for="telefone" class="form-label   mt-2">Telefone</label>
+                        <input type="text" class="form-control" id="telefone" placeholder="91234-5678" required>
+                    </div>
+
+                    <!-- pattern="[0-9]{2}-[0-9]{2}-[0-9]{3}" padrão do input telefone -->
+                </div>
+
+                <!-- UF e Cidade -->
+                <div class="row">
+                    <div class="col-12 col-xl-4  mt-2">
+                        <label for="estado" class="form-label">Estado</label>
+                        <select id="estado" class="form-select" required>
+                            <option selected disabled value="">UF</option>
+                            <option value="AC">Acre</option>
+                            <option value="AL">Alagoas</option>
+                            <option value="AP">Amapá</option>
+                            <option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option>
+                            <option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option>
+                            <option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                        </select>
+                    </div>
+                    <div class="col- 12 col-xl-8  mt-2">
+                        <label for="cidade" class="form-label">Cidade</label>
+                        <input type="text" class="form-control" id="cidade" required>
+                    </div>
+                </div>
+
+                <!-- Email e Senha -->
+                <div class="row">
+                    <div class="col">
+                        <label for="email" class="form-label   mt-2">E-mail</label>
+                        <input type="email" class="form-control" id="email" placeholder="exemplo@exemplo.com.br" required>
+
+                        <label for="senha" class="form-label   mt-2">Senha</label>
+                        <input type="password" class="form-control" id="senha" required>
+
+                        <label for="confirmarSenha" class="form-label   mt-2">Confirmar Senha</label>
+                        <input type="password" class="form-control" id="confirmarSenha" required>
+                    </div>
+                </div>
+
+                <!-- Botões -->
+                <div class="d-flex justify-content-end mt-4 ">
+                    <a href="index.html" class="btn btn-danger ms-2">Cancelar</a>
+                    <button class="btn btn-primary ms-2">Cadastrar</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+
+
     <!-- ======== LISTA DE EMPRESAS ======== -->
     @if (ViewBag.Empresas != null && ((IEnumerable<ProjetoEstagio.Models.Empresa>)ViewBag.Empresas).Any())
     {
