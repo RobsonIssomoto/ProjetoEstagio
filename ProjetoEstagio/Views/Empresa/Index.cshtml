@@ -371,7 +371,7 @@
                 <!-- Email e Senha -->
                 <div class="row">
                     <div class="col">
-                        <label for="email" class="form-label   mt-2">E-mail</label>
+                        <label for="email" class="form-label mt-2">E-mail</label>
                         <input type="email" class="form-control" id="email" placeholder="exemplo@exemplo.com.br" required>
 
                         <label for="senha" class="form-label   mt-2">Senha</label>
@@ -383,9 +383,14 @@
                 </div>
 
                 <!-- Botões -->
-                <div class="d-flex justify-content-end mt-4 ">
-                    <a href="index.html" class="btn btn-danger ms-2">Cancelar</a>
-                    <button class="btn btn-primary ms-2">Cadastrar</button>
+                @* <div class="d-flex justify-content-end mt-4 "> *@
+                @*     <a href="index.html" class="btn btn-danger ms-2">Cancelar</a> *@
+                @*     <button class="btn btn-primary ms-2">Cadastrar</button> *@
+                @* </div> *@
+
+                <div class="d-grid gap-2 mt-3 d-md-flex justify-content-md-end">
+                    <button class="btn btn-danger me-md-2" type="button">Cadastrar</button>
+                    <button class="btn btn-outline-danger" type="button">Cancelar</button>
                 </div>
 
             </div>
