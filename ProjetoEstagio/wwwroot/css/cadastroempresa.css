@@ -1,0 +1,219 @@
+/** {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1.6;
+    color: white;
+}
+
+header {
+    background-color: red;
+    padding: 1rem;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    height: 80px;*/ /* Defina uma altura fixa, se necessário */
+/*}
+h1{
+    text-align: center;
+}
+
+select {
+    padding: 2px;
+    font-size: 15px;
+    width: 100%;
+}
+
+.project {
+  
+    justify-content: center;
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+    
+}
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul li {
+    position: relative;*/ /* Necessário para posicionar o submenu */
+    /*margin: 0 1rem;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+}*/
+
+/* Estilos para o submenu */
+/*nav ul li ul {
+    display: none;*/ /* Oculta o submenu inicialmente */
+    /*position: absolute;
+    top: 100%;*/ /* Posiciona o submenu logo abaixo do item principal */
+    /*left: 0;
+    background-color: white;
+    padding: 10px;
+    list-style: none;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+nav ul li:hover ul {
+    display: block;*/ /* Mostra o submenu ao passar o mouse */
+/*}
+
+nav ul li ul li {
+    margin: 0;
+    padding: 5px 0;
+}
+
+nav ul li ul li a {
+    color: red;*/ /* Cor dos itens do submenu */
+    /*padding: 5px 10px;
+    display: block;
+}
+
+nav ul li ul li a:hover {
+    background-color: #ddd;*/ /* Cor de fundo ao passar o mouse sobre o submenu */
+/*}
+
+#sobre {
+    background: url('FATEC.png') no-repeat center;
+    height: 20vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:flex-start;
+    color: black;
+    padding-left: 100px;
+}
+
+#titulo{
+    margin: 50px; 
+    text-align: center;
+ color: black;  
+}
+#login {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    color: black;
+    padding-left: 50px;*/ /* Ajuste o padding conforme necessário */
+    /*padding-top: 0;*/ /* Remover o espaçamento superior */
+/*}
+
+#login h1 {*/ /* Estilo para o título */
+    /*margin-bottom: 20px;*/ /* Ajuste para aproximar do formulário */
+    /*font-size: 24px;
+    text-align: left;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;*/ /* Espaçamento entre os grupos de formulário */
+    /*flex-wrap: wrap;*/ /* Permite que os elementos quebrem linha em telas menores */
+    /*margin-bottom: 10px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;*/ /* Largura mínima para os campos */
+/*}
+
+form input[type="text"],
+form input[type="password"],
+form input[type="email"] {
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    
+}
+form input[type="text"],
+form input[type="password"],
+form input[type="email"] {
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    
+}
+
+#botao {
+    margin-top: 5rem;*/ /* Ajuste de margem superior para aproximar dos campos */
+    /*display: flex;
+    justify-content: center;*/ /* Centraliza o conteúdo */
+/*}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 4rem;*/ /* Espaçamento entre os botões */
+/*}
+
+.cta {
+    padding: 1rem 2rem;*/ /* Aumenta o espaço interno dos botões */
+    /*background-color: red;
+    color: white;
+    border: none;
+    text-decoration: none;
+    border-radius: 25px;
+    text-align: center;
+}
+tabela-empresas {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+
+.tabela-empresas th,
+.tabela-empresas td {
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    text-align: left;
+    color: black;
+}
+
+.tabela-empresas th {
+    background: #f2f2f2;
+}
+
+.btn-acao {
+    display: inline-block;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+    .btn-acao.editar {
+        background: #1976d2;
+        color: #fff;
+    }
+
+    .btn-acao.excluir {
+        background: #d32f2f;
+        color: #fff;
+    }
+
+        .btn-acao.excluir:hover {
+            background: #b71c1c;
+        }
+
+    .btn-acao.editar:hover {
+        background: #004ba0;
+    }*/
