@@ -23,6 +23,11 @@ namespace ProjetoEstagio.Controllers
             return View();
         }
 
+        public IActionResult Principal()
+        {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

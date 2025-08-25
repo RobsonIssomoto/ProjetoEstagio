@@ -67,5 +67,20 @@ namespace ProjetoEstagio.Controllers
 
             return RedirectToAction("Index");
         }
+
+        public IActionResult Cadastro()
+        {
+            return View("Cadastro");
+        }
+
+        public IActionResult Login()
+        {
+            return View("Login");
+        }
+
+        public IActionResult Principal()
+        {
+            return View("Principal");
+        }
     }
 }

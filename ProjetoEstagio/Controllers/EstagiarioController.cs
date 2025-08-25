@@ -6,7 +6,25 @@ namespace ProjetoEstagio.Controllers
     {
         public IActionResult Index()
         {
+            return View("../Home/Index");
+        }
+
+        public IActionResult Login()
+        {
             return View("Login");
         }
+
+        public IActionResult Cadastro()
+        {
+            return View("Cadastro");
+        }
+
+        public IActionResult Principal()
+        {
+            return View("Principal");
+        }
+
+
+
     }
 }

@@ -7,30 +7,33 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ProjetoEstagio.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <script src="https://kit.fontawesome.com/b02dd4a413.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-danger border-bottom box-shadow mb-3" data-bs-theme="dark">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SGE</a>
+               
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                        aria-expanded="false" aria-label="Toggle navigation" style="border: 0;">
+                    <i class="fa-solid fa-bars fa-border rounded-1" style="color: white"></i>
                 </button>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SGE</a>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Estagiario" asp-action="Index">Estagiário</a>
+                            <a class="nav-link text-light" asp-area="" asp-controller="Estagiario" asp-action="Login">Estagiário</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Privacy">Empresa</a>
+                            <a class="nav-link text-light" asp-area="" asp-controller="Empresa" asp-action="Login">Empresa</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="">Orientador</a>
                         </li>
                     </ul>
                     <form class="d-flex" role="pesquisar">
-                        <input class="form-control me-2" type="pesquisar" placeholder="Pesquisar" aria-label="Pesquisar" />
+                        <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar" />
                         <button class="btn btn-outline-light" type="submit">Pesquisar</button>
                     </form>
                 </div>
