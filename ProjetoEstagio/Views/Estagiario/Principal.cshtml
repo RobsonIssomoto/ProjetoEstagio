@@ -72,6 +72,14 @@
             padding: 0px 8px;
             border-radius: 2px;
         }
+
+        #bdSidebar {
+            height: 100vh;
+        }
+
+        #hero {
+            height: 100vh;
+        }
     </style>
 </head>
 
@@ -145,7 +153,7 @@
             </div>
         </div>
 
-        <div class="bg-light flex-fill">
+        <div id="hero" class="bg-light flex-fill h-100 overflow-auto">
             <div class="p-3 d-md-none d-flex text-white bg-danger">
                 <a href="#" class="text-white"
                    data-bs-toggle="offcanvas"
@@ -156,7 +164,7 @@
 
                 <span class="ms-3">SGE - Fatec</span>
             </div>
-            <div class="p-4">
+            <div class="pt-4 px-4">
                 <nav style="--bs-breadcrumb-divider:'>';font-size:14px">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
@@ -181,7 +189,6 @@
                                 <p class="card-text">3 Vagas Disponíveis</p>
                                 <p class="card-text">1 Candidatura Aguardando Resposta</p>
                             </div>
-
                         </div>
                     </div>
 
@@ -207,7 +214,7 @@
                 </div>
                 <!-- Dashboards Fim -->
                 <!-- Pesquisar Início -->
-                <div class="container mt-5">
+                <div class="container mt-5 col-sm-12 col-md-8">
                     <h3 class="text-center mb-3">Buscar Estágios</h3>
                     <div class="input-group mb-3">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Selecionar</button>
@@ -293,6 +300,79 @@
                     </div>
                 </div>
                 <!-- Tabela Fim -->
+                <!-- Tabela Início -->
+                <div class="container mt-5">
+                    <h3 class="text-center mb-3">Lista de Estágios</h3>
+                    <button type="button" class="btn btn-primary btn-sm mb-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-funnel-fill" viewBox="0 0 16 16">
+                            <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5z" />
+                        </svg>Filtro
+                    </button>
+
+                    <div class="table-responsive" style="overflow-x: auto; white-space: nowrap;">
+                        <table class="table table-striped table-hover table-bordered border-black align-middle">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Código</th>
+                                    <th scope="col">Descrição</th>
+                                    <th scope="col">Empresa</th>
+                                    <th scope="col">Carga Horária</th>
+                                    <th scope="col">Valor da Bolsa</th>
+                                    <th scope="col">Local</th>
+                                    <th scope="col">Candidatar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>Fullstack</td>
+                                    <td>IBM</td>
+                                    <td>30h</td>
+                                    <td>R$ 1700,00</td>
+                                    <td>Campinas/SP</td>
+                                    <td>
+                                        <div class="d-flex justify-content-evenly gap-1">
+                                            <button class="btn btn-primary btn-sm">Candidatar</button>
+                                            <button class="btn btn-outline-primary btn-sm">Visualizar</button>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>Back-end</td>
+                                    <td>TOTVS</td>
+                                    <td>30h</td>
+                                    <td>R$ 2000,00</td>
+                                    <td>São Paulo/SP</td>
+                                    <td>
+                                        <div class="d-flex justify-content-evenly gap-1">
+                                            <button class="btn btn-primary btn-sm">Candidatar</button>
+                                            <button class="btn btn-outline-primary btn-sm">Visualizar</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">3</th>
+                                    <td>Front-end</td>
+                                    <td>CI&T</td>
+                                    <td>40h</td>
+                                    <td>R$ 1800,00</td>
+                                    <td>Campinas/SP</td>
+                                    <td>
+                                        <div class="d-flex justify-content-evenly gap-1">
+                                            <button class="btn btn-primary btn-sm">Candidatar</button>
+                                            <button class="btn btn-outline-primary btn-sm">Visualizar</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Tabela Fim -->
+
+
             </div>
         </div>
     </div>
