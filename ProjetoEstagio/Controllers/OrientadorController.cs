@@ -2,16 +2,11 @@
 
 namespace ProjetoEstagio.Controllers
 {
-    public class EstagiarioController : Controller
+    public class OrientadorController : Controller
     {
         public IActionResult Index()
         {
-            return View("Index");
-        }
-
-        public IActionResult Login()
-        {
-            return View("Login");
+            return View();
         }
 
         public IActionResult Cadastro()
@@ -19,12 +14,9 @@ namespace ProjetoEstagio.Controllers
             return View("Cadastro");
         }
 
-        public IActionResult Principal()
+        public IActionResult Login()
         {
-            return View("Principal");
+            return View("Login");
         }
-
-
-
     }
 }
