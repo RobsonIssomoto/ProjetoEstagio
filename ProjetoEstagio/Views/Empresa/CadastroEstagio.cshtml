@@ -35,107 +35,29 @@
         <form class="row d-flex justify-content-center" style="font-size: .75em">
             <div class=" col-4 bg-white my-2 p-3 rounded shadow" style="min-width: 380px">
                 <h3 class="text-center mb-3">FORMULÁRIO</h3>
-                <!-- Nome do Responsável (ADM) -->
+                <!-- Nome do Estágio -->
                 <div class="row  mb-3">
                     <div class="col-lg-12">
-                        <label for="nome" class="form-label">Nome (Responsável)</label>
+                        <label for="nome" class="form-label">Nome Estágio</label>
                         <input type="text" class="form-control" id="nome" placeholder="Nome" required>
                     </div>
                 </div>
-                <!-- Sobrenome -->
+                <!-- Descrição do Estágio -->
                 <div class="row  mb-3">
                     <div class="col-lg-12">
-                        <label for="sobrenome" class="form-label">Sobrenome</label>
-                        <input type="text" class="form-control" id="sobrenome" placeholder="Sobrenome" required>
+                        <label for="sobrenome" class="form-label">Descrição</label>
+                        <input type="text" class="form-control" id="descricao" placeholder="Descrição" required>
                     </div>
                 </div>
 
-                <!-- Nome da Empresa -->
+                <!-- Valor da Bolsa -->
                 <div class="row  mb-3">
                     <div class="col-lg-12">
-                        <label for="empresa" class="form-label">Empresa</label>
-                        <input type="text" class="form-control" id="empresa" placeholder="Empresa" required>
+                        <label for="valor" class="form-label">Valor da Bolsa</label>
+                        <input type="text" class="form-control" id="valor" placeholder="R$ " required>
                     </div>
                 </div>
 
-                <!-- CNPJ  -->
-                <div class="row  mb-3">
-                    <div class="col-lg-12">
-                        <label for="cnpj" class="form-label">CNPJ</label>
-                        <input type="text" class="form-control" id="cnpj" placeholder="CNPJ" required>
-                    </div>
-                </div>
-
-                <!-- UF e Cidade -->
-                <div class="row  mb-3">
-                    <div class="col-12 col-xl-4  mt-2">
-                        <label for="estado" class="form-label">Estado</label>
-                        <select id="estado" class="form-select" required>
-                            <option selected disabled value="">UF</option>
-                            <option value="AC">Acre</option>
-                            <option value="AL">Alagoas</option>
-                            <option value="AP">Amapá</option>
-                            <option value="AM">Amazonas</option>
-                            <option value="BA">Bahia</option>
-                            <option value="CE">Ceará</option>
-                            <option value="DF">Distrito Federal</option>
-                            <option value="ES">Espírito Santo</option>
-                            <option value="GO">Goiás</option>
-                            <option value="MA">Maranhão</option>
-                            <option value="MT">Mato Grosso</option>
-                            <option value="MS">Mato Grosso do Sul</option>
-                            <option value="MG">Minas Gerais</option>
-                            <option value="PA">Pará</option>
-                            <option value="PB">Paraíba</option>
-                            <option value="PR">Paraná</option>
-                            <option value="PE">Pernambuco</option>
-                            <option value="PI">Piauí</option>
-                            <option value="RJ">Rio de Janeiro</option>
-                            <option value="RN">Rio Grande do Norte</option>
-                            <option value="RS">Rio Grande do Sul</option>
-                            <option value="RO">Rondônia</option>
-                            <option value="RR">Roraima</option>
-                            <option value="SC">Santa Catarina</option>
-                            <option value="SP">São Paulo</option>
-                            <option value="SE">Sergipe</option>
-                            <option value="TO">Tocantins</option>
-                        </select>
-                    </div>
-                    <div class="col- 12 col-xl-8  mt-2">
-                        <label for="cidade" class="form-label">Cidade</label>
-                        <input type="text" class="form-control" id="cidade" required>
-                    </div>
-                </div>
-
-                <!-- Código de Área e Nº de Telefone -->
-                <div class="row  mb-3">
-                    <div class="col-4">
-                        <label for="codigo" class="form-label mt-2">Código</label>
-                        <input type="text" class="form-control" id="codigo" placeholder="(DDD)" required>
-                    </div>
-                    <div class="col-8">
-                        <label for="telefone" class="form-label   mt-2">Telefone</label>
-                        <input type="text" class="form-control" id="telefone" placeholder="91234-5678" required>
-                    </div>
-
-                    <!-- pattern="[0-9]{2}-[0-9]{2}-[0-9]{3}" padrão do input telefone -->
-                </div>
-
-                
-
-                <!-- Email e Senha -->
-                <div class="row mb-3">
-                    <div class="col">
-                        <label for="email" class="form-label mt-2">E-mail</label>
-                        <input type="email" class="form-control" id="email" placeholder="exemplo@exemplo.com.br" required>
-
-                        <label for="senha" class="form-label   mt-2">Senha</label>
-                        <input type="password" class="form-control" id="senha" required>
-
-                        <label for="confirmarSenha" class="form-label   mt-2">Confirmar Senha</label>
-                        <input type="password" class="form-control" id="confirmarSenha" required>
-                    </div>
-                </div>
 
                 <!-- Botões -->
                 @* <div class="d-flex justify-content-end mt-4 "> *@
@@ -152,6 +74,12 @@
         </form>
     </div>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+    <script>
+        $('#valor').mask("#.##0,00", {reverse: true});
+    </script>
 </body>
 </html>

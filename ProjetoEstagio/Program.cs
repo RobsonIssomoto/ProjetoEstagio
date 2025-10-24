@@ -1,12 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using ProjetoEstagio.Data;
+using ProjetoEstagio.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), new MySqlServerVersion(new Version(8, 0, 33))));
-    ;
+builder.Services.AddDbContext<ProjetoEstagioContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
+builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
+builder.Services.AddScoped<ISupervisorRepository, SupervisorRepository>();
+    
 
 var app = builder.Build();
 

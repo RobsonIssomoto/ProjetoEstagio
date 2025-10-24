@@ -1,0 +1,36 @@
+﻿@model List<ProjetoEstagio.Models.SupervisorModel>
+@{
+    ViewData["Title"] = "Index Supervisor";
+}
+
+<h3>Lista de Supervisores</h3>
+
+<table id="supervisorTable" class="table">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Cargo</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (SupervisorModel supervisor in Model)
+            {
+                <tr>
+                    <td>@supervisor.Id</td>
+                    <td>@supervisor.Nome</td>
+                    <td>@supervisor.CPF</td>
+                    <td>@supervisor.Cargo</td>
+                    <td>
+                        <a asp-action="Editar" asp-route-id="@supervisor.Id" class="btn btn-primary btn-sm">Editar</a>
+                        <a asp-action="DeletarConfirmar" asp-route-id="@supervisor.Id" class="btn btn-danger btn-sm">Deletar</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

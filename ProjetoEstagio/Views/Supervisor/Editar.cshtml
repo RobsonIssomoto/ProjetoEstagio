@@ -1,0 +1,33 @@
+﻿@model ProjetoEstagio.Models.SupervisorModel
+@{
+    ViewData["Title"] = "Editar Supervisor";
+}
+<div class="container mb-4">
+    <form asp-controller="Supervisor" asp-action="Alterar" method="post" class="row d-flex justify-content-center" style="font-size: .75em">
+        <div class="col-4 bg-white my-2 p-3 rounded shadow" style="min-width: 380px">
+            <h3 class="text-center mb-3">EDITAR SUPERVISOR</h3>
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group row m-3">
+                <label for="Nome">Nome</label>
+                <input type="text" class="form-control" asp-for="Nome" required />
+            </div>
+
+            <div class="form-group row m-3">
+                <label for="CPF">CPF</label>
+                <input type="text" class="form-control" asp-for="CPF" required />
+            </div>
+
+            <div class="form-group row m-3">
+                <label for="Cargo">Cargo</label>
+                <input type="text" class="form-control" asp-for="Cargo" required>
+            </div>
+
+            <div class="form-group row m-3">
+                <button type="submit" class="btn btn-danger mb-2">Editar</button>
+                <button type="submit" class="btn btn-outline-secondary">Cancelar</button>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,11 @@
+﻿@model SupervisorModel
+@{
+    ViewData["Title"] = "Confirmar Apagar Supervisor";
+}
+
+<div class="text-center">
+    <h3>Deseja apagar empresa (@Model.Nome)?</h3>
+</div>
+
+<a class="btn btn-secondary btn-block" asp-action="Index" asp-controller="Supervisor" role="button">Cancelar</a>
+<a class="btn btn-danger btn-block" asp-action="Deletar" asp-controller="Supervisor" asp-route-id="@Model.Id">Deletar</a>

@@ -1,456 +1,66 @@
-﻿@model ProjetoEstagio.Models.Empresa
+﻿@model List<ProjetoEstagio.Models.EmpresaModel>
 @{
-    ViewData["Title"] = "Cadastro de Empresas";
+    ViewData["Title"] = "Index Empresa";
+}
+<!--<h3>Lista de Supervisores</h3>
+<div class="form-group">
+<label asp-for="SupervisorId" class="control-label"></label>
+<select asp-for="SupervisorId" asp-items="ViewBag.SupervisorList" class="form-control">
+<option value="">-- Selecione o Supervisor --</option>
+</select>
+<span asp-validation-for="SupervisorId" class="text-danger"></span>
+</div>
+-->
+<h3>Lista de Empresas</h3>
+
+@if (TempData["MensagemSucesso"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Sucesso!</strong> @TempData["MensagemSucesso"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        
+    </div>
+   
 }
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta name="description" content="SISTEMA ESTÁGIO">
-    <title>SISTEMA ESTÁGIO</title>
-    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
-
-    <!-- Scripts de validação MVC -->
-    <partial name="_ValidationScriptsPartial" />
-</head>
-
-<body>
-    <section id="sobre"></section>
-
-    <!-- ======== MENU ======== -->
-    <header>
-
-
-        @*MENU ANTIGO*@
-        @* <nav>
-            <div class="menu-toggle" id="menu-toggle">
-                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-            </div>
-
-            <ul id="menu">
-                <li><a asp-controller="Home" asp-action="Index">Início</a></li>
-
-                <li>
-                    <a href="#estagios">Estágios</a>
-                    <ul>
-                        <li><a href="#">Consultar Estágios</a></li>
-                        <li><a href="#">Cadastrar novo Estágio</a></li>
-                        <li><a href="#">Preencher Formulários</a></li>
-                    </ul>
-                </li>
-
-                <li>
-                    <a href="#usuario">Alunos</a>
-                    <ul>
-                        <li><a href="#">Cadastrar Aluno</a></li>
-                    </ul>
-                </li>
-
-                <li>
-                    <a href="#empresa">Empresas</a>
-                    <ul>
-                        <li><a asp-controller="Empresa" asp-action="Index">Cadastrar Empresa</a></li>
-                        <li><a asp-controller="Empresa" asp-action="Index">Listar Empresas</a></li>
-                    </ul>
-                </li>
-
-                <li>
-                    <a href="#orientador">Orientadores</a>
-                    <ul>
-                        <li><a href="#">Cadastrar Orientadores</a></li>
-                    </ul>
-                </li>
-
-                <li>
-                    <a href="#documentos">Documentos</a>
-                    <ul>
-                        <li><a href="#">Consultar Documentos</a></li>
-                        <li><a href="#">Anexar Documentos</a></li>
-                    </ul>
-                </li>
-
-                <li>
-                    <a href="#formularios">Formulários</a>
-                    <ul>
-                        <li><a href="#">Termo de Compromisso</a></li>
-                        <li><a href="#">Plano de Início</a></li>
-                        <li><a href="#">Relatório de Atividades</a></li>
-                        <li><a href="#">Ficha de Avaliação</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav> *@
-    </header>
-
-    <!-- ======== TÍTULO ======== -->
-    <section id="titulo" class="text-center mb-3">
-        <h2>CADASTRO DE EMPRESA</h2>
-    </section>
-
-    <!-- ======== FORMULÁRIO ======== -->
-
-    <div class="container mb-4">
-        <form class="row d-flex justify-content-center g-3 ">
-            <div class="col-4">
-                <div class="col">
-                    <label for="nomeEmpresa" class="form-label">Nome da Empresa</label>
-                    <input type="text" class="form-control" id="nomeEmpresa" placeholder="Nome da Empresa" required>
-                </div>
-                <div class="col">
-                    <label for="cnpj" class="form-label">CNPJ</label>
-                    <input type="text" class="form-control" id="cnpj" placeholder="CNPJ" required>
-                </div>
-                <div class="col">
-                    <label for="entradaEmail" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="entradaEmail" required>
-                </div>
-                <div class="col">
-                    <label for="entradaSenha" class="form-label">Senha</label>
-                    <input type="password" class="form-control" id="entradaSenha" required>
-                </div>
-                <div class="col">
-                    <label for="entradaCep" class="form-label">CEP</label>
-                    <input type="text" class="form-control" id="entradaCep" placeholder="CEP" required>
-                </div>
-                <div class="col">
-                    <label for="entradaEndereco" class="form-label">Endereço</label>
-                    <input type="text" class="form-control" id="entradaEndereco" placeholder="Endereço" required>
-                </div>
-                <div class="col">
-                    <label for="entradaCidade" class="form-label">Cidade</label>
-                    <input type="text" class="form-control" id="cidade" required>
-                </div>
-                <div class="col">
-                    <label for="entradaEstado" class="form-label">Estado</label>
-                    <select asp-for="Estado" class="form-control" required>
-                        <option value="">Selecione um estado</option>
-                        @foreach (var uf in new[] { "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO" })
-                        {
-                            <option value="@uf">@uf</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-12">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="cadastroCheck">
-                        <label class="form-check-label" for="cadastroCheck">
-                            Declaro que Li e Concordo com os Termos da <a href="#">Política de Privacidade</a>
-                        </label>
-                    </div>
-                </div>
-                <div class="d-grid gap-2 mt-3 d-md-flex justify-content-md-end">
-                    <button class="btn btn-danger me-md-2" type="button">Cadastrar</button>
-                    <button class="btn btn-outline-danger" type="button">Cancelar</button>
-                </div>
-            </div>
-        </form>
-        @*<form asp-action="@(Model.Id == 0 ? "Create" : "Edit")" asp-controller="Empresa" method="post">
-        <section id="login" class="col-6">
-            <input type="hidden" asp-for="Id" />
-
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="">NOME:</label>
-                    <input type="text" asp-for="Nome" class="form-control" />
-                    <span asp-validation-for="Nome" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="">CNPJ:</label>
-                    <input type="text" asp-for="CNPJ" class="form-control" id="CNPJ" />
-                    <span asp-validation-for="CNPJ" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="">SEGMENTO:</label>
-                    <input asp-for="Segmento" class="form-control" />
-                </div>
-            </div>
-
-            <div class="form-row">
-
-                <div class="form-group">
-                    <label for="">CEP:</label>
-                    <input type="text" asp-for="Cep" class="form-control" />
-                </div>
-
-                <div class="form-group">
-                    <label for="">RUA:</label>
-                    <input asp-for="Rua" class="form-control" />
-                </div>
-
-                <div class="form-group">
-                    <label>CIDADE:</label>
-                    <input asp-for="Cidade" class="form-control" />
-                </div>
-
-                <div class="form-group">
-                    <label>ESTADO:</label>
-                    <select asp-for="Estado" class="form-control">
-                        <option value="">Selecione um estado</option>
-                        @foreach (var uf in new[] { "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO" })
-                        {
-                            <option value="@uf">@uf</option>
-                        }
-                    </select>
-                </div>
-                 <!-- Campos extras (não existem no modelo) -->
-                <div class="form-group">
-                    <h3>REPRESENTANTE:</h3>
-                    <input asp-for="Representante" class="form-control" />
-                    <span asp-validation-for="Representante" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <h3>FUNÇÃO:</h3>
-                    <input asp-for="Funcao" class="form-control" />
-                    <span asp-validation-for="Funcao" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <h3>CPF:</h3>
-                    <input asp-for="CPF" class="form-control" />
-                    <span asp-validation-for="CPF" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <h3>DEPARTAMENTO:</h3>
-                    <input asp-for="Departamento" class="form-control" />
-                    <span asp-validation-for="Departamento" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <h3>TELEFONE:</h3>
-                    <input asp-for="telefone" class="form-control" />
-                    <span asp-validation-for="telefone" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <h3>CEP:</h3>
-                    <input asp-for="cep" class="form-control" />
-                    <span asp-validation-for="cep" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <h3>SUPERVISOR:</h3>
-                    <input asp-for="Supervisor" class="form-control" />
-                    <span asp-validation-for="Supervisor" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <h3>CARGO SUPERIOR:</h3>
-                    <input asp-for="Cargo" class="form-control" />
-                    <span asp-validation-for="Cargo" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <h3>EMAIL:</h3>
-                    <input type="email" asp-for="Email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-            </div>
-        </section>
-        <form asp-action="Save" asp-controller="Empresa" method="post">
-
-
-            <section id="botao">
-                <div class="button-container" style="display: flex; gap: 10px;">
-                    <!-- Botão Cadastrar -->
-                    <button type="submit" name="action" value="cadastrar" class="btn btn-primary">Cadastrar</button>
-
-                    <!-- Botão Atualizar -->
-                    <button type="submit" name="action" value="atualizar" class="btn btn-danger">Atualizar Registro</button>
-
-        </form>
-
-        </div>
-        </section>
-
-        <!-- Mensagem de carregamento opcional -->
-        <div id="loadingMessage" style="display:none;text-align:center;margin-top:20px;">
-            <p>Enviando dados...</p>
-        </div>
-    </form> *@
-
+@if (TempData["MensagemErro"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Erro!</strong> @TempData["MensagemErro"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        
     </div>
+    
+}
 
 
 
-
-
-    <!-- TESTE FORMULÁRIO-->
-    <div class="container mb-4">
-        <form class="row d-flex justify-content-center" style="font-size: .75em">
-            <div class=" col-4 bg-white my-2 p-3 rounded shadow" style="min-width: 380px">
-                <h3 class="text-center mb-3">CADASTRO DE ESTAGIÁRIO</h3>
-                <!-- Nome e Sobrenome -->
-                <div class="row  mb-3">
-                    <div class="col-lg-6">
-                        <label for="nome" class="form-label">Nome</label>
-                        <input type="text" class="form-control" id="nome" placeholder="Nome" required>
-                    </div>
-                    <div class="col-lg-6">
-                        <label for="sobrenome" class="form-label">Sobrenome</label>
-                        <input type="text" class="form-control" id="sobrenome" placeholder="Sobrenome" required>
-                    </div>
-                </div>
-                <!-- Tipo de Documento e Nº do Documento -->
-                <div class="row  mb-3">
-                    <div class="col-12 col-xxl-5 mt-2">
-                        <label for="tipoDocumento" class="form-label">Documento</label>
-                        <select id="tipoDocumento" class="form-select" required>
-                            <option selected disabled value="">Selecione</option>
-                            <option value="RG">RG</option>
-                            <option value="CPF">CPF</option>
-                        </select>
-                    </div>
-                    <div class="col-12 col-xxl-7  mt-2">
-                        <label for="documento" class="form-label">Nº Documento</label>
-                        <input type="text" class="form-control" id="documento" required>
-                    </div>
-                </div>
-
-                <!-- Código de Área e Nº de Telefone -->
-                <div class="row  mb-3">
-                    <div class="col-3">
-                        <label for="codigo" class="form-label mt-2">Código</label>
-                        <input type="text" class="form-control" id="codigo" placeholder="(DDD)" required>
-                    </div>
-                    <div class="col-9">
-                        <label for="telefone" class="form-label   mt-2">Telefone</label>
-                        <input type="text" class="form-control" id="telefone" placeholder="91234-5678" required>
-                    </div>
-
-                    <!-- pattern="[0-9]{2}-[0-9]{2}-[0-9]{3}" padrão do input telefone -->
-                </div>
-
-                <!-- UF e Cidade -->
-                <div class="row  mb-3">
-                    <div class="col-12 col-xl-4  mt-2">
-                        <label for="estado" class="form-label">Estado</label>
-                        <select id="estado" class="form-select" required>
-                            <option selected disabled value="">UF</option>
-                            <option value="AC">Acre</option>
-                            <option value="AL">Alagoas</option>
-                            <option value="AP">Amapá</option>
-                            <option value="AM">Amazonas</option>
-                            <option value="BA">Bahia</option>
-                            <option value="CE">Ceará</option>
-                            <option value="DF">Distrito Federal</option>
-                            <option value="ES">Espírito Santo</option>
-                            <option value="GO">Goiás</option>
-                            <option value="MA">Maranhão</option>
-                            <option value="MT">Mato Grosso</option>
-                            <option value="MS">Mato Grosso do Sul</option>
-                            <option value="MG">Minas Gerais</option>
-                            <option value="PA">Pará</option>
-                            <option value="PB">Paraíba</option>
-                            <option value="PR">Paraná</option>
-                            <option value="PE">Pernambuco</option>
-                            <option value="PI">Piauí</option>
-                            <option value="RJ">Rio de Janeiro</option>
-                            <option value="RN">Rio Grande do Norte</option>
-                            <option value="RS">Rio Grande do Sul</option>
-                            <option value="RO">Rondônia</option>
-                            <option value="RR">Roraima</option>
-                            <option value="SC">Santa Catarina</option>
-                            <option value="SP">São Paulo</option>
-                            <option value="SE">Sergipe</option>
-                            <option value="TO">Tocantins</option>
-                        </select>
-                    </div>
-                    <div class="col- 12 col-xl-8  mt-2">
-                        <label for="cidade" class="form-label">Cidade</label>
-                        <input type="text" class="form-control" id="cidade" required>
-                    </div>
-                </div>
-
-                <!-- Email e Senha -->
-                <div class="row ">
-                    <div class="col">
-                        <label for="email" class="form-label mt-2">E-mail</label>
-                        <input type="email" class="form-control" id="email" placeholder="exemplo@exemplo.com.br" required>
-
-                        <label for="senha" class="form-label   mt-2">Senha</label>
-                        <input type="password" class="form-control" id="senha" required>
-
-                        <label for="confirmarSenha" class="form-label   mt-2">Confirmar Senha</label>
-                        <input type="password" class="form-control" id="confirmarSenha" required>
-                    </div>
-                </div>
-
-                <!-- Botões -->
-                @* <div class="d-flex justify-content-end mt-4 "> *@
-                @*     <a href="index.html" class="btn btn-danger ms-2">Cancelar</a> *@
-                @*     <button class="btn btn-primary ms-2">Cadastrar</button> *@
-                @* </div> *@
-
-                <div class="d-grid gap-2 mt-3 d-md-flex justify-content-md-end">
-                    <button class="btn btn-danger me-md-2" type="button">Cadastrar</button>
-                    <button class="btn btn-outline-danger" type="button">Cancelar</button>
-                </div>
-
-            </div>
-        </form>
-    </div>
-
-
-
-    <!-- ======== LISTA DE EMPRESAS ======== -->
-    @if (ViewBag.Empresas != null && ((IEnumerable<ProjetoEstagio.Models.Empresa>)ViewBag.Empresas).Any())
-    {
-        <h3 style="margin-top:40px">Empresas cadastradas</h3>
-
-        <table class="tabela-empresas">
-            <thead>
+<table id="empresaTable" class="table">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Nome</th>
+            <th>CNPJ</th>
+            <th>Email</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (EmpresaModel empresa in Model)
+            {
                 <tr>
-                    <th>Nome</th>
-                    <th>CNPJ</th>
-                    <th>Cidade</th>
-                    <th>Segmento</th>
-                    <th style="width:120px">Ações</th>
+                    <td>@empresa.Id</td>
+                    <td>@empresa.Nome</td>
+                    <td>@empresa.CNPJ</td>
+                    <td>@empresa.Email</td>
+                    <td>
+                        <a asp-action="Editar" asp-route-id="@empresa.Id" class="btn btn-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i></a>
+                        <a asp-action="DeletarConfirmar" asp-route-id="@empresa.Id" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></a>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var e in (IEnumerable<ProjetoEstagio.Models.Empresa>)ViewBag.Empresas)
-                {
-                    <tr>
-                        <td>@e.Nome</td>
-                        <td>@e.CNPJ</td>
-                        <td>@e.Cidade</td>
-                        <td>@e.Segmento</td>
-
-                        <!-- Ações -->
-                        <td style="text-align:center">
-                            <!-- Botão Editar: recarrega a tela preenchida -->
-                            <a asp-action="Index"
-                               asp-route-cnpj="@e.CNPJ"
-                               class="btn-acao editar">Editar</a>
-
-                            <!-- Botão Excluir: form inline que envia o CNPJ -->
-                            <form asp-action="DeleteConfirmedPorCNPJ"
-                                  asp-controller="Empresa"
-                                  method="post"
-                                  style="display:inline">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="cnpj" value="@e.CNPJ" />
-                                <button type="submit"
-                                        class="btn-acao excluir"
-                                        onclick="return confirm('Excluir @e.Nome?');">
-                                    Excluir
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-
-    <!-- JS -->
-    <script src="~/js/cadastroempresa.js"></script>
-</body>
-</html>
+            }
+        }
+    </tbody>
+</table>

@@ -57,6 +57,7 @@
                     </div>
                 </div>
 
+
                 <!-- Código de Área e Nº de Telefone -->
                 <div class="row  mb-3">
                     <div class="col-4">
@@ -86,6 +87,7 @@
                 </div>
 
 
+
                 <!-- Concorda Termo de Uso e Políticas -->
                 <div class="d-flex mt-1">
                     <!-- Confirmação -->
@@ -97,6 +99,8 @@
                         </label>
                     </div>
                 </div>
+
+                
 
 
                 <!-- Botões -->
@@ -113,7 +117,18 @@
             </div>
         </form>
     </div>
+    
+    
+    <!-- Script JQuery e JQuery Mask Plugin para formatação dos campos de text input -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+    <script>
+        $('#cpf').mask('000.000.000-00');
+        $('#codigo').mask('00');
+        $('#telefone').mask('00000-0000');
+    </script>
 
 </body>
 </html>
