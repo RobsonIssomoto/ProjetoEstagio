@@ -8,7 +8,7 @@ namespace ProjetoEstagio.Data
         public ProjetoEstagioContext(DbContextOptions<ProjetoEstagioContext> options) : base(options) { }
 
         public DbSet<EmpresaModel> Empresas { get; set; }
-        public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<UsuarioModel> Usuarios { get; set; }
         public DbSet<SupervisorModel> Supervisores { get; set; }
     }
 }

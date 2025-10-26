@@ -1,0 +1,95 @@
+﻿@model UsuarioModel
+@{
+}
+<div class="container-fluid p-0 d-flex h-100">
+    <div id="bdSidebar"
+         class="d-flex flex-column
+                    flex-shrink-0
+                    px-4 pt-3 bg-danger
+                    text-white offcanvas-md offcanvas-start">
+        <a href="Index"
+           class="navbar-brand text-center">
+            <h5>SGE</h5>
+        </a><hr>
+
+
+        <ul class="mynav nav nav-pills flex-column mb-auto">
+            <li class="nav-item mb-1">
+                <a href="#">
+                    <i class="fa-regular fa-user"></i>
+                    Perfil
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a href="#">
+                    <i class="fa-solid fa-archway"></i>
+                    Estágios
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a href="#">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    Atividades
+                </a>
+            </li>
+
+            <li class="nav-item mb-1">
+                <a href="#">
+                    <i class="fa-solid fa-file-pen"></i>
+                    Documentos
+                </a>
+            </li>
+
+            <li class="nav-item mb-1">
+                <a href="#">
+                    <i class="fas fa-cog pe-2"></i>
+                    Configuração
+                    <!--<span class="notification-badge">5</span>-->
+                </a>
+            </li>
+
+            <li class="sidebar-item">
+                <a class="sidebar-link" asp-controller="Login" asp-action="Logout">
+                    <i class="fas fa-sign-out-alt pe-2"></i>
+                    <span class="topic">Sair</span>
+                </a>
+            </li>
+
+        </ul>
+        <hr>
+        <div class="d-flex m-2">
+            <i class="fa-solid fa-book me-2">
+                <span>
+                    SGE Fatec 2025
+                </span>
+            </i>
+        </div>
+    </div>
+
+    <div id="hero" class="bg-light flex-fill h-100 overflow-auto">
+        <div class="p-3 d-md-none d-flex text-white bg-danger">
+            <a href="#" class="text-white"
+               data-bs-toggle="offcanvas"
+               data-bs-target="#bdSidebar">
+                <i class="fa-solid fa-bars fa-xl"></i>
+            </a>
+
+            <span class="ms-3">SGE - Fatec</span>
+        </div>
+        <div class="pt-4 px-4">
+            <nav style="--bs-breadcrumb-divider:'>';font-size:14px">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="Principal" style="color: black" ;><i class="fa-solid fa-house "></i></a>
+                    </li>
+                    @* <li class="breadcrumb-item">Estagiário</li> *@
+                    @* <li class="breadcrumb-item">Início</li> *@
+                    <li class=" ms-auto">Olá, @Model.Login<i class="fa-solid fa-circle-user  fa-2xl ms-2"></i></li>
+                </ol>
+            </nav>
+
+            <hr>
+
+        </div>
+    </div>
+</div>

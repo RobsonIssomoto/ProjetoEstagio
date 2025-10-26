@@ -29,6 +29,15 @@ namespace ProjetoEstagio.Repository
             return _projetoEstagioContext.Empresas.FirstOrDefault(e => e.Id == id);
         }
 
+        public EmpresaModel BuscarComSupervisores(int id)
+        {
+            // Usamos o Include para "incluir" a lista de Supervisores
+            // na consulta da Empresa.
+            return _projetoEstagioContext.Empresas
+                .Include(e => e.Supervisores)
+                .FirstOrDefault(e => e.Id == id);
+        }
+
         public EmpresaModel Editar(EmpresaModel empresa)
         {
             _projetoEstagioContext.Empresas.Update(empresa);
@@ -64,5 +73,7 @@ namespace ProjetoEstagio.Repository
 
             return true;
         }
+
+        
     }
 }

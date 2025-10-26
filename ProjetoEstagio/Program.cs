@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProjetoEstagio.Data;
+using ProjetoEstagio.Helper;
 using ProjetoEstagio.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,8 +11,16 @@ builder.Services.AddDbContext<ProjetoEstagioContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
 builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
 builder.Services.AddScoped<ISupervisorRepository, SupervisorRepository>();
-    
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ISessao, Sessao>();
 
+builder.Services.AddSession(o =>
+{
+    o.Cookie.HttpOnly = true;
+    o.Cookie.IsEssential = true;
+});
+    
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,10 +36,14 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession();
+
 app.UseAuthorization();
+
+
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Login}/{action=Index}/{id?}");
 
 app.Run();

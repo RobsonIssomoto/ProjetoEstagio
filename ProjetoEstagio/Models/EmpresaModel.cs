@@ -11,12 +11,14 @@ namespace ProjetoEstagio.Models
         public string Nome { get; set; }
 
         [Required(ErrorMessage = "O campo CNPJ é de preenchimento Obrigatório.")]
-        
+
         public string CNPJ { get; set; }
 
         [Required(ErrorMessage = "O campo E-mail é de preenchimento Obrigatório.")]
         [EmailAddress(ErrorMessage = "O E-mail informado não é válido.")]
         public string Email { get; set; }
+
+        public virtual ICollection<SupervisorModel>? Supervisores { get; set; }
 
         //public string Segmento { get; set; }
         //public string Cep { get; set; }

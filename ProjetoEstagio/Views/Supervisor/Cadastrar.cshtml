@@ -59,6 +59,13 @@
                 <div class="row mb-3">
                     <div class="col-lg-12">
                         <label for="cargo" class="form-label">Cargo</label>
+                        <select asp-for"IdEmpresa" asp-items="ViewBag.Empresas" class="form-control"></select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-lg-12">
+                        <label for="IdEmpresa" class="form-label">Empresa</label>
                         <input type="text" class="form-control" id="cargo" placeholder="Cargo" asp-for="Cargo" required>
                     </div>
                 </div>
@@ -100,10 +107,12 @@
                     </div>
                 </div>
 
+             
+
 
                 <div class="form-group row m-1">
                     <button type="submit" class="btn btn-danger mb-2">Cadastrar</button>
-                    <button type="submit" class="btn btn-outline-secondary">Cancelar</button>
+                    <a class="btn btn-outline-secondary" asp-action="Index" asp-controller="Supervisor" role="button">Cancelar</a>
                 </div>
             </div>
         </form>

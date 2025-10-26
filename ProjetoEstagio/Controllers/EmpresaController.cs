@@ -10,7 +10,7 @@ namespace ProjetoEstagio.Controllers
     public class EmpresaController : Controller
     {
 
-        private readonly ProjetoEstagioContext _context;
+        //private readonly ProjetoEstagioContext _context;
 
         //public EmpresaController(ProjetoEstagioContext context)
         //{
@@ -151,21 +151,22 @@ namespace ProjetoEstagio.Controllers
                 if (deletar)
                 {
                     TempData["MensagemSucesso"] = "Empresa excluída com sucesso";
-                    
+
                 }
                 else
                 {
-                    TempData["MensagemErro"] = $"Erro ao exclúir empresa. Tente novamente";
+                    TempData["MensagemErro"] = $"Erro ao excluir empresa. Tente novamente";
                 }
                 return RedirectToAction("Index");
             }
-            catch(System.Exception erro)
+            catch (System.Exception erro)
             {
                 TempData["MensagemErro"] = $"Devido erro: {erro.Message}";
                 return RedirectToAction("Index");
             }
-            
         }
+
+
 
         //[HttpGet] 
         //public IActionResult Index(string cnpj = null)
@@ -232,23 +233,46 @@ namespace ProjetoEstagio.Controllers
             return View("Login");
         }
 
-        //public IActionResult Principal()
-        //{
-        //    return View("Principal");
-        //}
+        public IActionResult DetalhesSupervisores(int id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //public IActionResult CadastroEstagio()
-        //{
-        //    return View("CadastroEstagio");
-        //}
+            // Usamos o NOVO método do repositório
+            EmpresaModel empresa = _empresaRepository.BuscarComSupervisores(id);
 
-        //private readonly ISupervisorRepository _supervisorRepository;
+            if (empresa == null)
+            {
+                return NotFound("Empresa não encontrada.");
+            }
 
-        //public EmpresaController(ISupervisorRepository supervisorRepository)
-        //{
-        //    var supervisores = _supervisorRepository.ListarTodos();
-        //    ViewBag.SupervisorList = new SelectList(supervisores, "Id", "Nome");
-        //    return View();
-        //}
+            // Envia o objeto 'empresa' (que agora contém a lista
+            // de supervisores) para a View.
+            return View(empresa);
+        }
+
+        // ... (O resto dos seus métodos: Deletar, Login, etc.) ...
     }
+
+    //public IActionResult Principal()
+    //{
+    //    return View("Principal");
+    //}
+
+    //public IActionResult CadastroEstagio()
+    //{
+    //    return View("CadastroEstagio");
+    //}
+
+    //private readonly ISupervisorRepository _supervisorRepository;
+
+    //public EmpresaController(ISupervisorRepository supervisorRepository)
+    //{
+    //    var supervisores = _supervisorRepository.ListarTodos();
+    //    ViewBag.SupervisorList = new SelectList(supervisores, "Id", "Nome");
+    //    return View();
+    //}
 }
+

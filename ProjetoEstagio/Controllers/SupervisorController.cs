@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using ProjetoEstagio.Data;
 using ProjetoEstagio.Models;
 using ProjetoEstagio.Repository;
@@ -7,7 +8,7 @@ namespace ProjetoEstagio.Controllers
 {
     public class SupervisorController : Controller
     {
-        private readonly ProjetoEstagioContext _context;
+        //private readonly ProjetoEstagioContext _context;
 
         private readonly ISupervisorRepository _supervisorRepository;
         public SupervisorController(ISupervisorRepository supervisorRepository)
@@ -21,9 +22,15 @@ namespace ProjetoEstagio.Controllers
             return View(supervisores);
         }
         
+        //public IActionResult Cadastrar()
+        //{
+        //    ViewData["Empresas"] = new SelectList(_context.Empresas, "Id", "Nome"); 
+        //    return View("Cadastrar");
+        //}
+
         public IActionResult Cadastrar()
         {
-            return View("Cadastrar");
+            return View();
         }
 
         [HttpPost]

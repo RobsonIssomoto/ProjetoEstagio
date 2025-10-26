@@ -1,0 +1,53 @@
+﻿@model LoginModel
+
+@{
+    Layout = "_LayoutLogin";
+    ViewData["Title"] = "Página de Login";
+}
+
+
+@if (TempData["MensagemErro"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Erro!</strong> @TempData["MensagemErro"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<div class="container mb-4">
+    <form asp-controller="Login" asp-action="Login" method="post" class="row d-flex justify-content-center" style="font-size: .75em">
+        <div class="col-4 bg-white my-2 p-3 rounded shadow" style="min-width: 380px">
+            <h3 class="text-center mb-3">LOGIN</h3>
+
+            <div class="form-group m-4">
+                <label for="Login">Login</label>
+                <div class="input-group">
+                    <input type="text" asp-for="Login" class="form-control" placeholder="usuario@exemplo.com.br"/>
+                </div>
+                @Html.ValidationMessageFor(x => x.Login)
+            </div>
+
+            <div class="form-group m-4">
+                <label for="Senha">Senha</label>
+                <div style="position: relative;">
+                    <input type="password" asp-for="Senha" class="form-control" id="senha" />
+                    <span id="togglePassword">
+                        <i class="bi bi-eye"></i>
+                    </span>
+                </div>
+                @Html.ValidationMessageFor(x => x.Senha)
+            </div>
+
+            <div class="form-group row m-4">
+                <button type="submit" class="btn btn-danger mb-3">Entrar</button>
+                <a class="btn btn-outline-secondary mb-3" asp-action="Principal" asp-controller="Estagiario" role="button">Cancelar</a>
+            </div>
+
+            <!-- Criar Conta -->
+            <div class="me-auto text-center mt-4">Não possui cadastro?<a asp-controller="" asp-action="" style="text-decoration: none;">&nbsp;&nbsp;Criar nova conta</a></div>
+        </div>
+    </form>
+</div>
+
+
+
+
