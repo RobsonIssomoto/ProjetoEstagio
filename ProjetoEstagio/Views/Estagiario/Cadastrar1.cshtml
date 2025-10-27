@@ -1,0 +1,67 @@
+﻿@model ProjetoEstagio.Models.EstagiarioModel
+
+@{
+    Layout = "_LayoutCadastro";
+    ViewData["Title"] = "Cadastrar Estagiário";
+}
+
+<div class="container mb-4">
+    <form asp-controller="Estagiario" asp-action="Cadastrar" method="post" class="row d-flex justify-content-center" style="font-size: .75em">
+        <div class="col-4 bg-white my-2 p-3 rounded shadow" style="min-width: 380px">
+            <h3 class="text-center mb-3">CADASTRO DE ESTAGIÁRIO</h3>
+
+            <div class="form-group m-4">
+                <h6 class="text-center">Dados Pessoais</h6>
+                <label for="Nome">Nome</label>
+                <div class="input-group">
+                    <input type="text" class="form-control nome" asp-for="Nome" placeholder="Nome completo" />
+                </div>
+                @* @Html.ValidationMessageFor(x => x.Login) *@
+            </div>
+
+            <div class="form-group m-4">
+                <label for="CPF">CPF</label>
+                <div class="input-group">
+                    <input type="text" class="form-control cpf" asp-for="CPF" placeholder="CPF sem pontos e traços" />
+                </div>
+                @* @Html.ValidationMessageFor(x => x.Login) *@
+            </div>
+
+            <div class="form-group m-4">
+                <label for="Telefone">Telefone</label>
+                <div class="input-group">
+                    <input type="text" class="form-control telefone_com_ddd" asp-for="Telefone" placeholder="(XX)XXXXX-XXXX" />
+                </div>
+                @* @Html.ValidationMessageFor(x => x.Login) *@
+            </div>
+
+            <div class="form-group m-4">
+                <label for="Email">E-mail</label>
+                <div class="input-group">
+                    <input type="email" class="form-control" asp-for="Email" placeholder="exemplo@email.com" />
+                </div>
+                @* @Html.ValidationMessageFor(x => x.Login) *@
+            </div>
+
+            <div class="form-group m-4">
+                <label for="Senha">Senha</label>
+                <div style="position: relative;">
+                    <input type="password" class="form-control" id="senha" />
+                    <span id="togglePassword">
+                        <i class="bi bi-eye"></i>
+                    </span>
+                </div>
+                @* @Html.ValidationMessageFor(x => x.Senha) *@
+            </div>
+
+
+
+            <div class="form-group row m-4">
+                <button type="submit" class="btn btn-danger mb-3">Cadastrar</button>
+                <a class="btn btn-outline-secondary mb-3" asp-action="" asp-controller="" role="button">Cancelar</a>
+            </div>
+
+
+        </div>
+    </form>
+</div>

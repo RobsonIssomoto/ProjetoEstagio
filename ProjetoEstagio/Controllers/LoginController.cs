@@ -35,7 +35,7 @@ namespace ProjetoEstagio.Controllers
                     {
                         // SUCESSO: Cria a sessão e redireciona
                         _sessao.CriarSessaoDoUsuario(usuario);
-                        return RedirectToAction("Principal", "Estagiario");
+                        return RedirectToAction("Index", "Home");
                     }
 
                     // FALHA DE AUTENTICAÇÃO: Usuário nulo OU senha errada

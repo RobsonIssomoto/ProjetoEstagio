@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetoEstagio.Data;
 
@@ -11,9 +12,11 @@ using ProjetoEstagio.Data;
 namespace ProjetoEstagio.Migrations
 {
     [DbContext(typeof(ProjetoEstagioContext))]
-    partial class ProjetoEstagioContextModelSnapshot : ModelSnapshot
+    [Migration("20251027160617_Relacionamentos Usuario x Estagiario e Usuario x Empresa e Representante")]
+    partial class RelacionamentosUsuarioxEstagiarioeUsuarioxEmpresaeRepresentante
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,46 +67,6 @@ namespace ProjetoEstagio.Migrations
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("Empresas");
-                });
-
-            modelBuilder.Entity("ProjetoEstagio.Models.EstagiarioModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CPF")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DataAtualizacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("Estagiarios");
                 });
 
             modelBuilder.Entity("ProjetoEstagio.Models.SupervisorModel", b =>
@@ -171,17 +134,6 @@ namespace ProjetoEstagio.Migrations
                 });
 
             modelBuilder.Entity("ProjetoEstagio.Models.EmpresaModel", b =>
-                {
-                    b.HasOne("ProjetoEstagio.Models.UsuarioModel", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Usuario");
-                });
-
-            modelBuilder.Entity("ProjetoEstagio.Models.EstagiarioModel", b =>
                 {
                     b.HasOne("ProjetoEstagio.Models.UsuarioModel", "Usuario")
                         .WithMany()

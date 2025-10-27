@@ -5,8 +5,6 @@ namespace ProjetoEstagio.Models
 {
     public class UsuarioModel
     {
-
-
         public int Id { get; set; }
         [Required(ErrorMessage = "O campo Login é de preenchimento Obrigatório.")]
         public string Login { get; set; }
@@ -19,6 +17,7 @@ namespace ProjetoEstagio.Models
         public string Senha { get; set; }
         public DateTime DataCadastro { get; set; }
         public DateTime? DataAtualizacao { get; set; }
+
 
         public bool SenhaValida(string senha) 
         {

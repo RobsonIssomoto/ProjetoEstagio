@@ -8,8 +8,6 @@ namespace ProjetoEstagio.Controllers
 {
     public class SupervisorController : Controller
     {
-        //private readonly ProjetoEstagioContext _context;
-
         private readonly ISupervisorRepository _supervisorRepository;
         public SupervisorController(ISupervisorRepository supervisorRepository)
         {
@@ -21,12 +19,6 @@ namespace ProjetoEstagio.Controllers
             List<SupervisorModel> supervisores = _supervisorRepository.ListarTodos();
             return View(supervisores);
         }
-        
-        //public IActionResult Cadastrar()
-        //{
-        //    ViewData["Empresas"] = new SelectList(_context.Empresas, "Id", "Nome"); 
-        //    return View("Cadastrar");
-        //}
 
         public IActionResult Cadastrar()
         {

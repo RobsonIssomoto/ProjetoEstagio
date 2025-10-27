@@ -1,0 +1,74 @@
+﻿@{
+    Layout = "_LayoutCadastro";
+    ViewData["Title"] = "Cadastro de Empresa Tela";
+}
+
+<div class="container mb-4">
+    <form asp-controller="Login" asp-action="Login" method="post" class="row d-flex justify-content-center" style="font-size: .75em">
+        <div class="col-4 bg-white my-2 p-3 rounded shadow" style="min-width: 380px">
+            <h3 class="text-center mb-3">CADASTRO DE EMPRESA</h3>
+      
+            <div class="form-group m-4">
+                <h6 class="text-center">Dados da Empresa</h6>
+                <label for="RazaoSocial">Razão Social</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Razão Social" />
+                </div>
+                @* @Html.ValidationMessageFor(x => x.Login) *@
+            </div>
+
+            <div class="form-group m-4">
+                <label for="CNPJ">CNPJ</label>
+                <div class="input-group">
+                    <input type="text" class="form-control cnpj" placeholder="CNPJ sem pontos e traços" />
+                </div>
+                @* @Html.ValidationMessageFor(x => x.Login) *@
+            </div>
+          
+            <div class="form-group m-4">
+                <h6 class="text-center">Dados do Representante</h6>
+                <label for="Nome">Nome do Representante</label>
+                <div class="input-group">
+                    <input type="text" class="form-control nome" placeholder="Nome completo do Representante" />
+                </div>
+                @* @Html.ValidationMessageFor(x => x.Login) *@
+            </div>
+
+            <div class="form-group m-4">
+                <label for="Telefone">Telefone</label>
+                <div class="input-group">
+                    <input type="text" class="form-control telefone_com_ddd" placeholder="(XX)XXXXX-XXXX" />
+                </div>
+                @* @Html.ValidationMessageFor(x => x.Login) *@
+            </div>
+
+
+            <div class="form-group m-4">
+                <label for="Email">E-mail</label>
+                <div class="input-group">
+                    <input type="email" class="form-control " placeholder="exemplo@email.com" />
+                </div>
+                @* @Html.ValidationMessageFor(x => x.Login) *@
+            </div>
+
+            
+            <div class="form-group m-4">
+                <label for="Senha">Senha</label>
+                <div style="position: relative;">
+                    <input type="password" class="form-control" id="senha" />
+                    <span id="togglePassword">
+                        <i class="bi bi-eye"></i>
+                    </span>
+                </div>
+                @* @Html.ValidationMessageFor(x => x.Senha) *@
+            </div>
+
+            <div class="form-group row m-4">
+                <button type="submit" class="btn btn-danger mb-3">Cadastrar</button>
+                <a class="btn btn-outline-secondary mb-3" asp-action="" asp-controller="" role="button">Cancelar</a>
+            </div>
+
+
+        </div>
+    </form>
+</div>

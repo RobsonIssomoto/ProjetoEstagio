@@ -1,6 +1,7 @@
 ﻿@model List<UsuarioModel>
 @{
-    ViewData["Title"] = "Lista de Usuários";
+    Layout = "_LayoutUsuario";
+    ViewData["Title"] = "LISTA DE USUÁRIOS";
 }
 
 @if (TempData["MensagemSucesso"] != null)
@@ -24,7 +25,7 @@
         <a class="btn btn-primary" asp-controller="Usuario" asp-action="Cadastrar" role="button">Adicionar novo usuário</a>
     </div>
 </div>
-<h1 class="display-4 text-center">Listagem de usuários</h1>
+<h2 class="display-4 text-center">LISTA DE USUÁRIOS</h2>
 <table id="usuarioTable" class="display table-responsive" style="overflow-x: auto; white-space: nowrap;">
     <thead>
         <tr>

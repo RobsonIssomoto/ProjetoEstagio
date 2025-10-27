@@ -1,12 +1,28 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿
+$(document).ready(function () {
+    // Aplica as máscaras nos elementos com os IDs correspondentes
+    $('.cpf').mask('000.000.000-00');
+    $('.cnpj').mask('00.000.000/0000-00');
+    $('.codigo').mask('00');
+    $('.telefone').mask('00000-0000');
+    $('.telefone_com_ddd').mask('(00) 00000-0000');
 
-// Write your JavaScript code.
+    $('.nome').mask('A', {
+        'translation': {
+            A: {
+                pattern: /[A-Za-z\s+]/,
+                recursive: true
+            }
+        }
+    });
+});
+
 
 $(document).ready(function () {
     getDataTable('#empresaTable');
     getDataTable('#usuarioTable');
     getDataTable('#supervisorTable');
+    getDataTable('#estagiarioTable');
 });
 
 function getDataTable(id) {
@@ -54,3 +70,30 @@ if (alertTrigger) {
         appendAlert('Nice, you triggered this alert message!', 'success')
     })
 }
+
+$(document).ready(function () {
+    // "Escuta" o clique no span que tem o ícone
+    $("#togglePassword").on('click', function () {
+
+        // Pega o input da senha
+        var $passwordInput = $("#senha");
+
+        // Pega o ícone que está dentro do span
+        var $icon = $(this).find('i');
+
+        // Verifica o tipo atual do input
+        if ($passwordInput.attr('type') === 'password') {
+            // Se for 'password', muda para 'text' (mostrar)
+            $passwordInput.attr('type', 'text');
+
+            // Troca o ícone para "olho cortado"
+            $icon.removeClass('bi-eye').addClass('bi-eye-slash');
+        } else {
+            // Se for 'text', muda para 'password' (esconder)
+            $passwordInput.attr('type', 'password');
+
+            // Troca o ícone de volta para "olho"
+            $icon.removeClass('bi-eye-slash').addClass('bi-eye');
+        }
+    });
+});

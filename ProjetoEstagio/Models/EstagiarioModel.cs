@@ -1,21 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ProjetoEstagio.Models
 {
-    public class EmpresaModel
+    public class EstagiarioModel
     {
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "A Razão Social é de preenchimento Obrigatório.")]
-        public string RazaoSocial { get; set; }
-
-        [Required(ErrorMessage = "O CNPJ é de preenchimento Obrigatório.")]
-        public string CNPJ { get; set; }
-
         [Required(ErrorMessage = "O nome é de preenchimento Obrigatório.")]
         public string Nome { get; set; }
+
+        [Required(ErrorMessage = "O CPF é de preenchimento Obrigatório.")]
+        public string CPF { get; set; }
 
         [Required(ErrorMessage = "O Telefone é de preenchimento Obrigatório.")]
         public string Telefone { get; set; }
@@ -29,8 +25,5 @@ namespace ProjetoEstagio.Models
 
         public int UsuarioId { get; set; }
         public virtual UsuarioModel Usuario { get; set; }
-
-        public virtual ICollection<SupervisorModel>? Supervisores { get; set; }
-
     }
 }

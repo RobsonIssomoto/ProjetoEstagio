@@ -44,7 +44,6 @@ namespace ProjetoEstagio.Repository
             _projetoEstagioContext.SaveChanges();
             return empresa;
         }
-
         public EmpresaModel Atualizar(EmpresaModel empresa)
         {
             EmpresaModel empresaDB = BuscarPorId(empresa.Id);
@@ -61,7 +60,6 @@ namespace ProjetoEstagio.Repository
             return empresaDB;
 
         }
-
         public bool Deletar(int id)
         {
             EmpresaModel empresaDB = BuscarPorId(id);
@@ -72,8 +70,6 @@ namespace ProjetoEstagio.Repository
             _projetoEstagioContext.SaveChanges();
 
             return true;
-        }
-
-        
+        }    
     }
 }
