@@ -18,91 +18,88 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-danger border-bottom box-shadow mb-3" data-bs-theme="dark">
             <div class="container-fluid">
-
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation" style="border: 0;">
                     <i class="fa-solid fa-bars fa-border rounded-1" style="color: white"></i>
                 </button>
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SGE</a>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Estagiario" asp-action="Login">Estagiário</a>
+                    <ul class="navbar-nav flex-grow-1 ">
+                        <li class="nav-item mx-4">
+                            <a class="nav-link text-light" asp-area="" asp-controller="" asp-action="">Inicio</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Empresa" asp-action="Login">Empresa</a>
+                        <li class="nav-item me-4">
+                            <a class="nav-link text-light" asp-area="" asp-controller="" asp-action="">Sobre</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Orientador" asp-action="Login">Orientador</a>
+                        <li class="nav-item me-4">
+                            <a class="nav-link text-light" asp-area="" asp-controller="" asp-action="">Contato</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Supervisor" asp-action="Login">Supervisor</a>
+                        <li class="nav-item me-4">
+                            <a class="nav-link text-light" asp-area="" asp-controller="" asp-action="">Ajuda</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item dropdown me-4">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Link
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Action</a></li>
+                                <li><a class="dropdown-item" href="#">Another action</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#">Something else here</a></li>
+                            </ul>
+                        </li>
+
+                        @* @if (Model != null && Model.Perfil == ProjetoEstagio.Models.Enums.Perfil.Admin) *@
+                        @* { *@
+
+
+                        @* } *@
+                        <li class="nav-item me-4">
                             <a class="nav-link text-light" asp-area="" asp-controller="Usuario" asp-action="Index">Usuario</a>
                         </li>
                     </ul>
                     <form class="d-flex" role="pesquisar">
-                        <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar" />
-                        <button class="btn btn-outline-light" type="submit">Pesquisar</button>
+                        @* <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar" /> *@
+                        <a class="btn btn-outline-light" asp-controller="Login" asp-action="Index">Login</a>
                     </form>
                 </div>
             </div>
         </nav>
     </header>
     <div class="container flex-grow-1">
-        <h1 class="text-center m-5">Logo</h1>
+        <h1 class="text-center m-4"><img src="~/img/ftc.png" style="max-width: 150px" class="img-fluid" /></h1>
         <main role="main" class="pb-3">
-            
             @RenderBody()
         </main>
     </div>
 
     <footer class="border-top footer text-muted text-center">
+        Fatec Atibaia Avenida Jerônimo de Camargo – 421 (CIEM III) Caetetuba Atibaia – SP - CEP: 12951-540
         <div class="container">
             &copy; 2025 - ProjetoEstagio - <a href="https://fatecatibaia.cps.sp.gov.br/">Fatec</a>
         </div>
     </footer>
 
+    <!-- 1. jQuery (O ÚNICO E PRINCIPAL) -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="https://kit.fontawesome.com/b02dd4a413.js" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- DataTables JS -->
+    <!-- 2. Bootstrap (depende do jQuery) -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 3. Font Awesome (ícones) -->
+    <script src="https://kit.fontawesome.com/b02dd4a413.js" crossorigin="anonymous"></script>
+
+    <!-- 4. DataTables JS (plugin, depende do jQuery) -->
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-    <script>
-        $(document).ready(function() {
-            // "Escuta" o clique no span que tem o ícone
-            $("#togglePassword").on('click', function() {
+    <!-- 5. jQuery Mask (plugin, depende do jQuery) - NOVO! -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
-                // Pega o input da senha
-                var $passwordInput = $("#senha");
+    <!-- 6. Seu script customizado (deve ser carregado DEPOIS de todos os plugins) -->
+    <script src="~/js/site.js" asp-append-version="true"></script>
 
-                // Pega o ícone que está dentro do span
-                var $icon = $(this).find('i');
-
-                // Verifica o tipo atual do input
-                if ($passwordInput.attr('type') === 'password') {
-                    // Se for 'password', muda para 'text' (mostrar)
-                    $passwordInput.attr('type', 'text');
-
-                    // Troca o ícone para "olho cortado"
-                    $icon.removeClass('bi-eye').addClass('bi-eye-slash');
-                } else {
-                    // Se for 'text', muda para 'password' (esconder)
-                    $passwordInput.attr('type', 'password');
-
-                    // Troca o ícone de volta para "olho"
-                    $icon.removeClass('bi-eye-slash').addClass('bi-eye');
-                }
-            });
-        });
-    </script>
+    <!-- 7. Scripts específicos da página (sempre por último) -->
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
 
-    

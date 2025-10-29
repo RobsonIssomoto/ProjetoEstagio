@@ -10,5 +10,6 @@ namespace ProjetoEstagio.Data
         public DbSet<EmpresaModel> Empresas { get; set; }
         public DbSet<UsuarioModel> Usuarios { get; set; }
         public DbSet<SupervisorModel> Supervisores { get; set; }
+        public DbSet<EstagiarioModel> Estagiarios { get; set; }
     }
 }

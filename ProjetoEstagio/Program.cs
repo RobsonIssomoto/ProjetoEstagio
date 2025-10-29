@@ -9,10 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ProjetoEstagioContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
+
 builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
 builder.Services.AddScoped<ISupervisorRepository, SupervisorRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IEstagiarioRepository, EstagiarioRepository>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<ISessao, Sessao>();
 
 builder.Services.AddSession(o =>

@@ -1,27 +1,18 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+   
+    ViewData["Title"] = "Cadastro de Estagiário";
 }
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta name="description" content="SISTEMA ESTÁGIO">
-    <title>SISTEMA ESTÁGIO - Cadastro Estagiário</title>
-    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
-
+   
     <!-- Scripts de validação MVC -->
     <partial name="_ValidationScriptsPartial" />
 </head>
 
 <body>
 
-    <!-- ======== MENU ======== -->
-    <header>
-
-    </header>
 
     <!-- ======== TÍTULO ======== -->
     <section id="titulo" class="text-center mb-3">
@@ -38,14 +29,14 @@
                 <div class="row  mb-3">
                     <div class="col-lg-12">
                         <label for="nome" class="form-label">Nome</label>
-                        <input type="text" class="form-control" id="nome" placeholder="Nome" required>
+                        <input type="text" id="nome" class="form-control" pattern="[a-zA-Z\s]+" placeholder="Nome" required>
                     </div>
                 </div>
                 <!-- Sobrenome -->
                 <div class="row  mb-3">
                     <div class="col-lg-12">
                         <label for="sobrenome" class="form-label">Sobrenome</label>
-                        <input type="text" class="form-control" id="sobrenome" placeholder="Sobrenome" required>
+                        <input type="text" class="form-control" id="sobrenome" pattern="[a-zA-Z\s]+" placeholder="Sobrenome" required>
                     </div>
                 </div>
 
@@ -100,7 +91,7 @@
                     </div>
                 </div>
 
-                
+
 
 
                 <!-- Botões -->
@@ -114,21 +105,10 @@
                     <button class="btn btn-outline-danger" type="button">Cancelar</button>
                 </div>
 
+
             </div>
         </form>
     </div>
-    
-    
-    <!-- Script JQuery e JQuery Mask Plugin para formatação dos campos de text input -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-
-    <script>
-        $('#cpf').mask('000.000.000-00');
-        $('#codigo').mask('00');
-        $('#telefone').mask('00000-0000');
-    </script>
 
 </body>
 </html>

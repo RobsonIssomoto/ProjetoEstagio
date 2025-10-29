@@ -1,12 +1,41 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
-
+﻿
 $(document).ready(function () {
+
+    // --- Máscaras ---
+    $('.cpf').mask('000.000.000-00');
+    $('.cnpj').mask('00.000.000/0000-00');
+    $('.codigo').mask('00');
+    $('.telefone').mask('00000-0000');
+    $('.telefone_com_ddd').mask('(00) 00000-0000');
+    $('.nome').mask('A', {
+        'translation': {
+            A: {
+                pattern: /[A-Za-z\s+]/,
+                recursive: true
+            }
+        }
+    });
+
+    // --- DataTables ---
     getDataTable('#empresaTable');
     getDataTable('#usuarioTable');
     getDataTable('#supervisorTable');
+    getDataTable('#estagiarioTable');
+
+    // --- Toggle de Senha ---
+    $(".input-icon-toggle").on('click', function () {
+        var $icon = $(this).find('i');
+        var $passwordInput = $(this).siblings('input.form-control');
+
+        if ($passwordInput.attr('type') === 'password') {
+            $passwordInput.attr('type', 'text');
+            $icon.removeClass('bi-eye').addClass('bi-eye-slash');
+        } else {
+            $passwordInput.attr('type', 'password');
+            $icon.removeClass('bi-eye-slash').addClass('bi-eye');
+        }
+    });
+
 });
 
 function getDataTable(id) {
@@ -54,3 +83,4 @@ if (alertTrigger) {
         appendAlert('Nice, you triggered this alert message!', 'success')
     })
 }
+

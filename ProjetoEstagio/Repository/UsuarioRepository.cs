@@ -44,7 +44,6 @@ namespace ProjetoEstagio.Repository
             if (usuarioDB == null) throw new Exception("Erro na atualização. Usuário não encontrado!");
 
             usuarioDB.Login = usuario.Login;
-            usuarioDB.Senha = usuario.Senha;
             usuarioDB.Email = usuario.Email;
             usuarioDB.Perfil = usuario.Perfil;
             usuarioDB.DataAtualizacao = DateTime.Now;
