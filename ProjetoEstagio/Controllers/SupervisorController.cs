@@ -25,6 +25,11 @@ namespace ProjetoEstagio.Controllers
             return View();
         }
 
+        public IActionResult Principal()
+        {
+            return View();
+        }
+
         [HttpPost]
         public IActionResult Cadastrar(SupervisorModel supervisor)
         {

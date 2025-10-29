@@ -1,17 +1,90 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ProjetoEstagio.Data; // 1. Adicionado
 using ProjetoEstagio.Models;
+using ProjetoEstagio.Models.Enums; // 2. Adicionado
+using ProjetoEstagio.Models.ViewModels; // 3. Adicionado
 using ProjetoEstagio.Repository;
 
 namespace ProjetoEstagio.Controllers
 {
     public class EmpresaController : Controller
     {
-        public EmpresaController(IEmpresaRepository empresaRepository)
+        // 4. Dependências Injetadas
+        private readonly IEmpresaRepository _empresaRepository;
+        private readonly IUsuarioRepository _usuarioRepository;
+        private readonly ProjetoEstagioContext _context;
+
+        public EmpresaController(
+            IEmpresaRepository empresaRepository,
+            IUsuarioRepository usuarioRepository, // Adicionado
+            ProjetoEstagioContext context) // Adicionado
         {
             _empresaRepository = empresaRepository;
+            _usuarioRepository = usuarioRepository;
+            _context = context;
         }
 
-        private readonly IEmpresaRepository _empresaRepository;
+        // --- LÓGICA DE CADASTRO PÚBLICO (Nova) ---
+
+        // GET: /Empresa/Cadastrar
+        public IActionResult Cadastrar()
+        {
+            // (Substitui seu 'Cadastrar' e 'Cadastrar1' antigos)
+            return View(new EmpresaCadastroViewModel());
+        }
+
+        [HttpPost]
+        public IActionResult Cadastrar(EmpresaCadastroViewModel viewModel)
+        {
+            // (Substitui seu [HttpPost] Cadastrar antigo)
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    if (ModelState.IsValid)
+                    {
+                        // 1. Criar o Usuario
+                        var usuario = new UsuarioModel();
+                        usuario.Login = viewModel.Email;
+                        usuario.Email = viewModel.Email;
+                        // --- AQUI ESTÁ A MÁGICA ---
+                        usuario.Perfil = Perfil.Representante; // Definido automaticamente
+                                                               // -------------------------
+                        usuario.SetSenhaHash(viewModel.Senha);
+
+                        _usuarioRepository.Cadastrar(usuario);
+
+                        // 2. Criar a Empresa
+                        var empresa = new EmpresaModel
+                        {
+                            RazaoSocial = viewModel.RazaoSocial,
+                            CNPJ = viewModel.CNPJ,
+                            Nome = viewModel.Nome,
+                            Telefone = viewModel.Telefone,
+                            Email = viewModel.Email,
+                            DataCadastro = DateTime.Now,
+                            UsuarioId = usuario.Id // <-- O VÍNCULO!
+                        };
+
+                        _empresaRepository.Cadastrar(empresa);
+
+                        // 3. Salva tudo
+                        transaction.Commit();
+
+                        TempData["MensagemSucesso"] = "Empresa cadastrada! Faça o login.";
+                        return RedirectToAction("Index", "Login");
+                    }
+                }
+                catch (System.Exception erro)
+                {
+                    transaction.Rollback();
+                    TempData["MensagemErro"] = $"Erro ao cadastrar: {erro.Message}";
+                }
+            }
+            return View(viewModel);
+        }
+
+        // --- MÉTODOS DE ADMIN (Seus métodos antigos) ---
 
         public IActionResult Index()
         {
@@ -19,48 +92,14 @@ namespace ProjetoEstagio.Controllers
             return View(empresas);
         }
 
-        public IActionResult Principal()
-        {
-            return View();
-        }
-
-        public IActionResult Cadastrar1()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Cadastrar1(EmpresaModel empresa)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    _empresaRepository.Cadastrar(empresa);
-                    TempData["MensagemSucesso"] = "Empresa cadastrada com sucesso";
-                    return RedirectToAction("Index");
-                }
-            }
-            catch (System.Exception erro)
-            {
-                TempData["MensagemErro"] = $"Erro {erro.Message} no cadastro da empresa. Tente novamente";
-                return RedirectToAction("Index");
-            }
-            return View(empresa);
-        }
-
         [HttpGet]
         public IActionResult Editar(int id)
         {
             EmpresaModel empresa = _empresaRepository.BuscarPorId(id);
-
-            if (empresa == null)
-            {
-                return NotFound();
-            }
-
+            if (empresa == null) return NotFound();
             return View(empresa);
         }
+
 
         [HttpPost]
         public IActionResult Alterar(EmpresaModel empresa)
@@ -93,6 +132,8 @@ namespace ProjetoEstagio.Controllers
 
             return View(empresa);
         }
+
+
         public IActionResult Deletar(int id)
         {
             try
@@ -117,11 +158,6 @@ namespace ProjetoEstagio.Controllers
             }
         }
 
-        public IActionResult Login()
-        {
-            return View("Login");
-        }
-
         public IActionResult DetalhesSupervisores(int id)
         {
             if (id == null)
@@ -142,7 +178,11 @@ namespace ProjetoEstagio.Controllers
             return View(empresa);
         }
 
-        // ... (O resto dos seus métodos: Deletar, Login, etc.) ...
+        public IActionResult Login() => View("Login");
+
+        public IActionResult Principal()
+        {
+            return View();
+        }
     }
 }
-

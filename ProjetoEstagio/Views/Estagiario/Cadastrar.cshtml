@@ -1,7 +1,7 @@
-﻿@model ProjetoEstagio.Models.EstagiarioModel
+﻿@model ProjetoEstagio.Models.ViewModels.EstagiarioCadastroViewModel
 
 @{
-    Layout = "_LayoutCadastro";
+    Layout = "_LayoutLogin";
     ViewData["Title"] = "Cadastrar Estagiário";
 }
 
@@ -16,7 +16,7 @@
                 <div class="input-group">
                     <input type="text" class="form-control nome" asp-for="Nome" placeholder="Nome completo" />
                 </div>
-                @* @Html.ValidationMessageFor(x => x.Login) *@
+                @Html.ValidationMessageFor(x => x.Nome)
             </div>
 
             <div class="form-group m-4">
@@ -24,7 +24,7 @@
                 <div class="input-group">
                     <input type="text" class="form-control cpf" asp-for="CPF" placeholder="CPF sem pontos e traços" />
                 </div>
-                @* @Html.ValidationMessageFor(x => x.Login) *@
+                @Html.ValidationMessageFor(x => x.CPF)
             </div>
 
             <div class="form-group m-4">
@@ -32,7 +32,7 @@
                 <div class="input-group">
                     <input type="text" class="form-control telefone_com_ddd" asp-for="Telefone" placeholder="(XX)XXXXX-XXXX" />
                 </div>
-                @* @Html.ValidationMessageFor(x => x.Login) *@
+                @Html.ValidationMessageFor(x => x.Telefone)
             </div>
 
             <div class="form-group m-4">
@@ -40,28 +40,42 @@
                 <div class="input-group">
                     <input type="email" class="form-control" asp-for="Email" placeholder="exemplo@email.com" />
                 </div>
-                @* @Html.ValidationMessageFor(x => x.Login) *@
+                @Html.ValidationMessageFor(x => x.Email)
             </div>
 
             <div class="form-group m-4">
-                <label for="Senha">Senha</label>
-                <div style="position: relative;">
-                    <input type="password" class="form-control" id="senha" />
-                    <span id="togglePassword">
+                <label asp-for="Senha">Senha</label>
+                <div class="input-icon-wrapper">
+                    <input type="password" class="form-control" asp-for="Senha" id="senha" placeholder="Digite sua senha" />
+                    <span class="input-icon-toggle">
                         <i class="bi bi-eye"></i>
                     </span>
                 </div>
-                @* @Html.ValidationMessageFor(x => x.Senha) *@
+                @Html.ValidationMessageFor(x => x.Senha)
             </div>
 
-
+            <div class="form-group m-4">
+                <label asp-for="ConfirmarSenha">Confirmar Senha</label>
+                <div class="input-icon-wrapper">
+                    <input type="password" class="form-control" asp-for="ConfirmarSenha" id="ConfirmarSenha" placeholder="Confirme sua senha" />
+                    <span class="input-icon-toggle">
+                        <i class="bi bi-eye"></i>
+                    </span>
+                </div>
+                @Html.ValidationMessageFor(x => x.ConfirmarSenha)
+                @* <span asp-validation-for="ConfirmarSenha" class="text-danger"></span> *@
+            </div>
 
             <div class="form-group row m-4">
                 <button type="submit" class="btn btn-danger mb-3">Cadastrar</button>
                 <a class="btn btn-outline-secondary mb-3" asp-action="" asp-controller="" role="button">Cancelar</a>
             </div>
-
-
         </div>
     </form>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

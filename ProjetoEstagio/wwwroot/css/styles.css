@@ -48,15 +48,34 @@ footer {
     padding: 15px;
 }
 
-footer a{
-    text-decoration: none;
+    footer a {
+        text-decoration: none;
+    }
+
+        footer a:hover {
+            color: #dc3545;
+        }
+
+/*#togglePassword {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    cursor: pointer;
+}*/
+
+.input-icon-wrapper {
+    position: relative;
 }
 
-footer a:hover {
-    color: #dc3545;
+    /* 2. Adiciona espaço no input para o texto não passar por baixo do ícone */
+.input-icon-wrapper .form-control {
+    padding-right: 40px; /* 40px para o ícone */
 }
 
-#togglePassword {
+/* 3. Posiciona o ícone flutuando sobre o input */
+.input-icon-toggle {
     position: absolute;
     right: 0.75rem;
     top: 50%;

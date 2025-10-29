@@ -19,7 +19,6 @@ namespace ProjetoEstagio.Helper
             return JsonConvert.DeserializeObject<UsuarioModel>(sessaoUsuario);
 
         }
-
         public void CriarSessaoDoUsuario(UsuarioModel usuario)
         {
             string valor = JsonConvert.SerializeObject(usuario);

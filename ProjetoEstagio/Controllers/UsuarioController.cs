@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ProjetoEstagio.Filters;
 using ProjetoEstagio.Models;
 using ProjetoEstagio.Repository;
 
 namespace ProjetoEstagio.Controllers
 {
+
     public class UsuarioController : Controller
     {
 

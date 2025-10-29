@@ -1,0 +1,19 @@
+﻿@{
+    Layout = "_LayoutLogin";
+}
+
+<div class="container mb-4 d-flex justify-content-center">
+    <div class="col-4 bg-white my-2 p-3 rounded shadow justify-content-center" style="min-width: 380px">
+        <h2 class="text-center fs-2 mb-3 py-2">CADASTRAR-SE COMO:</h2>
+
+        <div class="form-group row m-4">
+            <a class="btn btn-primary mb-3 py-2" asp-controller="Estagiario" asp-action="Cadastrar" role="button">ESTAGIÁRIO</a>
+            <a class="btn btn-success mb-3 py-2" asp-controller="Empresa" asp-action="Cadastrar" role="button">EMPRESA</a>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,4 +1,5 @@
-﻿using ProjetoEstagio.Models.Enums;
+﻿using BCrypt.Net; // 1. ADICIONE ESTE USING
+using ProjetoEstagio.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace ProjetoEstagio.Models
@@ -14,14 +15,35 @@ namespace ProjetoEstagio.Models
         public Perfil? Perfil { get; set; }
 
         [Required(ErrorMessage = "O campo Senha é de preenchimento Obrigatório.")]
-        public string Senha { get; set; }
+        public string Senha { get; private set; } // 2. SET FOI MUDADO PARA "private"
         public DateTime DataCadastro { get; set; }
         public DateTime? DataAtualizacao { get; set; }
 
+        // Construtor vazio para o EF Core
+        public UsuarioModel() { }
 
-        public bool SenhaValida(string senha) 
+        // --- 3. MÉTODO NOVO PARA CRIAR O HASH ---
+        // (O EstagiarioController vai chamar este método)
+        public void SetSenhaHash(string senha)
         {
-            return Senha == senha;
+            if (string.IsNullOrEmpty(senha))
+            {
+                throw new Exception("A senha não pode ser vazia.");
+            }
+            // Gera o "sal" e o "hash" da senha
+            Senha = BCrypt.Net.BCrypt.HashPassword(senha);
+        }
+
+        // --- 4. MÉTODO ANTIGO ATUALIZADO PARA USAR HASH ---
+        // (O LoginController vai chamar este método)
+        public bool SenhaValida(string senha)
+        {
+            if (string.IsNullOrEmpty(senha) || string.IsNullOrEmpty(this.Senha))
+            {
+                return false;
+            }
+            // Compara a senha digitada com o hash salvo no banco
+            return BCrypt.Net.BCrypt.Verify(senha, this.Senha);
         }
     }
 }

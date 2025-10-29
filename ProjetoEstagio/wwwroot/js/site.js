@@ -1,12 +1,12 @@
 ﻿
 $(document).ready(function () {
-    // Aplica as máscaras nos elementos com os IDs correspondentes
+
+    // --- Máscaras ---
     $('.cpf').mask('000.000.000-00');
     $('.cnpj').mask('00.000.000/0000-00');
     $('.codigo').mask('00');
     $('.telefone').mask('00000-0000');
     $('.telefone_com_ddd').mask('(00) 00000-0000');
-
     $('.nome').mask('A', {
         'translation': {
             A: {
@@ -15,14 +15,27 @@ $(document).ready(function () {
             }
         }
     });
-});
 
-
-$(document).ready(function () {
+    // --- DataTables ---
     getDataTable('#empresaTable');
     getDataTable('#usuarioTable');
     getDataTable('#supervisorTable');
     getDataTable('#estagiarioTable');
+
+    // --- Toggle de Senha ---
+    $(".input-icon-toggle").on('click', function () {
+        var $icon = $(this).find('i');
+        var $passwordInput = $(this).siblings('input.form-control');
+
+        if ($passwordInput.attr('type') === 'password') {
+            $passwordInput.attr('type', 'text');
+            $icon.removeClass('bi-eye').addClass('bi-eye-slash');
+        } else {
+            $passwordInput.attr('type', 'password');
+            $icon.removeClass('bi-eye-slash').addClass('bi-eye');
+        }
+    });
+
 });
 
 function getDataTable(id) {
@@ -71,29 +84,3 @@ if (alertTrigger) {
     })
 }
 
-$(document).ready(function () {
-    // "Escuta" o clique no span que tem o ícone
-    $("#togglePassword").on('click', function () {
-
-        // Pega o input da senha
-        var $passwordInput = $("#senha");
-
-        // Pega o ícone que está dentro do span
-        var $icon = $(this).find('i');
-
-        // Verifica o tipo atual do input
-        if ($passwordInput.attr('type') === 'password') {
-            // Se for 'password', muda para 'text' (mostrar)
-            $passwordInput.attr('type', 'text');
-
-            // Troca o ícone para "olho cortado"
-            $icon.removeClass('bi-eye').addClass('bi-eye-slash');
-        } else {
-            // Se for 'text', muda para 'password' (esconder)
-            $passwordInput.attr('type', 'password');
-
-            // Troca o ícone de volta para "olho"
-            $icon.removeClass('bi-eye-slash').addClass('bi-eye');
-        }
-    });
-});

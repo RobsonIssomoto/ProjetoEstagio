@@ -1,17 +1,31 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+// 1. Usings adicionados
 using ProjetoEstagio.Data;
+using ProjetoEstagio.Filters;
 using ProjetoEstagio.Models;
+using ProjetoEstagio.Models.Enums;
+using ProjetoEstagio.Models.ViewModels; // <-- Adicionado
 using ProjetoEstagio.Repository;
+// 2. Remova 'using Microsoft.AspNetCore.Mvc.Rendering;' (não usado)
 
 namespace ProjetoEstagio.Controllers
 {
+    [EstagiarioLogado]
     public class EstagiarioController : Controller
     {
+        // 3. Dependências Adicionadas
         private readonly IEstagiarioRepository _estagiarioRepository;
-        public EstagiarioController(IEstagiarioRepository estagiarioRepository)
+        private readonly IUsuarioRepository _usuarioRepository; // <-- Adicionado
+        private readonly ProjetoEstagioContext _context; // <-- Adicionado
+
+        public EstagiarioController(
+            IEstagiarioRepository estagiarioRepository,
+            IUsuarioRepository usuarioRepository, // <-- Adicionado
+            ProjetoEstagioContext context) // <-- Adicionado
         {
             _estagiarioRepository = estagiarioRepository;
+            _usuarioRepository = usuarioRepository; // <-- Adicionado
+            _context = context; // <-- Adicionado
         }
 
         public IActionResult Index()
@@ -20,44 +34,71 @@ namespace ProjetoEstagio.Controllers
             return View(estagiario);
         }
 
-        public IActionResult Cadastrar1()
+        // 4. Ação GET atualizada para usar o ViewModel
+        public IActionResult Cadastrar()
         {
-            return View();
+            return View(new EstagiarioCadastroViewModel());
         }
 
+        // 5. Ação POST substituída pela lógica do "Passo 5"
         [HttpPost]
-        public IActionResult Cadastrar1(EstagiarioModel estagiario)
+        public IActionResult Cadastrar(EstagiarioCadastroViewModel viewModel)
         {
-            try
+            // Começa a transação (ou salva os dois, ou falha os dois)
+            using (var transaction = _context.Database.BeginTransaction())
             {
-                if (ModelState.IsValid)
+                try
                 {
-                    _estagiarioRepository.Cadastrar(estagiario);
-                    TempData["MensagemSucesso"] = "Estagiário cadastrado com sucesso";
-                    return RedirectToAction("Index");
+                    if (ModelState.IsValid)
+                    {
+                        // 1. Criar o Objeto Usuario
+                        var usuario = new UsuarioModel();
+                        usuario.Login = viewModel.Email; // Login é o email
+                        usuario.Email = viewModel.Email;
+                        usuario.Perfil = Perfil.Estagiario;
+                        usuario.SetSenhaHash(viewModel.Senha); // Seta o HASH
+
+                        _usuarioRepository.Cadastrar(usuario); // Salva o usuário
+
+                        // 2. Criar o Objeto Estagiario
+                        var estagiario = new EstagiarioModel
+                        {
+                            Nome = viewModel.Nome,
+                            CPF = viewModel.CPF,
+                            Telefone = viewModel.Telefone,
+                            Email = viewModel.Email,
+                            DataCadastro = DateTime.Now,
+                            UsuarioId = usuario.Id // <-- O VÍNCULO!
+                        };
+
+                        _estagiarioRepository.Cadastrar(estagiario); // Salva o perfil
+
+                        // 3. Se tudo deu certo, salva as mudanças no banco
+                        transaction.Commit();
+
+                        TempData["MensagemSucesso"] = "Cadastro realizado! Faça o login.";
+                        return RedirectToAction("Index", "Login"); // Redireciona para o Login
+                    }
+                }
+                catch (Exception erro)
+                {
+                    transaction.Rollback(); // Desfaz tudo
+                    TempData["MensagemErro"] = $"Erro ao cadastrar: {erro.Message}";
                 }
             }
-            catch (System.Exception erro)
-            {
-                TempData["MensagemErro"] = $"Erro {erro.Message} no cadastro do estagiario. Tente novamente";
-                return RedirectToAction("Index");
-            }
-            return View(estagiario);
+
+            // Se o ModelState for inválido ou a transação falhar,
+            // retorna para a view com os dados que o usuário digitou.
+            return View(viewModel);
         }
 
         [HttpGet]
         public IActionResult Editar(int id)
         {
             EstagiarioModel estagiario = _estagiarioRepository.BuscarPorId(id);
-
-            if (estagiario == null)
-            {
-                return NotFound();
-            }
-
+            if (estagiario == null) return NotFound();
             return View(estagiario);
         }
-
 
         [HttpPost]
         public IActionResult Alterar(EstagiarioModel estagiario)
@@ -67,13 +108,13 @@ namespace ProjetoEstagio.Controllers
                 if (ModelState.IsValid)
                 {
                     _estagiarioRepository.Atualizar(estagiario);
-                    TempData["MensagemSucesso"] = "Dados da empresa alterado com sucesso";
+                    TempData["MensagemSucesso"] = "Dados alterados com sucesso";
                     return RedirectToAction("Index");
                 }
             }
             catch (System.Exception erro)
             {
-                TempData["MensagemErro"] = $"Erro {erro.Message} na alteração dos dados da empresa. Tente novamente";
+                TempData["MensagemErro"] = $"Erro {erro.Message} na alteração. Tente novamente";
                 return RedirectToAction("Index");
             }
             return View("Editar", estagiario);
@@ -82,41 +123,32 @@ namespace ProjetoEstagio.Controllers
         public IActionResult DeletarConfirmar(int id)
         {
             EstagiarioModel estagiario = _estagiarioRepository.BuscarPorId(id);
-
-            if (estagiario == null)
-            {
-                return NotFound();
-            }
-
+            if (estagiario == null) return NotFound();
             return View(estagiario);
         }
+
         public IActionResult Deletar(int id)
         {
             try
             {
                 bool deletar = _estagiarioRepository.Deletar(id);
-
                 if (deletar)
-                {
-                    TempData["MensagemSucesso"] = "Estagiário excluída com sucesso";
-
-                }
+                    TempData["MensagemSucesso"] = "Estagiário excluído com sucesso";
                 else
-                {
                     TempData["MensagemErro"] = $"Erro ao excluir estagiário. Tente novamente";
-                }
-                return RedirectToAction("Index");
             }
             catch (System.Exception erro)
             {
                 TempData["MensagemErro"] = $"Devido erro: {erro.Message}";
-                return RedirectToAction("Index");
             }
+            return RedirectToAction("Index");
         }
+        public IActionResult Login() => View("Login");
 
-        public IActionResult Login()
+        public IActionResult Principal()
         {
-            return View("Login");
+            return View();
+
         }
     }
 }

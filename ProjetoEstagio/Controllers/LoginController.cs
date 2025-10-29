@@ -14,6 +14,7 @@ namespace ProjetoEstagio.Controllers
             _usuarioRepository = usuarioRepository;
             _sessao = sessao;
         }
+
         public IActionResult Index()
         {
             if (_sessao.BuscarSessaoDoUsuario() != null) return RedirectToAction("Index", "Home");
@@ -30,12 +31,12 @@ namespace ProjetoEstagio.Controllers
                 {
                     UsuarioModel usuario = _usuarioRepository.BuscarPorLogin(loginModel.Login);
 
-                    // Checa se o usuário existe E se a senha é válida (com o BCrypt)
+                    // Checa se o usuário existe e se a senha é válida (com o BCrypt)
                     if (usuario != null && usuario.SenhaValida(loginModel.Senha))
                     {
                         // SUCESSO: Cria a sessão e redireciona
                         _sessao.CriarSessaoDoUsuario(usuario);
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Index", "Usuario");
                     }
 
                     // FALHA DE AUTENTICAÇÃO: Usuário nulo OU senha errada
@@ -63,6 +64,10 @@ namespace ProjetoEstagio.Controllers
                 TempData["MensagemErro"] = $"Erro ao tentar realizar Login. Tente novamente: {erro.Message}";
                 return RedirectToAction("Index");
             }
+        }
+        public IActionResult PreLogin()
+        {
+            return View();
         }
 
         public IActionResult Logout()

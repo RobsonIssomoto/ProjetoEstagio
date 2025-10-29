@@ -1,33 +1,91 @@
-﻿@model ProjetoEstagio.Models.EmpresaModel
+﻿@model ProjetoEstagio.Models.ViewModels.EmpresaCadastroViewModel
+
 @{
+    Layout = "_LayoutLogin";
     ViewData["Title"] = "Cadastrar Empresa";
 }
+
 <div class="container mb-4">
-    <form asp-action="Cadastrar" method="post" class="row d-flex justify-content-center" style="font-size: .75em">
+    <form asp-controller="Empresa" asp-action="Cadastrar" method="post" class="row d-flex justify-content-center" style="font-size: .75em">
         <div class="col-4 bg-white my-2 p-3 rounded shadow" style="min-width: 380px">
-            <h3 class="text-center mb-3">CADASTRAR DE EMPRESA</h3>
-            <div class="form-group row m-3">
-                <label for="Nome">Nome</label>
-                <input type="text" class="form-control" asp-for="Nome" />
-                @Html.ValidationMessageFor(x => x.Nome)
+            <h3 class="text-center mb-3">CADASTRO DE EMPRESA</h3>
+
+            <div class="form-group m-4">
+                <h6 class="text-center">Dados da Empresa</h6>
+                <label asp-for="RazaoSocial">Razão Social</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" asp-for="RazaoSocial" placeholder="Razão Social" />
+                </div>
+                <span asp-validation-for="RazaoSocial" class="text-danger"></span>
             </div>
 
-            <div class="form-group row m-3">
-                <label for="CNPJ">CNPJ</label>
-                <input type="text" class="form-control" asp-for="CNPJ"  />
-                @Html.ValidationMessageFor(x => x.CNPJ)
+            <div class="form-group m-4">
+                <label asp-for="CNPJ"></label>
+                <div class="input-group">
+                    <input type="text" class="form-control cnpj" asp-for="CNPJ" placeholder="Apenas números" />
+                </div>
+                <span asp-validation-for="CNPJ" class="text-danger"></span>
             </div>
 
-            <div class="form-group row m-3">
-                <label for="Email">E-mail</label>
-                <input type="email" class="form-control" asp-for="Email" >
-                @Html.ValidationMessageFor(x => x.Email)
+            <div class="form-group m-4">
+                <h6 class="text-center">Dados do Representante</h6>
+                <label asp-for="Nome">Nome do Representante</label>
+                <div class="input-group">
+                    <input type="text" class="form-control nome" asp-for="Nome" placeholder="Nome Completo do Representante" />
+                </div>
+                <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
 
-            <div class="form-group row m-3">
-                <button type="submit" class="btn btn-danger mb-2">Cadastrar</button>
-                <a class="btn btn-outline-secondary" asp-action="Index" asp-controller="Empresa" role="button">Cancelar</a>
+            <div class="form-group m-4">
+                <label asp-for="Telefone"></label>
+                <div class="input-group">
+                    <input type="text" class="form-control telefone_com_ddd" asp-for="Telefone" placeholder="(XX) XXXXX-XXXX" />
+                </div>
+                <span asp-validation-for="Telefone" class="text-danger"></span>
+            </div>
+
+            <div class="form-group m-4">
+                <label asp-for="Email"></label>
+                <div class="input-group">
+                    <input type="email" class="form-control" asp-for="Email" placeholder="exemplo@email.com" />
+                </div>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group m-4">
+                <label asp-for="Senha">Senha</label>
+                <div class="input-icon-wrapper">
+                    <input type="password" class="form-control" asp-for="Senha" id="Senha" placeholder="Digite sua senha" />
+
+                    <span class="input-icon-toggle">
+                        <i class="bi bi-eye"></i>
+                    </span>
+                </div>
+                <span asp-validation-for="Senha" class="text-danger"></span>
+            </div>
+
+            <div class="form-group m-4">
+                <label asp-for="ConfirmarSenha">Confirmar Senha</label>
+                <div class="input-icon-wrapper">
+                    <input type="password" class="form-control ConfirmarSenha" asp-for="ConfirmarSenha" id="ConfirmarSenha" placeholder="Confirme sua senha" />
+
+                    <span class="input-icon-toggle">
+                        <i class="bi bi-eye"></i>
+                    </span>
+                </div>
+                <span asp-validation-for="ConfirmarSenha" class="text-danger"></span>
+            </div>
+
+            <div class="form-group row m-4">
+                <button type="submit" class="btn btn-danger mb-3">Cadastrar</button>
+                <a class="btn btn-outline-secondary mb-3" asp-action="Index" asp-controller="Login" role="button">Cancelar</a>
             </div>
         </div>
     </form>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
