@@ -1,42 +1,408 @@
-﻿
-$(document).ready(function () {
+﻿$(document).ready(function () {
 
-    // --- Máscaras ---
-    $('.cpf').mask('000.000.000-00');
-    $('.cnpj').mask('00.000.000/0000-00');
-    $('.codigo').mask('00');
-    $('.telefone').mask('00000-0000');
-    $('.telefone_com_ddd').mask('(00) 00000-0000');
-    $('.nome').mask('A', {
-        'translation': {
-            A: {
-                pattern: /[A-Za-z\s+]/,
-                recursive: true
-            }
-        }
-    });
+    console.log('site.js carregado!');
 
     // --- DataTables ---
     getDataTable('#empresaTable');
     getDataTable('#usuarioTable');
-    getDataTable('#supervisorTable');
     getDataTable('#estagiarioTable');
+    getDataTable('#supervisorTable');
+
+    // ==========================================================
+    //  !!!! PASSO 1: APLIQUE AS MÁSCARAS NO CARREGAMENTO DA PÁGINA !!!!
+    // ==========================================================
+    // Isso vai consertar seu formulário de Estagiário (e qualquer
+    // outra página estática que use as classes de máscara)
+    aplicarMascarasGlobais('body');
+    // ==========================================================
+
 
     // --- Toggle de Senha ---
-    $(".input-icon-toggle").on('click', function () {
+    $(document).on('click', ".input-icon-toggle", function () {
+        // 'this' é o <span> que foi clicado
         var $icon = $(this).find('i');
+
+        // O input é o "irmão" (sibling) do span que tem a classe .form-control
         var $passwordInput = $(this).siblings('input.form-control');
 
+        // Se o tipo for 'password'
         if ($passwordInput.attr('type') === 'password') {
+            // Muda para 'text' (mostrar senha)
             $passwordInput.attr('type', 'text');
+            // Muda o ícone para 'olho cortado'
             $icon.removeClass('bi-eye').addClass('bi-eye-slash');
-        } else {
+        }
+        // Se for 'text'
+        else {
+            // Muda para 'password' (esconder senha)
             $passwordInput.attr('type', 'password');
+            // Muda o ícone para 'olho normal'
             $icon.removeClass('bi-eye-slash').addClass('bi-eye');
         }
     });
 
-});
+    // ===================================================================
+    // FUNÇÃO AUXILIAR (setupModalForm)
+    // ===================================================================
+    function setupModalForm(modalBodySelector) {
+        var $modalBody = $(modalBodySelector);
+        if (!$modalBody.length) return;
+
+        var $form = $modalBody.find('form');
+        if (!$form.length) return;
+
+        // 1. Remova validadores antigos (Correto)
+        $form.removeData("validator");
+        $form.removeData("unobtrusiveValidation");
+
+        // 2. "Liga" a validação (Correto)
+        if ($.validator && $.validator.unobtrusive) {
+            $.validator.unobtrusive.parse($form);
+        }
+
+        // ==========================================================
+        //  !!!! PASSO 2: CHAME A FUNÇÃO DE MÁSCARA AQUI TAMBÉM !!!!
+        // ==========================================================
+        // Em vez de duplicar o código, apenas chamamos a nova função.
+        // Ela vai aplicar as máscaras *apenas* dentro do modal.
+        aplicarMascarasGlobais(modalBodySelector);
+        // ==========================================================
+
+        // 3. Correção do [Remote] (Correto)
+        $form.find('input[data-val-remote]').on('blur', function () {
+            var $input = $(this);
+            setTimeout(function () {
+                $input.valid();
+            }, 100);
+        });
+    }
+
+    // ===================================================================
+    //  !!!! PASSO 3: CRIE A NOVA FUNÇÃO DE MÁSCARAS !!!!
+    // ===================================================================
+    function aplicarMascarasGlobais(seletorContexto) {
+        // O 'seletorContexto' garante que só aplicamos máscaras
+        // no conteúdo novo (seja 'body' ou o '#modal .modal-body')
+        var $contexto = $(seletorContexto);
+        if (!$contexto.length) $contexto = $('body'); // Garante um contexto
+
+        console.log('Aplicando máscaras em:', seletorContexto);
+
+        // Adicionamos { clearIfNotMatch: true } para FORÇAR
+        // o usuário a não digitar mais do que a máscara permite.
+        // Isso resolve seu problema de "ditar mais dígitos".
+        var options = { clearIfNotMatch: true };
+
+        $contexto.find('.cpf').mask('000.000.000-00', options);
+        $contexto.find('.cnpj').mask('00.000.000/0000-00', options);
+        $contexto.find('.codigo').mask('00', options);
+        $contexto.find('.telefone').mask('00009-0000', options);
+        $contexto.find('.telefone_com_ddd').mask('(00) 00009-0000', options);
+
+        // Máscara de nome não precisa do 'clearIfNotMatch'
+        $contexto.find('.nome').mask('A', {
+            'translation': {
+                A: {
+                    pattern: /[A-Za-z\s+]/,
+                    recursive: true
+                }
+            }
+        });
+    }
+
+    // ===================================================================
+    // SUPERVISOR - CADASTRAR
+    // ===================================================================
+    // MUDANÇA: Usar $(document).on() em vez de .click() direto
+    $(document).on('click', '.btn-cadastrar-supervisor', function (e) {
+        e.preventDefault();
+        console.log('Botão cadastrar supervisor clicado!');
+
+        $.ajax({
+            url: '/Supervisor/Cadastrar',
+            type: 'GET',
+            beforeSend: function () {
+                console.log('Carregando formulário de cadastro...');
+            },
+            success: function (result) {
+                console.log('Formulário carregado com sucesso!');
+                var modalBodySelector = '#cadastrarSupervisorModal .modal-body';
+                $(modalBodySelector).html(result);
+                setupModalForm(modalBodySelector);
+
+                var modal = new bootstrap.Modal(document.getElementById('cadastrarSupervisorModal'));
+                modal.show();
+            },
+            error: function (xhr, status, error) {
+                console.error('Erro ao carregar formulário:', xhr.status, xhr.responseText);
+
+                if (xhr.status === 401) {
+                    alert("Sua sessão expirou. Você será redirecionado para a página de login.");
+                    window.location.href = '/Login/Index';
+                } else {
+                    alert("Erro ao carregar o formulário. Tente novamente.");
+                }
+            }
+        });
+    });
+
+    // ===================================================================
+    // SUPERVISOR - EDITAR
+    // ===================================================================
+    // MUDANÇA: Usar $(document).on() em vez de .click() direto
+    $(document).on('click', '.btn-edit-supervisor', function (e) {
+        e.preventDefault();
+        console.log('Botão editar supervisor clicado!');
+
+        var id = $(this).data('id');
+        console.log('ID do supervisor:', id);
+
+        $.ajax({
+            url: '/Supervisor/Editar/' + id,
+            type: 'GET',
+            beforeSend: function () {
+                console.log('Carregando dados do supervisor...');
+            },
+            success: function (result) {
+                console.log('Dados carregados com sucesso!');
+                var modalBodySelector = '#editarSupervisorModal .modal-body';
+                $(modalBodySelector).html(result);
+                setupModalForm(modalBodySelector);
+
+                var modal = new bootstrap.Modal(document.getElementById('editarSupervisorModal'));
+                modal.show();
+            },
+            error: function (xhr, status, error) {
+                console.error('Erro ao carregar edição:', xhr.status, xhr.responseText);
+
+                if (xhr.status === 401) {
+                    alert("Sua sessão expirou. Você será redirecionado para a página de login.");
+                    window.location.href = '/Login/Index';
+                } else if (xhr.status === 403) {
+                    alert("Você não tem permissão para editar este item.");
+                } else if (xhr.status === 404) {
+                    alert("O supervisor que você está tentando editar não foi encontrado.");
+                } else {
+                    alert("Erro ao carregar o formulário de edição.");
+                }
+            }
+        });
+    });
+
+    // ===================================================================
+    // SUPERVISOR - SUBMIT CADASTRO
+    // ===================================================================
+    $(document).on('submit', '#form-cadastrar-supervisor', function (e) {
+        e.preventDefault();
+        console.log('Formulário de cadastro submetido!');
+
+        var $form = $(this);
+
+        if (!$form.valid()) {
+            console.log('Formulário inválido!');
+            return;
+        }
+
+        var serializedData = $form.serialize();
+        console.log('Enviando dados...');
+        console.log('Dados serializados:', serializedData);
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: serializedData,
+            success: function (result) {
+                console.log('Resposta recebida:', result);
+                console.log('Tipo da resposta:', typeof result);
+
+                // Se result for um objeto com a propriedade 'sucesso'
+                if (typeof result === 'object' && result.sucesso === true) {
+                    console.log('Cadastro realizado com sucesso!');
+                    window.location.reload();
+                }
+                // Se result for uma string HTML (erros de validação)
+                else if (typeof result === 'string') {
+                    console.log('Retornou HTML com erros de validação');
+                    var modalBodySelector = '#cadastrarSupervisorModal .modal-body';
+                    $(modalBodySelector).html(result);
+                    setupModalForm(modalBodySelector);
+                }
+                // Caso inesperado
+                else {
+                    console.error('Resposta inesperada:', result);
+                    alert('Erro inesperado. Verifique os dados e tente novamente.');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Erro no submit:', xhr.status, xhr.responseText);
+
+                if (xhr.status === 401) {
+                    alert("Sua sessão expirou. Você será redirecionado para a página de login.");
+                    window.location.href = '/Login/Index';
+                } else {
+                    alert("Ocorreu um erro no servidor. Tente novamente.\nDetalhe: " + xhr.status + " " + error);
+                }
+            }
+        });
+    });
+
+    // ===================================================================
+    // SUPERVISOR - SUBMIT EDIÇÃO
+    // ===================================================================
+    $(document).on('submit', '#form-editar-supervisor', function (e) {
+        e.preventDefault();
+        console.log('Formulário de edição submetido!');
+
+        var $form = $(this);
+
+        if (!$form.valid()) {
+            console.log('Formulário inválido!');
+            return;
+        }
+
+        var serializedData = $form.serialize();
+        console.log('Enviando dados...');
+        console.log('Dados serializados:', serializedData);
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: serializedData,
+            success: function (result) {
+                console.log('Resposta recebida:', result);
+                console.log('Tipo da resposta:', typeof result);
+
+                // Se result for um objeto com a propriedade 'sucesso'
+                if (typeof result === 'object' && result.sucesso === true) {
+                    console.log('Edição realizada com sucesso!');
+                    window.location.reload();
+                }
+                // Se result for uma string HTML (erros de validação)
+                else if (typeof result === 'string') {
+                    console.log('Retornou HTML com erros de validação');
+                    var modalBodySelector = '#editarSupervisorModal .modal-body';
+                    $(modalBodySelector).html(result);
+                    setupModalForm(modalBodySelector);
+                }
+                // Caso inesperado
+                else {
+                    console.error('Resposta inesperada:', result);
+                    alert('Erro inesperado. Verifique os dados e tente novamente.');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Erro no submit:', xhr.status, xhr.responseText);
+
+                if (xhr.status === 401) {
+                    alert("Sua sessão expirou. Você será redirecionado para a página de login.");
+                    window.location.href = '/Login/Index';
+                } else {
+                    alert("Ocorreu um erro no servidor. Tente novamente.\nDetalhe: " + xhr.status + " " + error);
+                }
+            }
+        });
+    });
+
+    // ===================================================================
+    // SUPERVISOR - ABRIR MODAL DELETAR (CARREGAMENTO DINÂMICO)
+    // ===================================================================
+    $(document).on('click', '.btn-deletar-supervisor', function (e) {
+        e.preventDefault();
+        console.log('Botão deletar supervisor clicado!');
+
+        var id = $(this).data('id');
+        console.log('ID do supervisor:', id);
+
+        $.ajax({
+            url: '/Supervisor/Deletar/' + id, // Nova URL [HttpGet]
+            type: 'GET',
+            beforeSend: function () {
+                console.log('Carregando dados para exclusão...');
+            },
+            success: function (result) {
+                console.log('Formulário de exclusão carregado!');
+                var modalBodySelector = '#deletarSupervisorModal .modal-body';
+                $(modalBodySelector).html(result);
+
+                // Re-aplica máscaras e validação (para a máscara de CPF)
+                setupModalForm(modalBodySelector);
+
+                var modal = new bootstrap.Modal(document.getElementById('deletarSupervisorModal'));
+                modal.show();
+            },
+            error: function (xhr, status, error) {
+                console.error('Erro ao carregar exclusão:', xhr.status, xhr.responseText);
+                if (xhr.status === 401) {
+                    alert("Sua sessão expirou.");
+                    window.location.href = '/Login/Index';
+                } else if (xhr.status === 403) {
+                    alert("Você não tem permissão para ver este item.");
+                } else if (xhr.status === 404) {
+                    alert("O supervisor não foi encontrado.");
+                } else {
+                    alert("Erro ao carregar o formulário de exclusão.");
+                }
+            }
+        });
+    });
+
+
+    // ===================================================================
+    // SUPERVISOR - SUBMIT DELETAR
+    // ===================================================================
+    $(document).on('submit', '#form-deletar-supervisor', function (e) {
+        e.preventDefault();
+        console.log('Formulário de exclusão submetido!');
+
+        var $form = $(this);
+        var serializedData = $form.serialize();
+
+        console.log('Enviando dados para exclusão...');
+        console.log('Dados serializados:', serializedData);
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: serializedData,
+            success: function (result) {
+                console.log('Resposta recebida:', result);
+                if (typeof result === 'object' && result.sucesso === true) {
+                    console.log('Exclusão realizada com sucesso!');
+                    var modalEl = document.getElementById('deletarSupervisorModal');
+                    bootstrap.Modal.getInstance(modalEl).hide();
+                    window.location.reload();
+                } else {
+                    // Isso não deve acontecer no modo "nuclear"
+                    console.error('Resposta inesperada:', result);
+                    alert('Erro inesperado ao excluir.');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Erro no submit de exclusão:', xhr.status, xhr.responseText);
+                var modalEl = document.getElementById('deletarSupervisorModal');
+                bootstrap.Modal.getInstance(modalEl).hide();
+
+                if (xhr.status === 401) {
+                    alert("Sua sessão expirou.");
+                    window.location.href = '/Login/Index';
+                } else if (xhr.status === 403) {
+                    alert("Acesso negado: Você não tem permissão para excluir este item.");
+                } else if (xhr.status === 404) {
+                    alert("Erro: O supervisor que você tentou excluir não foi encontrado.");
+                } else {
+                    alert("Ocorreu um erro no servidor. Tente novamente.\nDetalhe: " + (xhr.responseText || error));
+                }
+            }
+        });
+    });
+
+
+}); // Fim do $(document).ready()
+
+
+// ===================================================================
+// FUNÇÕES AUXILIARES GLOBAIS
+// ===================================================================
 
 function getDataTable(id) {
     $(id).DataTable({
@@ -62,7 +428,6 @@ function getDataTable(id) {
         }
     });
 }
-
 
 const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
 const appendAlert = (message, type) => {

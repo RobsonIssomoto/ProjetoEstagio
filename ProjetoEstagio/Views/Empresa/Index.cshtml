@@ -2,15 +2,7 @@
 @{
     ViewData["Title"] = "Index Empresa";
 }
-<!--<h3>Lista de Supervisores</h3>
-<div class="form-group">
-<label asp-for="SupervisorId" class="control-label"></label>
-<select asp-for="SupervisorId" asp-items="ViewBag.SupervisorList" class="form-control">
-<option value="">-- Selecione o Supervisor --</option>
-</select>
-<span asp-validation-for="SupervisorId" class="text-danger"></span>
-</div>
--->
+
 <h3>Lista de Empresas</h3>
 
 @if (TempData["MensagemSucesso"] != null)
@@ -55,6 +47,12 @@
                     </td>
                 </tr>
             }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center">Nenhuma empresa encontrada.</td>
+            </tr>
         }
     </tbody>
 </table>

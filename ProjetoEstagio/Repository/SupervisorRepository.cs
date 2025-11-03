@@ -24,6 +24,13 @@ namespace ProjetoEstagio.Repository
             return _projetoEstagioContext.Supervisores.ToList();
         }
 
+        public List<SupervisorModel> ListarPorEmpresa(int empresaId)
+        {
+            return _projetoEstagioContext.Supervisores
+                  .Where(s => s.EmpresaId == empresaId)
+                  .ToList();
+        }
+
         public SupervisorModel BuscarPorId(int id)
         {
             return _projetoEstagioContext.Supervisores.FirstOrDefault(s => s.Id == id);

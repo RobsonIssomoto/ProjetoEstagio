@@ -11,7 +11,7 @@ namespace ProjetoEstagio.Models
         [Required(ErrorMessage = "A Razão Social é de preenchimento Obrigatório.")]
         public string RazaoSocial { get; set; }
 
-        [Required(ErrorMessage = "O CNPJ é de preenchimento Obrigatório.")]
+        [Required(ErrorMessage = "O CNPJ é de preenchimento Obrigatório.(model)")]
         public string CNPJ { get; set; }
 
         [Required(ErrorMessage = "O nome é de preenchimento Obrigatório.")]

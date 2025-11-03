@@ -2,16 +2,63 @@
     Layout = "_LayoutLogin";
 }
 
-<div class="container mb-4 d-flex justify-content-center">
-    <div class="col-4 bg-white my-2 p-3 rounded shadow justify-content-center" style="min-width: 380px">
-        <h2 class="text-center fs-2 mb-3 py-2">CADASTRAR-SE COMO:</h2>
+<style>
+    .choice-card {
+        transition: all 0.2s ease-in-out;
+        border: 1px solid #eee; /* Borda sutil */
+    }
 
-        <div class="form-group row m-4">
-            <a class="btn btn-primary mb-3 py-2" asp-controller="Estagiario" asp-action="Cadastrar" role="button">ESTAGIÁRIO</a>
-            <a class="btn btn-success mb-3 py-2" asp-controller="Empresa" asp-action="Cadastrar" role="button">EMPRESA</a>
+        .choice-card:hover {
+            transform: translateY(-5px); /* Efeito de "levantar" */
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important; /* Sombra mais forte */
+        }
+
+        /* Borda muda de cor no hover */
+        .choice-card.card-primary:hover {
+            border-color: var(--bs-primary);
+        }
+
+        .choice-card.card-success:hover {
+            border-color: var(--bs-success);
+        }
+</style>
+
+<div class="container mb-4 d-flex justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6 bg-white my-2 p-4 p-md-5 rounded shadow">
+        <h2 class="text-center fs-2 mb-4 py-2">Qual é o seu perfil?</h2>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <a class="choice-card card-primary d-block text-decoration-none p-4 rounded text-center shadow-sm h-100"
+                   asp-controller="Estagiario" asp-action="Cadastrar">
+
+                    <i class="fas fa-user-graduate fs-1 text-primary mb-3"></i>
+
+                    <h4 class="text-body mb-2">ESTAGIÁRIO</h4>
+                    <p class="small text-muted mb-0">
+                        Sou aluno e vou enviar e acompanhar meus documentos de estágio. 
+                        <!--Para alunos que precisam enviar termos, relatórios e outros documentos de estágio.-->
+                    </p>
+                </a>
+            </div>
+
+            <div class="col-md-6">
+                <a class="choice-card card-success d-block text-decoration-none p-4 rounded text-center shadow-sm h-100"
+                   asp-controller="Empresa" asp-action="Cadastrar">
+
+                    <i class="fas fa-building fs-1 text-success mb-3"></i>
+
+                    <h4 class="text-body mb-2">EMPRESA</h4>
+                    <p class="small text-muted mb-0">
+                        Somos uma empresa e vamos gerenciar a documentação dos nossos estagiários.
+                        <!--Para empresas que precisam validar e gerenciar os documentos de seus estagiários.-->
+                    </p>
+                </a>
+            </div>
         </div>
     </div>
 </div>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

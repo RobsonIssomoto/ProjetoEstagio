@@ -6,6 +6,9 @@ namespace ProjetoEstagio.Helper
     {
         void CriarSessaoDoUsuario(UsuarioModel usuario);
         void RemoverSessaoDoUsuario();
+        void SalvarEmpresaIdNaSessao(int empresaId);
+        int? BuscarEmpresaIdDaSessao();
+
         UsuarioModel BuscarSessaoDoUsuario();
     }
 }

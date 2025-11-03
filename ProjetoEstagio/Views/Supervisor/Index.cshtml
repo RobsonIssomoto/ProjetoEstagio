@@ -1,36 +1,115 @@
 ﻿@model List<ProjetoEstagio.Models.SupervisorModel>
 @{
-    ViewData["Title"] = "Index Supervisor";
+    Layout = "_LayoutEmpresa";
+    ViewData["Title"] = "INDEX SUPERVISORES";
 }
 
-<h3>Lista de Supervisores</h3>
+<div class="container mt-4">
+    <div class="text-center">
+        <h2>@ViewData["Title"]</h2>
+    </div>
 
-<table id="supervisorTable" class="table">
-    <thead>
-        <tr>
-            <th>Código</th>
-            <th>Nome</th>
-            <th>CPF</th>
-            <th>Cargo</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (SupervisorModel supervisor in Model)
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="javascript:void(0);" class="btn btn-success btn-cadastrar-supervisor">
+            <i class="fas fa-plus-circle"></i> Adicionar Novo Supervisor
+        </a>
+    </div>
+
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div class="alert alert-success" role="alert">
+            @TempData["MensagemSucesso"]
+        </div>
+    }
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["MensagemErro"]
+        </div>
+    }
+
+    <table id="supervisorTable" class="table table-striped table-bordered table-hover" style="width:100%">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th class="text-start">CPF</th>
+                <th>Cargo</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var supervisor in Model)
+                {
+                    <tr>
+                        <td>@supervisor.Nome</td>
+                        <td class="text-start">@supervisor.CPF</td>
+                        <td>@supervisor.Cargo</td>
+                        <td>
+                            <a href="javascript:void(0);"
+                               class="btn btn-primary btn-sm btn-edit-supervisor"
+                               data-id="@supervisor.Id">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            <a href="javascript:void(0);"
+                               class="btn btn-danger btn-sm btn-deletar-supervisor"
+                               data-id="@supervisor.Id">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>@supervisor.Id</td>
-                    <td>@supervisor.Nome</td>
-                    <td>@supervisor.CPF</td>
-                    <td>@supervisor.Cargo</td>
-                    <td>
-                        <a asp-action="Editar" asp-route-id="@supervisor.Id" class="btn btn-primary btn-sm">Editar</a>
-                        <a asp-action="DeletarConfirmar" asp-route-id="@supervisor.Id" class="btn btn-danger btn-sm">Deletar</a>
-                    </td>
+                    <td colspan="4" class="text-center">Nenhum supervisor encontrado.</td>
                 </tr>
             }
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Cadastrar Supervisor -->
+<div class="modal fade" id="cadastrarSupervisorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cadastrar Supervisor (Modal)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Supervisor -->
+<div class="modal fade" id="editarSupervisorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Supervisor (Modal)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Deletar Supervisor -->
+<!-- Modal Deletar Supervisor -->
+<div class="modal fade" id="deletarSupervisorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <!-- O .modal-body agora está VAZIO,
+                 pronto para receber o AJAX -->
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</div>
+

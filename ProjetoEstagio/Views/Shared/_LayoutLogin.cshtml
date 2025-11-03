@@ -12,6 +12,12 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
     <!-- DataTables Bootstrap -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css" />
+
+    <style>
+        body {
+            overflow: visible;
+        }
+    </style>
 </head>
 
 <body class="d-flex flex-column min-vh-100">
@@ -58,10 +64,8 @@
                             <a class="nav-link text-light" asp-area="" asp-controller="Usuario" asp-action="Index">Usuario</a>
                         </li>
                     </ul>
-                    <form class="d-flex" role="pesquisar">
-                        @* <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar" /> *@
-                        <a class="btn btn-outline-light" asp-controller="Login" asp-action="Index">Login</a>
-                    </form>
+                    <a class="btn btn-light mx-3" asp-controller="Login" asp-action="PreLogin">Cadastrar</a>
+                    <a class="btn btn-outline-light" asp-controller="Login" asp-action="Index">Login</a>
                 </div>
             </div>
         </nav>
