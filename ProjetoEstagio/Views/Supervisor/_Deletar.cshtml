@@ -1,0 +1,41 @@
+﻿@model ProjetoEstagio.Models.SupervisorModel
+
+<!-- 1. O ID do formulário é novo: "form-deletar-supervisor" -->
+<form id="form-deletar-supervisor" asp-controller="Supervisor" asp-action="Deletar" method="post" class="row d-flex justify-content-center" style="font-size: .75em">
+
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="EmpresaId" />
+
+    <div class="alert alert-danger" role="alert">
+        <strong>Atenção!</strong> Tem certeza que deseja excluir este supervisor? Esta ação não pode ser desfeita.
+    </div>
+
+    <div class="col-12 bg-white my-2 p-3 rounded shadow">
+
+        <div class="form-group row m-3">
+            <label for="Nome">Nome</label>
+            <!-- MUDANÇA: "readonly" para "disabled" -->
+            <input type="text" class="form-control" asp-for="Nome" disabled />
+        </div>
+
+        <div class="form-group row m-3">
+            <label for="CPF">CPF</label>
+            <!-- MUDANÇA: "readonly" para "disabled" -->
+            <input type="text" class="form-control cpf" asp-for="CPF" disabled />
+        </div>
+
+        <div class="form-group row m-3">
+            <label for="Cargo">Cargo</label>
+            <!-- MUDANÇA: "readonly" para "disabled" -->
+            <input type="text" class="form-control" asp-for="Cargo" disabled />
+        </div>
+
+        <div class="form-group row m-3">
+            <!-- O botão de exclusão agora é type="submit" -->
+            <button type="submit" class="btn btn-danger mb-2">Confirmar Exclusão</button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+
+    </div>
+</form>

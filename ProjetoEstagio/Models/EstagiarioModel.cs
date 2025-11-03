@@ -16,7 +16,7 @@ namespace ProjetoEstagio.Models
         [Required(ErrorMessage = "O Telefone é de preenchimento Obrigatório.")]
         public string Telefone { get; set; }
 
-        [Required(ErrorMessage = "O campo E-mail é de preenchimento Obrigatório.")]
+        [Required(ErrorMessage = "O E-mail é de preenchimento Obrigatório.")]
         [EmailAddress(ErrorMessage = "O E-mail informado não é válido.")]
         public string Email { get; set; }
 

@@ -38,6 +38,13 @@ namespace ProjetoEstagio.Repository
                 .FirstOrDefault(e => e.Id == id);
         }
 
+
+        public EmpresaModel BuscarPorUsuarioId(int usuarioId)
+        {
+            return _projetoEstagioContext.Empresas.FirstOrDefault(e => e.UsuarioId == usuarioId);
+        }
+
+
         public EmpresaModel Editar(EmpresaModel empresa)
         {
             _projetoEstagioContext.Empresas.Update(empresa);

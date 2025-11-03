@@ -7,11 +7,7 @@ body {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     -moz-osx-font-smoothing: grayscale;
-}
-
-
-html {
-    font-size: 14px;
+    
 }
 
 @media (min-width: 768px) {
@@ -25,18 +21,19 @@ html {
 }
 
 html {
-    position: relative;
-    min-height: 100%;
+    height: 100%; /* ALTERADO de min-height */
+    font-size: 14px;
+    /* 'position: relative;' REMOVIDO */
 }
 
 body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
+    height: 100%; /* ALTERADO de min-height */
+    overflow: hidden; /* MANTIDO (Impede a barra de rolagem na PÁGINA) */
+    background-color: #ced4da63;
+    /* 'display: flex' REMOVIDO */
+    /* 'flex-direction: column' REMOVIDO */
 
-.container {
-    flex-grow: 1; /* Allows main content to expand and push footer down */
+   
 }
 
 .field-validation-error {
@@ -56,15 +53,6 @@ footer {
             color: #dc3545;
         }
 
-/*#togglePassword {
-    position: absolute;
-    right: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.2rem;
-    cursor: pointer;
-}*/
-
 .input-icon-wrapper {
     position: relative;
 }
@@ -83,3 +71,30 @@ footer {
     font-size: 1.2rem;
     cursor: pointer;
 }
+
+.bg-light.flex-fill {
+    /* Adiciona uma barra de rolagem vertical APENAS nesta div */
+    overflow-y: auto;
+}
+/*
+  SOLUÇÃO DATATABLES "MOSTRAR" E "PESQUISAR" (VERSÃO FINAL)
+  Baseado no HTML do console
+*/
+
+/* 1. Encontra a linha (row) que contém o controle .dt-length (Mostrar)
+     e força ela a nunca quebrar a linha.
+*/
+.row:has(> .col-md-auto > .dt-length) {
+    flex-wrap: nowrap !important;
+    align-items: center;
+}
+
+    /* 2. Encontra as colunas (.col-md-auto) que estão DENTRO dessa linha
+     e força a largura delas a ser 'auto' em TODAS as telas,
+     cancelando a quebra de linha do Bootstrap em telas pequenas.
+*/
+    .row:has(> .col-md-auto > .dt-length) > .col-md-auto {
+        width: auto !important;
+        flex-basis: auto !important; /* Garante que o flex-grow/shrink funcione */
+    }
+    

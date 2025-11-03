@@ -1,25 +1,8 @@
 ﻿@model List<ProjetoEstagio.Models.EstagiarioModel>
 @{
-    Layout = "_LayoutUsuario";
+    Layout = "_LayoutEstagiario";
     ViewData["Title"] = "Index Estagiário";
 }
-
-@if (TempData["MensagemSucesso"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>Sucesso!</strong> @TempData["MensagemSucesso"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
-@if (TempData["MensagemErro"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong>Erro!</strong> @TempData["MensagemErro"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
 
 
 @if (TempData["MensagemSucesso"] != null)

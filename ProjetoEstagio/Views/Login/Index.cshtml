@@ -5,6 +5,14 @@
     ViewData["Title"] = "Página de Login";
 }
 
+@if (TempData["MensagemSucesso"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Sucesso!</strong> @TempData["MensagemSucesso"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 @if (TempData["MensagemErro"] != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -12,6 +20,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
+
 
 <div class="container mb-4">
     <form asp-controller="Login" asp-action="Login" method="post" class="row d-flex justify-content-center" style="font-size: .75em">

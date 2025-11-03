@@ -6,6 +6,7 @@ namespace ProjetoEstagio.Repository
     {
         SupervisorModel Cadastrar(SupervisorModel supervisor);
         List<SupervisorModel> ListarTodos();
+        List<SupervisorModel> ListarPorEmpresa(int empresaId);
         SupervisorModel BuscarPorId(int id);
         SupervisorModel Editar(SupervisorModel supervisor);
         SupervisorModel Atualizar(SupervisorModel supervisor);

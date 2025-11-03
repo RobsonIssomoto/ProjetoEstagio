@@ -4,12 +4,18 @@
     Layout = "_LayoutLogin";
     ViewData["Title"] = "Cadastrar Empresa";
 }
-
+@if (TempData["MensagemErro"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Erro!</strong> @TempData["MensagemErro"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 <div class="container mb-4">
     <form asp-controller="Empresa" asp-action="Cadastrar" method="post" class="row d-flex justify-content-center" style="font-size: .75em">
         <div class="col-4 bg-white my-2 p-3 rounded shadow" style="min-width: 380px">
             <h3 class="text-center mb-3">CADASTRO DE EMPRESA</h3>
-
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group m-4">
                 <h6 class="text-center">Dados da Empresa</h6>
                 <label asp-for="RazaoSocial">Razão Social</label>

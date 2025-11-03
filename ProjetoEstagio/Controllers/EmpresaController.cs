@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProjetoEstagio.Data; // 1. Adicionado
 using ProjetoEstagio.Models;
 using ProjetoEstagio.Models.Enums; // 2. Adicionado
@@ -183,6 +184,47 @@ namespace ProjetoEstagio.Controllers
         public IActionResult Principal()
         {
             return View();
+        }
+
+        [AcceptVerbs("GET", "POST")] // Permite que a validação funcione em GET ou POST
+        public async Task<IActionResult> VerificarEmailUnico(string email)
+        {
+            // Verifica se já existe um USUÁRIO com este e-mail
+            // (Pelo seu modelo, o Email de login fica na UsuarioModel)
+            var emailJaExiste = await _context.Usuarios
+                                      .AnyAsync(u => u.Email.ToUpper() == email.ToUpper());
+
+            if (emailJaExiste)
+            {
+                // Se existe, retorna a mensagem de erro específica
+                return Json($"O E-mail {email} já está em uso.");
+            }
+
+            // Se não existe, a validação passa
+            return Json(true);
+        }
+
+
+        /// <summary>
+        /// Método para validação remota do CNPJ.
+        /// </summary>
+        /// <param name="cnpj">O CNPJ vindo do formulário</param>
+        [AcceptVerbs("GET", "POST")]
+        public async Task<IActionResult> VerificarCNPJUnico(string cnpj)
+        {
+            // Opcional, mas recomendado: Limpar a formatação do CNPJ (pontos e traços)
+            // var cpfLimpo = cpf.Replace(".", "").Replace("-", "");
+
+            // Verifica se já existe uma EMPRESA com este CNPJ
+            var cnpjJaExiste = await _context.Empresas
+                                    .AnyAsync(e => e.CNPJ == cnpj); // ou e.CNPJ == cnpjLimpo
+
+            if (cnpjJaExiste)
+            {
+                return Json($"O CNPJ {cnpj} já está cadastrado.");
+            }
+
+            return Json(true);
         }
     }
 }

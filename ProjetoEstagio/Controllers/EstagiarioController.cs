@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 // 1. Usings adicionados
 using ProjetoEstagio.Data;
 using ProjetoEstagio.Filters;
@@ -10,7 +12,6 @@ using ProjetoEstagio.Repository;
 
 namespace ProjetoEstagio.Controllers
 {
-    [EstagiarioLogado]
     public class EstagiarioController : Controller
     {
         // 3. Dependências Adicionadas
@@ -143,12 +144,60 @@ namespace ProjetoEstagio.Controllers
             }
             return RedirectToAction("Index");
         }
-        public IActionResult Login() => View("Login");
+       
 
         public IActionResult Principal()
         {
             return View();
 
+        }
+
+      
+        [AcceptVerbs("GET", "POST")] // Permite que a validação funcione em GET ou POST
+        public async Task<IActionResult> VerificarEmailUnico(string email)
+        {
+            // Verifica se já existe um USUÁRIO com este e-mail
+            // (Pelo seu modelo, o Email de login fica na UsuarioModel)
+            var emailJaExiste = await _context.Usuarios
+                                      .AnyAsync(u => u.Email.ToUpper() == email.ToUpper());
+
+            if (emailJaExiste)
+            {
+                // Se existe, retorna a mensagem de erro específica
+                return Json($"O E-mail {email} já está em uso.");
+            }
+
+            // Se não existe, a validação passa
+            return Json(true);
+        }
+
+        /// <summary>
+        /// Método para validação remota do CPF.
+        /// </summary>
+        /// <param name="cpf">O CPF vindo do formulário</param>
+        [AcceptVerbs("GET", "POST")]
+        public async Task<IActionResult> VerificarCPFUnico(string cpf)
+        {
+            // Opcional, mas recomendado: Limpar a formatação do CPF (pontos e traços)
+            // var cpfLimpo = cpf.Replace(".", "").Replace("-", "");
+
+            // Verifica se já existe um ESTAGIÁRIO com este CPF
+            var cpfJaExiste = await _context.Estagiarios
+                                    .AnyAsync(e => e.CPF == cpf); // ou e.CPF == cpfLimpo
+
+            if (cpfJaExiste)
+            {
+                return Json($"O CPF {cpf} já está cadastrado.");
+            }
+
+            return Json(true);
+        }
+
+        public IActionResult Login() => View("Login");
+
+        public IActionResult Processo()
+        {
+            return View();
         }
     }
 }
