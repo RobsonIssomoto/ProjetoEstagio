@@ -1,0 +1,21 @@
+[33mfcf9e19[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m HEAD@{0}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33mc663460[m HEAD@{1}: checkout: moving from Integração-de-Login-e-Relacionamento to master
+[33mf07694e[m[33m ([m[1;32mIntegração-de-Login-e-Relacionamento[m[33m)[m HEAD@{2}: commit: Modal Cadastrar e Editar Supervisor
+[33m5af9ce1[m[33m ([m[1;31morigin/Integração-de-Login-e-Relacionamento[m[33m)[m HEAD@{3}: commit: Layout Menu Usuário
+[33m240875e[m HEAD@{4}: checkout: moving from master to Integração-de-Login-e-Relacionamento
+[33mc663460[m HEAD@{5}: checkout: moving from Integração-de-Login-e-Relacionamento to master
+[33m240875e[m HEAD@{6}: commit: Integração do Login com tabelas Estagiário e Empresa/Representante
+[33mc663460[m HEAD@{7}: checkout: moving from master to Integração-de-Login-e-Relacionamento
+[33mc663460[m HEAD@{8}: commit: Sistema de Login c/ Sessão
+[33m108bfc5[m HEAD@{9}: checkout: moving from master to master
+[33m108bfc5[m HEAD@{10}: commit: Sistema de Login c/ Sessão
+[33m749b17f[m HEAD@{11}: commit: Alteração do BD p/ SQL
+[33m2a64bb4[m HEAD@{12}: commit: Modelos de Telas de Cadastro dos usuários.
+[33m1370514[m HEAD@{13}: commit: Inclui a opção de visualizar/ocultar senha na tela de login da empresa
+[33m82bd057[m HEAD@{14}: commit: Ajuste na Tela Principal do Estagiário - Com as inclusões de elementos a sidebar terminava antes do conteúdo. Após a inclusão de overflow-auto foi ativado o scroll no conteúdo lateral e aparenta que a sidebar está fixa
+[33m8e054b0[m HEAD@{15}: commit: Modelo de Tela Princpal com cards parecendo um dashboard para exibir notificações, campo de pesquisa com dropdown para tipo de pesquisa e tabela para exibir resultado da pesquisa
+[33mf265039[m HEAD@{16}: commit: Modelo de Tela de Login Básica
+[33m23185c3[m HEAD@{17}: commit: copiado layout dos botões de cadastro de empresa para os botões de cadastro de estagiário
+[33mde8d936[m HEAD@{18}: commit: adicionado formulário de cadastro de estagiário para ser utilizado como modelo
+[33mc7e87fb[m HEAD@{19}: commit: Adicionar arquivos de projeto.
+[33m82f4b8d[m HEAD@{20}: commit (initial): Adicione .gitattributes e .gitignore.
