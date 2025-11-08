@@ -10,11 +10,13 @@ namespace ProjetoEstagio.Controllers
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IEmpresaRepository _empresaRepository; // 2. ADICIONE O REPO DE EMPRESA
+        private readonly IEstagiarioRepository _estagiarioRepository;
         private readonly ISessao _sessao;
-        public LoginController(IUsuarioRepository usuarioRepository, IEmpresaRepository empresaRepository, ISessao sessao)
+        public LoginController(IUsuarioRepository usuarioRepository, IEmpresaRepository empresaRepository, IEstagiarioRepository estagiarioRepository, ISessao sessao)
         {
             _usuarioRepository = usuarioRepository;
             _empresaRepository = empresaRepository;
+            _estagiarioRepository = estagiarioRepository;
             _sessao = sessao;
         }
 
@@ -50,8 +52,8 @@ namespace ProjetoEstagio.Controllers
                             {
                                 // Salva o ID da Empresa na sessão (usando o Passo 2)
                                 _sessao.SalvarEmpresaIdNaSessao(empresa.Id);
-                               
-             }
+                                return RedirectToAction("Principal", "Empresa"); // (ou "Home")
+                            }
                             else
                             {
                                 // ERRO GRAVE: O usuário é 'Empresa' mas não achou vínculo
@@ -60,11 +62,29 @@ namespace ProjetoEstagio.Controllers
                                 return View("Index", loginModel);
                             }
                         }
+                        // (Assumindo que seu enum se chama Perfil.Estagiario)
+                        if (usuario.Perfil == Perfil.Estagiario)
+                        {
+                            EstagiarioModel estagiario = _estagiarioRepository.BuscarPorUsuarioId(usuario.Id);
+
+                            if (estagiario != null)
+                            {
+                                _sessao.SalvarEstagiarioIdNaSessao(estagiario.Id);
+                                return RedirectToAction("Principal", "Estagiario"); // (ou "Home")
+                            }
+                            else
+                            {
+                                TempData["MensagemErro"] = "Erro de integridade de dados: Usuário estagiário não localizado. Contate o suporte.";
+                                _sessao.RemoverSessaoDoUsuario(); // Desloga o usuário
+                                return View("Index", loginModel);
+                            }
+
+                        }
                         // --- FIM DA LÓGICA DE FILTRAGEM ---
 
                         // Se for Admin ou Estagiário, ou se for Empresa e passou na checagem,
                         // ele redireciona normalmente.
-                        return RedirectToAction("Index", "Usuario"); // (ou "Home")
+                        
                     }
 
                     // Seu código de "Usuário e/ou Senha inválido(s)!" não muda

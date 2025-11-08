@@ -1,59 +1,71 @@
-﻿@{
+﻿@model ProjetoEstagio.Models.EstagiarioModel
+@{
     Layout = "_LayoutEstagiario";
     ViewData["Title"] = "Processo Estagiário";
 }
+<form asp-controller="Estagiario" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="row justify-content-center ">
+        <div class=" card col-12 col-sm-8 bg-white p-4 rounded shadow ">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-center fw-bold ">
+                    Início do Processo
+                </h5>
+                <p class="text-center text-muted mb-4">Preencha as informações a seguir sobre o estágio</p>
 
-<div class="row justify-content-center ">
-    <div class=" card col-12 col-sm-8 bg-white p-4 rounded shadow ">
-        <div class="card-header bg-white border-0">
-            <h5 class="mb-0 text-center fw-bold ">
-                Início do Processo
-            </h5>
-            <p class="text-center text-muted mb-4">Preencha as informações a seguir sobre o estágio</p>
+            </div>
+            <!-- CARD DADOS PESSOAIS -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header text-center">
+                    <h5 class="mb-0">Dados Pessoais</h5>
+                </div>
+                <div class="card-body">
+                    <label class="form-label">Nome</label>
+                    <input type="text" class="form-control mb-3" asp-for="Nome" disabled />
 
+                    <label class="form-label">Curso</label>
+                    <input type="text" class="form-control" disabled />
+                </div>
+            </div>
+            <!-- CARD EMPRESA -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header text-center">
+                    <h5 class="mb-0">Dados da Empresa</h5>
+                </div>
+                <div class="card-body">
+
+                    <label class="form-label">Pesquisar Nome da Empresa</label>
+
+                    <input type="search" class="form-control mb-2"
+                           placeholder="Pesquisar por nome ou CNPJ"
+                           id="busca-empresa-input"
+                           autocomplete="off" />
+
+                    <div id="busca-empresa-resultados" class="list-group">
+                    </div>
+
+                    <input type="hidden" id="empresa-id-selecionada" name="EmpresaId" />
+
+                    <a href="#" class="small mt-2 d-block">
+                        Enviar convite para cadastro de empresa
+                    </a>
+                </div>
+            </div>
+
+            <!-- CARD OBSERVAÇÃO -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header text-center">
+                    <h5 class="mb-0">Observações</h5>
+                </div>
+                <div class="card-body">
+                    <label class="form-label">Dados Adicionais (opcional)</label>
+                    <textarea class="form-control" rows="5" placeholder="Inclua informações adicionais, se necessário"></textarea>
+                </div>
+            </div>
+            <div class="d-flex flex-column gap-2 my-2">
+                <button type="submit" class="btn btn-danger w-100">Enviar</button>
+                <a class="btn btn-outline-secondary w-100" asp-action="" asp-controller="">Cancelar</a>
+            </div>
         </div>
-        <!-- CARD DADOS PESSOAIS -->
-        <div class="card mb-4">
-            <div class="card-header text-center">
-                <h5 class="mb-0">Dados Pessoais</h5>
-            </div>
-            <div class="card-body">
-                <label class="form-label">Nome</label>
-                <input type="text" class="form-control mb-3" disabled />
-
-                <label class="form-label">Curso</label>
-                <input type="text" class="form-control" disabled />
-            </div>
-        </div>
-
-        <!-- CARD EMPRESA -->
-        <div class="card mb-4">
-            <div class="card-header text-center">
-                <h5 class="mb-0">Dados da Empresa</h5>
-            </div>
-            <div class="card-body">
-
-                <label class="form-label">Pesquisar Nome da Empresa</label>
-                <input type="search" class="form-control mb-2" placeholder="Pesquisar por nome ou CNPJ" />
-
-                <a href="#" class="small">Enviar convite para cadastro de empresa</a>
-            </div>
-        </div>
-
-        <!-- CARD OBSERVAÇÃO -->
-        <div class="card mb-4">
-            <div class="card-header text-center">
-                <h5 class="mb-0">Observações</h5>
-            </div>
-            <div class="card-body">
-                <label class="form-label">Dados Adicionais (opcional)</label>
-                <textarea class="form-control" rows="5" placeholder="Inclua informações adicionais, se necessário"></textarea>
-            </div>
-        </div>
-        <div class="d-flex flex-column gap-2 my-2">
-            <button type="submit" class="btn btn-danger w-100">Enviar</button>
-            <a class="btn btn-outline-secondary w-100" asp-action="" asp-controller="">Cancelar</a>
-        </div>
-
     </div>
-</div>
+</form>

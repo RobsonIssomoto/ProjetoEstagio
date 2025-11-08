@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@using ProjetoEstagio.Models
+@using ProjetoEstagio.Helper
+@inject ISessao _sessao
+
+@{
+    UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -15,31 +23,39 @@
 
         @await Component.InvokeAsync("EstagiarioMenu")
 
-        <div class="bg-light flex-fill">
-            <div class="p-3 d-md-none d-flex text-white bg-danger">
-                <a href="#" class="text-white"
-                   data-bs-toggle="offcanvas"
-                   data-bs-target="#bdSidebar">
-                    <i class="fa-solid fa-bars fa-xl"></i>
-                </a>
-                <span class="ms-3">SGE - Fatec</span>
-            </div>
+        <div class="bg-light flex-fill d-flex flex-column">
 
-            <div class="p-4">
+            <main class="p-4 flex-grow-1" style="overflow-y: auto;">
+
                 <nav style="--bs-breadcrumb-divider:'>';font-size:14px">
                     <ol class="breadcrumb">
+
                         <li class="breadcrumb-item">
                             <a href="Home/Privacy" style="color: black" ;><i class="fa-solid fa-house"></i></a>
                         </li>
                         <li class="breadcrumb-item">Estagiário</li>
                         <li class="breadcrumb-item">Início</li>
+
+                        <li class="ms-auto d-flex align-items-center text-dark ">
+                            
+                            @if (usuarioLogado != null)
+                            {
+                                <span>@usuarioLogado.Email</span>
+                            }
+                            else
+                            {
+                                <span>Visitante</span>
+                            }
+                            <i class="fa-solid fa-circle-user mx-1"></i>
+                        </li>
                     </ol>
                 </nav>
+
                 <hr>
 
                 @RenderBody()
+            </main>
 
-            </div>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

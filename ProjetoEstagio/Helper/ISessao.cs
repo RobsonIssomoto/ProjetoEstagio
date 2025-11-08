@@ -8,6 +8,8 @@ namespace ProjetoEstagio.Helper
         void RemoverSessaoDoUsuario();
         void SalvarEmpresaIdNaSessao(int empresaId);
         int? BuscarEmpresaIdDaSessao();
+        void SalvarEstagiarioIdNaSessao(int estagiarioId);
+        int? BuscarEstagiarioIdDaSessao();
 
         UsuarioModel BuscarSessaoDoUsuario();
     }

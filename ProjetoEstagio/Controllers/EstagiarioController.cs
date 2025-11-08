@@ -4,11 +4,12 @@ using Microsoft.EntityFrameworkCore;
 // 1. Usings adicionados
 using ProjetoEstagio.Data;
 using ProjetoEstagio.Filters;
+using ProjetoEstagio.Helper;
 using ProjetoEstagio.Models;
 using ProjetoEstagio.Models.Enums;
 using ProjetoEstagio.Models.ViewModels; // <-- Adicionado
 using ProjetoEstagio.Repository;
-// 2. Remova 'using Microsoft.AspNetCore.Mvc.Rendering;' (não usado)
+
 
 namespace ProjetoEstagio.Controllers
 {
@@ -18,15 +19,18 @@ namespace ProjetoEstagio.Controllers
         private readonly IEstagiarioRepository _estagiarioRepository;
         private readonly IUsuarioRepository _usuarioRepository; // <-- Adicionado
         private readonly ProjetoEstagioContext _context; // <-- Adicionado
+        private readonly ISessao _sessao;
 
         public EstagiarioController(
             IEstagiarioRepository estagiarioRepository,
             IUsuarioRepository usuarioRepository, // <-- Adicionado
-            ProjetoEstagioContext context) // <-- Adicionado
+            ProjetoEstagioContext context,
+            ISessao sessao) // <-- Adicionado
         {
             _estagiarioRepository = estagiarioRepository;
             _usuarioRepository = usuarioRepository; // <-- Adicionado
             _context = context; // <-- Adicionado
+            _sessao = sessao;
         }
 
         public IActionResult Index()
@@ -144,7 +148,8 @@ namespace ProjetoEstagio.Controllers
             }
             return RedirectToAction("Index");
         }
-       
+
+
 
         public IActionResult Principal()
         {
@@ -152,7 +157,7 @@ namespace ProjetoEstagio.Controllers
 
         }
 
-      
+
         [AcceptVerbs("GET", "POST")] // Permite que a validação funcione em GET ou POST
         public async Task<IActionResult> VerificarEmailUnico(string email)
         {
@@ -197,7 +202,36 @@ namespace ProjetoEstagio.Controllers
 
         public IActionResult Processo()
         {
-            return View();
+            try
+            {
+                // 1. Busca o ID DO ESTAGIÁRIO salvo na sessão
+                // (Assumindo que sua classe _sessao tenha o método de leitura)
+                int? estagiarioId = _sessao.BuscarEstagiarioIdDaSessao();
+
+                if (estagiarioId == null)
+                {
+                    TempData["MensagemErro"] = "Sua sessão expirou.";
+                    return RedirectToAction("Index", "Login");
+                }
+
+                // 2. Busca o estagiário COMPLETO usando o repositório
+                //    Este método BuscarPorId DEVE buscar na tabela Estagiarios
+                EstagiarioModel estagiario = _estagiarioRepository.BuscarPorId(estagiarioId.Value);
+
+                if (estagiario == null)
+                {
+                    TempData["MensagemErro"] = "Erro: Perfil de estagiário não encontrado.";
+                    return RedirectToAction("Index", "Login");
+                }
+
+                // 3. Envia o modelo PREENCHIDO para a View
+                return View(estagiario);
+            }
+            catch (Exception erro)
+            {
+                TempData["MensagemErro"] = $"Erro ao carregar página: {erro.Message}";
+                return RedirectToAction("Index", "Login");
+            }
         }
     }
 }

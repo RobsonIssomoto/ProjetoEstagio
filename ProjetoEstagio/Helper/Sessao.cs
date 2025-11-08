@@ -26,7 +26,6 @@ namespace ProjetoEstagio.Helper
         }
 
     
-
         public void SalvarEmpresaIdNaSessao(int empresaId)
         {
             // Salva o ID como um Inteiro (Int32).
@@ -39,12 +38,25 @@ namespace ProjetoEstagio.Helper
             return _httpContext.HttpContext.Session.GetInt32("sessaoEmpresaId");
         }
 
+        public void SalvarEstagiarioIdNaSessao(int estagiarioId)
+        {
+            // Salva o ID como um Inteiro (Int32).
+            _httpContext.HttpContext.Session.SetInt32("sessaoEstagiarioId", estagiarioId);
+        }
+
+        public int? BuscarEstagiarioIdDaSessao()
+        {
+            // Lê o ID como um Inteiro (Int32). Retorna 'null' se não encontrar.
+            return _httpContext.HttpContext.Session.GetInt32("sessaoEstagiarioId");
+        }
+
         // --- 3. ATUALIZE O MÉTODO 'REMOVER' ---
 
         public void RemoverSessaoDoUsuario()
         {
             _httpContext.HttpContext.Session.Remove("sessaoUsuarioLogado");
-            _httpContext.HttpContext.Session.Remove("sessaoEmpresaId"); // <-- Limpa o ID da empresa também
+            _httpContext.HttpContext.Session.Remove("sessaoEmpresaId");
+            _httpContext.HttpContext.Session.Remove("sessaoEstagiarioId");// <-- Limpa o ID da empresa também
         }
     }
 }

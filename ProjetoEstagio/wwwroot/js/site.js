@@ -42,6 +42,108 @@
     });
 
     // ===================================================================
+    // PROCESSO ESTAGIÁRIO - AUTOCOMPLETE DE EMPRESA
+    // ===================================================================
+
+    // 1. Função Debounce (Impede muitas chamadas à API)
+    //    (Pode deixar esta função como está, fora do document.ready se quiser)
+    let timeoutId_empresa = null;
+    const debounceBusca = (funcao, delay) => {
+        return function (...args) {
+            clearTimeout(timeoutId_empresa);
+            timeoutId_empresa = setTimeout(() => {
+                funcao.apply(this, args);
+            }, delay);
+        };
+    };
+
+    // 2. Função principal que busca com AJAX (jQuery)
+    const buscarEmpresas = (searchTerm) => {
+        const $resultadosDiv = $('#busca-empresa-resultados'); // Pega a div de resultados
+
+        if (searchTerm.length < 3) {
+            $resultadosDiv.html(''); // Limpa se for muito curto
+            return;
+        }
+
+        $.ajax({
+            url: `/api/empresa/buscar?termo=${searchTerm}`, // Chama sua API
+            type: 'GET',
+            success: function (empresas) {
+                renderizarResultados(empresas);
+            },
+            error: function (error) {
+                console.error("Erro ao buscar empresas:", error);
+                $resultadosDiv.html('<a href="#" class="list-group-item text-danger">Erro ao buscar.</a>');
+            }
+        });
+    };
+
+    // 3. Função que renderiza os resultados
+    const renderizarResultados = (empresas) => {
+        const $resultadosDiv = $('#busca-empresa-resultados');
+        $resultadosDiv.html(''); // Limpa resultados antigos
+
+        if (!empresas || empresas.length === 0) {
+            $resultadosDiv.html('<a href="#" class="list-group-item list-group-item-action disabled">Nenhuma empresa encontrada.</a>');
+            return;
+        }
+
+        empresas.forEach(empresa => {
+            // Cria um item de lista (link) com jQuery
+            const $item = $('<a></a>')
+                .attr('href', '#')
+                .addClass('list-group-item list-group-item-action item-busca-empresa')
+                .html(`${empresa.nome} <br> <small class="text-muted">${empresa.cnpj}</small>`);
+
+            // Salva os dados no próprio elemento
+            $item.data('id', empresa.id);
+            $item.data('nome', empresa.nome);
+
+            $resultadosDiv.append($item);
+        });
+    };
+
+    // 4. Evento de DIGITAÇÃO (keyup) no input
+    //    Usa o debounce para esperar 300ms
+    $('#busca-empresa-input').on('keyup', debounceBusca((e) => {
+        buscarEmpresas(e.target.value);
+    }, 300));
+
+    // 5. Evento de CLIQUE no item de resultado
+    //    Usa $(document).on() para funcionar em itens criados dinamicamente
+    $(document).on('click', '.item-busca-empresa', function (e) {
+        e.preventDefault(); // Impede o link de navegar
+
+        var $item = $(this);
+        var id = $item.data('id');
+        var nome = $item.data('nome');
+
+        // Preenche os inputs
+        $('#empresa-id-selecionada').val(id);
+        $('#busca-empresa-input').val(nome);
+
+        // Limpa e esconde os resultados
+        $('#busca-empresa-resultados').html('');
+    });
+
+    // ===================================================================
+    // PROCESSO ESTAGIÁRIO - FECHAR AUTOCOMPLETE AO CLICAR FORA
+    // ===================================================================
+    $(document).on('click', function (e) {
+        // Seleciona os elementos da busca
+        const $inputBusca = $('#busca-empresa-input');
+        const $resultadosDiv = $('#busca-empresa-resultados');
+
+        // Verifica se o alvo do clique (e.target)
+        // NÃO é o input de busca E
+        // NÃO é um descendente da div de resultados
+        if (!$inputBusca.is(e.target) && $resultadosDiv.has(e.target).length === 0) {
+            $resultadosDiv.html(''); // Limpa os resultados
+        }
+    });
+
+    // ===================================================================
     // FUNÇÃO AUXILIAR (setupModalForm)
     // ===================================================================
     function setupModalForm(modalBodySelector) {

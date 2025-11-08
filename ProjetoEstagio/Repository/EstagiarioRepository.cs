@@ -25,6 +25,11 @@ namespace ProjetoEstagio.Repository
             return _projetoEstagioContext.Estagiarios.ToList();
         }
 
+        public List<EmpresaModel> ListarTodasEmpresas()
+        {
+            return _projetoEstagioContext.Empresas.ToList();
+        }
+
         public EstagiarioModel BuscarPorId(int id)
         {
             return _projetoEstagioContext.Estagiarios.FirstOrDefault(e => e.Id == id);
@@ -63,6 +68,15 @@ namespace ProjetoEstagio.Repository
             _projetoEstagioContext.SaveChanges();
 
             return true;
+        }
+
+        // MÉTODO CORRETO
+        // em EstagiarioRepository.cs
+        public EstagiarioModel BuscarPorUsuarioId(int usuarioId)
+        {
+            // CORRETO: Compara a Chave Estrangeira (UsuarioId) 
+            // com o ID do usuário (usuarioId)
+            return _projetoEstagioContext.Estagiarios.FirstOrDefault(e => e.UsuarioId == usuarioId);
         }
     }
 }

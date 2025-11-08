@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@using ProjetoEstagio.Models
+@using ProjetoEstagio.Helper
+@inject ISessao _sessao
+
+@{
+    UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -33,6 +41,18 @@
                         </li>
                         <li class="breadcrumb-item">Empresa</li>
                         <li class="breadcrumb-item">Início</li>
+                        <li class="ms-auto d-flex align-items-center text-dark ">
+
+                            @if (usuarioLogado != null)
+                            {
+                                <span>@usuarioLogado.Email</span>
+                            }
+                            else
+                            {
+                                <span>Visitante</span>
+                            }
+                            <i class="fa-solid fa-circle-user mx-1"></i>
+                        </li>
                     </ol>
                 </nav>
                 <hr>

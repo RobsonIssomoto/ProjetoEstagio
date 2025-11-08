@@ -97,4 +97,18 @@ footer {
         width: auto !important;
         flex-basis: auto !important; /* Garante que o flex-grow/shrink funcione */
     }
-    
+
+
+/* --- Estilo para a lista de resultados da busca de empresa --- */
+
+#busca-empresa-resultados {
+    /* Define uma altura máxima. 
+       Aprox. 300px deve dar uns 4-5 itens. 
+       Ajuste este valor como preferir! */
+    max-height: 300px;
+    /* Adiciona a barra de rolagem vertical APENAS se for necessário */
+    overflow-y: auto;
+    /* Opcional: só para garantir que ele fique sobre outros elementos */
+    position: relative;
+    z-index: 99;
+}
