@@ -1,0 +1,123 @@
+﻿@model ProjetoEstagio.Models.ViewModels.TermoPreenchimentoViewModel
+@{
+    ViewData["Title"] = "Analisar Solicitação";
+    Layout = "_LayoutEmpresa";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-8">
+
+        @* MUDANÇA 1: O <form> agora aponta para "SalvarTermo" como ação padrão *@
+        <form asp-action="SalvarTermo" method="post">
+
+            <input type="hidden" asp-for="TermoId" />
+            <input type="hidden" asp-for="SolicitacaoId" />
+
+            <!-- Para exibir erros de validação -->
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="card-header bg-white border-0 text-center mt-3">
+                <h3 class="fw-bold">Termo de Compromisso</h3>
+                <p class="text-muted">Preencha os dados contratuais para aprovar ou rejeite a solicitação.</p>
+            </div>
+
+            <!-- Card 1: Informações dos Envolvidos (Igual ao seu) -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Informações dos Envolvidos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="EstagiarioNome" class="form-label"></label>
+                            <input type="text" asp-for="EstagiarioNome" class="form-control" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="EmpresaNome" class="form-label"></label>
+                            <input type="text" asp-for="EmpresaNome" class="form-control" readonly />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="OrientadorNome" class="form-label"></label>
+                            <input type="text" asp-for="OrientadorNome" class="form-control" readonly />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Detalhes do Contrato (Igual ao seu) -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Detalhes do Contrato (Obrigatório para Aprovar)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="CargaHoraria" class="form-label"></label>
+                            <input type="number" asp-for="CargaHoraria" class="form-control" />
+                            <span asp-validation-for="CargaHoraria" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ValorBolsa" class="form-label"></label>
+                            <input type="number" step="0.01" asp-for="ValorBolsa" class="form-control" />
+                            <span asp-validation-for="ValorBolsa" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="DataInicio" class="form-label"></label>
+                            <input type="date" asp-for="DataInicio" class="form-control" />
+                            <span asp-validation-for="DataInicio" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="DataFim" class="form-label"></label>
+                            <input type="date" asp-for="DataFim" class="form-control" />
+                            <span asp-validation-for="DataFim" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="NumeroApolice" class="form-label"></label>
+                            <input type="text" asp-for="NumeroApolice" class="form-control" />
+                            <span asp-validation-for="NumeroApolice" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="NomeSeguradora" class="form-label"></label>
+                            <input type="text" asp-for="NomeSeguradora" class="form-control" />
+                            <span asp-validation-for="NomeSeguradora" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MUDANÇA 2: Card de Rejeição Adicionado -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-warning-subtle">
+                    <h5 class="mb-0">Ação Alternativa: Rejeitar</h5>
+                </div>
+                <div class="card-body">
+                    <label asp-for="Justificativa" class="form-label"></label>
+                    <textarea asp-for="Justificativa" class="form-control" rows="3" placeholder="Se desejar rejeitar, informe ao estagiário o motivo (opcional)"></textarea>
+                    <span asp-validation-for="Justificativa" class="text-danger small"></span>
+                </div>
+            </div>
+
+
+            <!-- MUDANÇA 3: Botões de Ação Atualizados -->
+            <div class="d-flex flex-column flex-md-row gap-2 my-2">
+
+                <!-- Botão PROSSEGUIR (Salvar) -->
+                <!-- Este botão usa a action padrão do <form> ("SalvarTermo") -->
+                <button type="submit" class="btn btn-danger btn-lg flex-grow-1">
+                    <i class="fa-solid fa-save me-2"></i> Prosseguir e Aprovar
+                </button>
+
+                <!-- Botão REJEITAR -->
+                <!-- Este botão usa 'asp-action' para enviar para a Action 'RejeitarTermo' -->
+                <button type="submit" class="btn btn-secondary btn-lg"
+                        asp-action="RejeitarTermo">
+                    <i class="fa-solid fa-times me-2"></i> Rejeitar Solicitação
+                </button>
+
+                <a class="btn btn-outline-secondary btn-lg" asp-action="Principal" asp-controller="Empresa">Cancelar</a>
+            </div>
+
+        </form>
+
+    </div>
+</div>

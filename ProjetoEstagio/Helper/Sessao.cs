@@ -50,6 +50,18 @@ namespace ProjetoEstagio.Helper
             return _httpContext.HttpContext.Session.GetInt32("sessaoEstagiarioId");
         }
 
+        public void SalvarNomeExibicao(string nome)
+        {
+            // Salva o nome como uma string simples
+            _httpContext.HttpContext.Session.SetString("sessaoNomeExibicao", nome);
+        }
+
+        public string BuscarNomeExibicao()
+        {
+            // Busca o nome. Retorna null se não existir.
+            return _httpContext.HttpContext.Session.GetString("sessaoNomeExibicao");
+        }
+
         // --- 3. ATUALIZE O MÉTODO 'REMOVER' ---
 
         public void RemoverSessaoDoUsuario()
@@ -57,6 +69,7 @@ namespace ProjetoEstagio.Helper
             _httpContext.HttpContext.Session.Remove("sessaoUsuarioLogado");
             _httpContext.HttpContext.Session.Remove("sessaoEmpresaId");
             _httpContext.HttpContext.Session.Remove("sessaoEstagiarioId");// <-- Limpa o ID da empresa também
+            _httpContext.HttpContext.Session.Remove("sessaoNomeExibicao"); // Limpa o nome também
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using ProjetoEstagio.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using ProjetoEstagio.Models;
 
 namespace ProjetoEstagio.Repository
 {
@@ -8,8 +9,10 @@ namespace ProjetoEstagio.Repository
         List<UsuarioModel> ListarTodos();
         UsuarioModel BuscarPorId(int id);
         UsuarioModel BuscarPorLogin(string login);
-        UsuarioModel Editar(UsuarioModel usuario);
         UsuarioModel Atualizar(UsuarioModel usuario);
+
+        Task<bool> VerificarEmailUnico(string email);
+
         bool Deletar(int id);
     }
 }

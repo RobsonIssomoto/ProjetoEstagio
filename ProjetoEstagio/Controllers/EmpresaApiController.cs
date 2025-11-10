@@ -49,7 +49,7 @@ namespace ProjetoEstagio.Controllers
                     e.Nome.ToUpper().Contains(termoUpper) ||
 
                     // << ADICIONE ESTA LINHA >>
-                    // Busca na Razão Social (onde está o "LTDA")
+                    // Busca na Razão Social
                     e.RazaoSocial.ToUpper().Contains(termoUpper) ||
 
                     // Busca no CNPJ

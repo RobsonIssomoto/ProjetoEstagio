@@ -10,6 +10,8 @@ namespace ProjetoEstagio.Helper
         int? BuscarEmpresaIdDaSessao();
         void SalvarEstagiarioIdNaSessao(int estagiarioId);
         int? BuscarEstagiarioIdDaSessao();
+        void SalvarNomeExibicao(string nome);
+        string BuscarNomeExibicao();
 
         UsuarioModel BuscarSessaoDoUsuario();
     }

@@ -14,6 +14,7 @@ namespace ProjetoEstagio.Repository
 
         public EmpresaModel Cadastrar(EmpresaModel empresa)
         {
+            empresa.DataCadastro = DateTime.Now;
             _projetoEstagioContext.Empresas.Add(empresa);
             _projetoEstagioContext.SaveChanges();
             return empresa;
@@ -29,6 +30,11 @@ namespace ProjetoEstagio.Repository
             return _projetoEstagioContext.Empresas.FirstOrDefault(e => e.Id == id);
         }
 
+        public EmpresaModel BuscarPorUsuarioId(int usuarioId)
+        {
+            return _projetoEstagioContext.Empresas.FirstOrDefault(e => e.UsuarioId == usuarioId);
+        }
+
         public EmpresaModel BuscarComSupervisores(int id)
         {
             // Usamos o Include para "incluir" a lista de Supervisores
@@ -38,19 +44,6 @@ namespace ProjetoEstagio.Repository
                 .FirstOrDefault(e => e.Id == id);
         }
 
-
-        public EmpresaModel BuscarPorUsuarioId(int usuarioId)
-        {
-            return _projetoEstagioContext.Empresas.FirstOrDefault(e => e.UsuarioId == usuarioId);
-        }
-
-
-        public EmpresaModel Editar(EmpresaModel empresa)
-        {
-            _projetoEstagioContext.Empresas.Update(empresa);
-            _projetoEstagioContext.SaveChanges();
-            return empresa;
-        }
         public EmpresaModel Atualizar(EmpresaModel empresa)
         {
             EmpresaModel empresaDB = BuscarPorId(empresa.Id);
@@ -77,6 +70,12 @@ namespace ProjetoEstagio.Repository
             _projetoEstagioContext.SaveChanges();
 
             return true;
-        }    
+        }
+
+        public async Task<bool> VerificarCNPJUnico(string cnpj)
+        {
+            return await _projetoEstagioContext.Empresas
+                 .AnyAsync(e => e.CNPJ == cnpj.ToString());
+        }
     }
 }

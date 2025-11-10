@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjetoEstagio.Data;
 using ProjetoEstagio.Helper;
 using ProjetoEstagio.Repository;
+using ProjetoEstagio.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,11 +12,18 @@ builder.Services.AddDbContext<ProjetoEstagioContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
 
 builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
+builder.Services.AddScoped<IEmpresaService, EmpresaService>();
 builder.Services.AddScoped<ISupervisorRepository, SupervisorRepository>();
-builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<ISupervisorService, SupervisorService>();
 builder.Services.AddScoped<IEstagiarioRepository, EstagiarioRepository>();
+builder.Services.AddScoped<IEstagiarioService, EstagiarioService>();
+builder.Services.AddScoped<IOrientadorRepository, OrientadorRepository>();
+builder.Services.AddScoped<IOrientadorService, OrientadorService>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<ISolicitacaoEstagioRepository, SolicitacaoEstagioRepository>();
+builder.Services.AddScoped<ITermoCompromissoRepository, TermoCompromissoRepository>();
+
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<ISessao, Sessao>();
 
 builder.Services.AddSession(o =>

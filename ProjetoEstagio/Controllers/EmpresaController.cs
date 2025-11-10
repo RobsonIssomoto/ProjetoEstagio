@@ -1,102 +1,117 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ProjetoEstagio.Data; // 1. Adicionado
 using ProjetoEstagio.Models;
-using ProjetoEstagio.Models.Enums; // 2. Adicionado
-using ProjetoEstagio.Models.ViewModels; // 3. Adicionado
-using ProjetoEstagio.Repository;
+using ProjetoEstagio.Models.Enums;
+using ProjetoEstagio.Models.ViewModels;
+using ProjetoEstagio.Services; // Sua camada de serviço
+using ProjetoEstagio.Helper; // Para ISessao
+using System.Linq;         // Para .Count()
 
 namespace ProjetoEstagio.Controllers
 {
     public class EmpresaController : Controller
     {
-        // 4. Dependências Injetadas
-        private readonly IEmpresaRepository _empresaRepository;
-        private readonly IUsuarioRepository _usuarioRepository;
-        private readonly ProjetoEstagioContext _context;
+        private readonly IEmpresaService _empresaService;
+        private readonly ISessao _sessao; // Injetado para o dashboard
 
         public EmpresaController(
-            IEmpresaRepository empresaRepository,
-            IUsuarioRepository usuarioRepository, // Adicionado
-            ProjetoEstagioContext context) // Adicionado
+            IEmpresaService empresaService,
+            ISessao sessao) // Context removido, Sessao adicionada
         {
-            _empresaRepository = empresaRepository;
-            _usuarioRepository = usuarioRepository;
-            _context = context;
+            _empresaService = empresaService;
+            _sessao = sessao;
         }
 
-        // --- LÓGICA DE CADASTRO PÚBLICO (Nova) ---
+        // --- LÓGICA DE CADASTRO PÚBLICO ---
 
-        // GET: /Empresa/Cadastrar
-        public IActionResult Cadastrar()
+        // GET: /Empresa/Cadastrar?token=...
+        public IActionResult Cadastrar(string? token) // Aceita o token da URL
         {
-            // (Substitui seu 'Cadastrar' e 'Cadastrar1' antigos)
-            return View(new EmpresaCadastroViewModel());
-        }
+            var viewModel = new EmpresaCadastroViewModel();
 
-        [HttpPost]
-        public IActionResult Cadastrar(EmpresaCadastroViewModel viewModel)
-        {
-            // (Substitui seu [HttpPost] Cadastrar antigo)
-            using (var transaction = _context.Database.BeginTransaction())
+            // (Opcional, mas recomendado) Se o token existir, armazene-o
+            // para que o POST possa recebê-lo de volta.
+            if (token != null)
             {
-                try
-                {
-                    if (ModelState.IsValid)
-                    {
-                        // 1. Criar o Usuario
-                        var usuario = new UsuarioModel();
-                        usuario.Login = viewModel.Email;
-                        usuario.Email = viewModel.Email;
-                        // --- AQUI ESTÁ A MÁGICA ---
-                        usuario.Perfil = Perfil.Representante; // Definido automaticamente
-                                                               // -------------------------
-                        usuario.SetSenhaHash(viewModel.Senha);
-
-                        _usuarioRepository.Cadastrar(usuario);
-
-                        // 2. Criar a Empresa
-                        var empresa = new EmpresaModel
-                        {
-                            RazaoSocial = viewModel.RazaoSocial,
-                            CNPJ = viewModel.CNPJ,
-                            Nome = viewModel.Nome,
-                            Telefone = viewModel.Telefone,
-                            Email = viewModel.Email,
-                            DataCadastro = DateTime.Now,
-                            UsuarioId = usuario.Id // <-- O VÍNCULO!
-                        };
-
-                        _empresaRepository.Cadastrar(empresa);
-
-                        // 3. Salva tudo
-                        transaction.Commit();
-
-                        TempData["MensagemSucesso"] = "Empresa cadastrada! Faça o login.";
-                        return RedirectToAction("Index", "Login");
-                    }
-                }
-                catch (System.Exception erro)
-                {
-                    transaction.Rollback();
-                    TempData["MensagemErro"] = $"Erro ao cadastrar: {erro.Message}";
-                }
+                ViewData["Token"] = token;
             }
+
             return View(viewModel);
         }
 
-        // --- MÉTODOS DE ADMIN (Seus métodos antigos) ---
+        [HttpPost]
+        public IActionResult Cadastrar(EmpresaCadastroViewModel viewModel, string? token) // Recebe o token
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // Envia o token para o serviço
+                    _empresaService.RegistrarNovaEmpresa(viewModel, token);
 
+                    TempData["MensagemSucesso"] = "Empresa cadastrada! Faça o login.";
+                    return RedirectToAction("Index", "Login");
+                }
+            }
+            catch (System.Exception erro)
+            {
+                TempData["MensagemErro"] = $"Erro ao cadastrar: {erro.Message}";
+            }
+            ViewData["Token"] = token; // Devolve o token para a view se houver erro
+            return View(viewModel);
+        }
+
+
+        // --- DASHBOARD DO REPRESENTANTE ---
+
+        // GET: /Empresa/Principal
+        public IActionResult Principal()
+        {
+            // 1. Obter o usuário (Representante) logado
+            UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            if (usuarioLogado == null || usuarioLogado.Perfil != Perfil.Representante)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // 2. Encontrar a Empresa vinculada (via Serviço)
+            EmpresaModel empresa = _empresaService.BuscarEmpresaPorUsuarioId(usuarioLogado.Id); //
+            if (empresa == null)
+            {
+                TempData["MensagemErro"] = "Erro: Empresa não encontrada para este usuário.";
+                return RedirectToAction("Index", "Login");
+            }
+
+            // (Opcional: Salvar o EmpresaId na sessão para o SupervisorController)
+            // _sessao.SalvarEmpresaIdNaSessao(empresa.Id);
+
+            // 3. Buscar as solicitações (via Serviço)
+            var solicitacoes = _empresaService.ListarSolicitacoes(empresa.Id); //
+
+            // 4. Montar o ViewModel para a View
+            var viewModel = new DashboardEmpresaViewModel
+            {
+                PedidosPendentesCount = solicitacoes.Count(s => s.Status == Status.Pendente),
+                PedidosDeEstagio = solicitacoes
+            };
+
+            // 5. Enviar o ViewModel para a View "Principal.cshtml"
+            return View(viewModel);
+        }
+
+
+        // --- MÉTODOS DE ADMIN (CRUD) ---
+
+        // GET: /Empresa/Index (Lista de Empresas para o Admin)
         public IActionResult Index()
         {
-            List<EmpresaModel> empresas = _empresaRepository.ListarTodos();
+            List<EmpresaModel> empresas = _empresaService.ListarTodos(); //
             return View(empresas);
         }
 
         [HttpGet]
         public IActionResult Editar(int id)
         {
-            EmpresaModel empresa = _empresaRepository.BuscarPorId(id);
+            EmpresaModel empresa = _empresaService.BuscarPorId(id); //
             if (empresa == null) return NotFound();
             return View(empresa);
         }
@@ -109,7 +124,7 @@ namespace ProjetoEstagio.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    _empresaRepository.Atualizar(empresa);
+                    _empresaService.Atualizar(empresa); //
                     TempData["MensagemSucesso"] = "Dados da empresa alterado com sucesso";
                     return RedirectToAction("Index");
                 }
@@ -124,13 +139,8 @@ namespace ProjetoEstagio.Controllers
 
         public IActionResult DeletarConfirmar(int id)
         {
-            EmpresaModel empresa = _empresaRepository.BuscarPorId(id);
-
-            if (empresa == null)
-            {
-                return NotFound();
-            }
-
+            EmpresaModel empresa = _empresaService.BuscarPorId(id); //
+            if (empresa == null) return NotFound();
             return View(empresa);
         }
 
@@ -139,17 +149,9 @@ namespace ProjetoEstagio.Controllers
         {
             try
             {
-                bool deletar = _empresaRepository.Deletar(id);
-
-                if (deletar)
-                {
-                    TempData["MensagemSucesso"] = "Empresa excluída com sucesso";
-
-                }
-                else
-                {
-                    TempData["MensagemErro"] = $"Erro ao excluir empresa. Tente novamente";
-                }
+                bool deletar = _empresaService.Deletar(id); //
+                if (deletar) TempData["MensagemSucesso"] = "Empresa excluída com sucesso";
+                else TempData["MensagemErro"] = $"Erro ao excluir empresa. Tente novamente";
                 return RedirectToAction("Index");
             }
             catch (System.Exception erro)
@@ -161,69 +163,163 @@ namespace ProjetoEstagio.Controllers
 
         public IActionResult DetalhesSupervisores(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            // Usamos o NOVO método do repositório
-            EmpresaModel empresa = _empresaRepository.BuscarComSupervisores(id);
-
-            if (empresa == null)
-            {
-                return NotFound("Empresa não encontrada.");
-            }
-
-            // Envia o objeto 'empresa' (que agora contém a lista
-            // de supervisores) para a View.
+            if (id == 0) return NotFound();
+            EmpresaModel empresa = _empresaService.BuscarComSupervisores(id); //
+            if (empresa == null) return NotFound("Empresa não encontrada.");
             return View(empresa);
         }
 
-        public IActionResult Login() => View("Login");
-
-        public IActionResult Principal()
+        
+        [HttpGet]
+        public async Task<IActionResult> BuscarEmpresas(string termoDeBusca)
         {
-            return View();
-        }
-
-        [AcceptVerbs("GET", "POST")] // Permite que a validação funcione em GET ou POST
-        public async Task<IActionResult> VerificarEmailUnico(string email)
-        {
-            // Verifica se já existe um USUÁRIO com este e-mail
-            // (Pelo seu modelo, o Email de login fica na UsuarioModel)
-            var emailJaExiste = await _context.Usuarios
-                                      .AnyAsync(u => u.Email.ToUpper() == email.ToUpper());
-
-            if (emailJaExiste)
+            if (string.IsNullOrEmpty(termoDeBusca))
             {
-                // Se existe, retorna a mensagem de erro específica
-                return Json($"O E-mail {email} já está em uso.");
+                return Json(new List<EmpresaModel>());
             }
 
-            // Se não existe, a validação passa
-            return Json(true);
+            // Busca no serviço (presumindo que ListarTodos() busca no repositório)
+            // Para otimizar, crie um método "BuscarPorNome(termo)" no seu service/repositório
+            var empresas = _empresaService.ListarTodos()
+                .Where(e => e.Nome.Contains(termoDeBusca, StringComparison.OrdinalIgnoreCase) ||
+                            e.CNPJ.Contains(termoDeBusca))
+                .Select(e => new { e.Id, e.Nome, e.CNPJ }) // Retorna só os dados necessários
+                .Take(5) // Limita a 5 resultados
+                .ToList();
+
+            return Json(empresas);
+        }
+
+        // Em EmpresaController.cs
+        [HttpGet]
+        public IActionResult PreencherTermo(int solicitacaoId)
+        {
+            try
+            {
+                // --- INÍCIO DA VERIFICAÇÃO E CRIAÇÃO ---
+                UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+                EmpresaModel empresaLogada = _empresaService.BuscarEmpresaPorUsuarioId(usuarioLogado.Id);
+                if (usuarioLogado == null || empresaLogada == null)
+                {
+                    return StatusCode(403, "Sessão inválida.");
+                }
+
+                // Esta linha busca ou cria o termo, e já o retorna com todos os Includes
+                TermoCompromissoModel termo = _empresaService.BuscarOuCriarTermoPorSolicitacao(solicitacaoId, empresaLogada.Id);
+
+                if (termo == null)
+                {
+                    return StatusCode(404, "Termo de Compromisso não encontrado.");
+                }
+                // --- FIM DA VERIFICAÇÃO E CRIAÇÃO ---
+
+
+                // --- CORREÇÃO AQUI: Mapeamento do Model para o ViewModel ---
+                var viewModel = new TermoPreenchimentoViewModel
+                {
+                    TermoId = termo.Id,
+                    SolicitacaoId = termo.SolicitacaoEstagioId,
+
+                    // Os dados de Aluno e Empresa agora vão funcionar
+                    EstagiarioNome = termo.SolicitacaoEstagio.Estagiario.Nome,
+                    EmpresaNome = termo.SolicitacaoEstagio.Empresa.Nome,
+
+                    // A lógica das datas padrão também vai funcionar
+                    // (Assumindo que o seu TermoCompromissoModel.cs tem 'DateTime?')
+                    CargaHoraria = termo.CargaHoraria ?? 0,
+                    ValorBolsa = termo.ValorBolsa ?? 0.0,
+                    DataInicio = termo.DataInicio ?? DateTime.Now,
+                    DataFim = termo.DataFim ?? DateTime.Now.AddMonths(6),
+                    NumeroApolice = termo.NumeroApolice,
+                    NomeSeguradora = termo.NomeSeguradora,
+                    Justificativa = termo.Justificativa
+                };
+                // --- FIM DA CORREÇÃO ---
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["MensagemErro"] = $"Erro ao carregar página: {ex.Message}";
+                return RedirectToAction("Principal");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SalvarTermo(TermoPreenchimentoViewModel viewModel)
+        {
+            // Lógica de repopular em caso de erro
+            Action<TermoPreenchimentoViewModel> repopularViewModel = (vm) => { /* ... (código anterior) ... */ };
+
+            // A validação [Required] dos campos do ViewModel
+            // garante que CargaHoraria, ValorBolsa, etc., foram preenchidos
+            if (!ModelState.IsValid)
+            {
+                repopularViewModel(viewModel);
+                return View("PreencherTermo", viewModel);
+            }
+
+            try
+            {
+                UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+                EmpresaModel empresaLogada = _empresaService.BuscarEmpresaPorUsuarioId(usuarioLogado.Id);
+                if (usuarioLogado == null || empresaLogada == null) return StatusCode(403, "Sessão inválida.");
+
+                // Chama o novo serviço de "Salvar"
+                _empresaService.SalvarTermo(viewModel, empresaLogada.Id);
+
+                TempData["MensagemSucesso"] = "Dados do contrato salvos e estágio aprovado com sucesso!";
+                return RedirectToAction("Principal");
+            }
+            catch (Exception ex)
+            {
+                TempData["MensagemErro"] = $"Erro ao salvar: {ex.Message}";
+                repopularViewModel(viewModel);
+                return View("PreencherTermo", viewModel);
+            }
         }
 
 
-        /// <summary>
-        /// Método para validação remota do CNPJ.
-        /// </summary>
-        /// <param name="cnpj">O CNPJ vindo do formulário</param>
+        // --- ADICIONE ESTE MÉTODO (para o botão "Rejeitar") ---
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult RejeitarTermo(TermoPreenchimentoViewModel viewModel)
+        {
+            try
+            {
+                UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+                EmpresaModel empresaLogada = _empresaService.BuscarEmpresaPorUsuarioId(usuarioLogado.Id);
+                if (usuarioLogado == null || empresaLogada == null) return StatusCode(403, "Sessão inválida.");
+
+                // Chama o novo serviço de "Rejeitar"
+                _empresaService.RejeitarTermo(viewModel, empresaLogada.Id);
+
+                TempData["MensagemSucesso"] = "Solicitação rejeitada com sucesso.";
+                return RedirectToAction("Principal");
+            }
+            catch (Exception ex)
+            {
+                TempData["MensagemErro"] = $"Erro ao rejeitar: {ex.Message}";
+
+                // Recarrega a página em caso de erro
+                Action<TermoPreenchimentoViewModel> repopularViewModel = (vm) => { /* ... (código anterior) ... */ };
+                repopularViewModel(viewModel);
+                return View("PreencherTermo", viewModel);
+            }
+        }
+        // --- OUTROS MÉTODOS ---
+
+        public IActionResult Login() => View("Login");
+
         [AcceptVerbs("GET", "POST")]
         public async Task<IActionResult> VerificarCNPJUnico(string cnpj)
         {
-            // Opcional, mas recomendado: Limpar a formatação do CNPJ (pontos e traços)
-            // var cpfLimpo = cpf.Replace(".", "").Replace("-", "");
-
-            // Verifica se já existe uma EMPRESA com este CNPJ
-            var cnpjJaExiste = await _context.Empresas
-                                    .AnyAsync(e => e.CNPJ == cnpj); // ou e.CNPJ == cnpjLimpo
-
+            bool cnpjJaExiste = await _empresaService.VerificarCNPJUnico(cnpj); //
             if (cnpjJaExiste)
             {
-                return Json($"O CNPJ {cnpj} já está cadastrado.");
+                return Json("Este CNPJ já está cadastrado.");
             }
-
             return Json(true);
         }
     }

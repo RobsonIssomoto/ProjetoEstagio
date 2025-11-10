@@ -89,30 +89,6 @@ namespace ProjetoEstagio.Controllers
         [HttpPost]
         public IActionResult Alterar(UsuarioSemSenhaModel usuarioSemSenhaModel)
         {
-            //try
-            //{
-            //    UsuarioModel usuario = null;
-            //    if (ModelState.IsValid)
-            //    {
-            //        usuario = new UsuarioModel()
-            //        {
-            //            Id = usuarioSemSenhaModel.Id,
-            //            Login = usuarioSemSenhaModel.Login,
-            //            Email = usuarioSemSenhaModel.Email,
-            //            Perfil = usuarioSemSenhaModel.Perfil,
-            //        };
-
-            //        usuario = _usuarioRepository.Atualizar(usuario);
-            //        TempData["MensagemSucesso"] = "Dados do usuário alterado com sucesso";
-            //        return RedirectToAction("Index");
-            //    }
-            //    return View(usuario);
-            //}
-            //catch (System.Exception erro)
-            //{
-            //    TempData["MensagemErro"] = $"{erro.Message} Tente novamente.";
-            //    return RedirectToAction("Index");
-            //}
 
             try
             {
@@ -155,6 +131,21 @@ namespace ProjetoEstagio.Controllers
                 TempData["MensagemErro"] = $"Erro ao salvar: {erro.Message}. Tente novamente.";
                 return RedirectToAction("Index");
             }
+        }
+
+        // Método [Remote] para validar Email
+        [AcceptVerbs("GET", "POST")]
+        public async Task<IActionResult> VerificarEmailUnico(string email)
+        {
+            // Chama o repositório correto, que já está injetado.
+            bool emailJaExiste = await _usuarioRepository.VerificarEmailUnico(email);
+
+            if (emailJaExiste)
+            {
+                return Json($"O e-mail {email} já está em uso.");
+            }
+
+            return Json(true);
         }
     }
 }

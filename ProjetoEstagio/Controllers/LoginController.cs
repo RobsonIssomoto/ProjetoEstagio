@@ -9,14 +9,20 @@ namespace ProjetoEstagio.Controllers
     public class LoginController : Controller
     {
         private readonly IUsuarioRepository _usuarioRepository;
-        private readonly IEmpresaRepository _empresaRepository; // 2. ADICIONE O REPO DE EMPRESA
+        private readonly IEmpresaRepository _empresaRepository;
         private readonly IEstagiarioRepository _estagiarioRepository;
+        private readonly ISupervisorRepository _supervisorRepository;
         private readonly ISessao _sessao;
-        public LoginController(IUsuarioRepository usuarioRepository, IEmpresaRepository empresaRepository, IEstagiarioRepository estagiarioRepository, ISessao sessao)
+        public LoginController(IUsuarioRepository usuarioRepository,
+            IEmpresaRepository empresaRepository,
+            IEstagiarioRepository estagiarioRepository,
+            ISupervisorRepository supervisorRepository,
+            ISessao sessao)
         {
             _usuarioRepository = usuarioRepository;
             _empresaRepository = empresaRepository;
             _estagiarioRepository = estagiarioRepository;
+            _supervisorRepository = supervisorRepository;
             _sessao = sessao;
         }
 
@@ -41,6 +47,9 @@ namespace ProjetoEstagio.Controllers
                         // SUCESSO: Cria a sessão principal do usuário
                         _sessao.CriarSessaoDoUsuario(usuario);
 
+                        // Define um nome padrão (o login)
+                        string nomeExibicao = usuario.Login;
+
                         // --- 5. LÓGICA DE FILTRAGEM DE PERFIL ---
                         // (Assumindo que seu enum se chama Perfil.Representante)
                         if (usuario.Perfil == Perfil.Representante)
@@ -52,6 +61,9 @@ namespace ProjetoEstagio.Controllers
                             {
                                 // Salva o ID da Empresa na sessão (usando o Passo 2)
                                 _sessao.SalvarEmpresaIdNaSessao(empresa.Id);
+                                nomeExibicao = empresa.Nome; // <-- Pega o Nome do Representante
+
+                                _sessao.SalvarNomeExibicao(nomeExibicao); // <-- Salva o Nome
                                 return RedirectToAction("Principal", "Empresa"); // (ou "Home")
                             }
                             else
@@ -70,6 +82,9 @@ namespace ProjetoEstagio.Controllers
                             if (estagiario != null)
                             {
                                 _sessao.SalvarEstagiarioIdNaSessao(estagiario.Id);
+                                nomeExibicao = estagiario.Nome; // <-- Pega o Nome do Estagiário
+
+                                _sessao.SalvarNomeExibicao(nomeExibicao); // <-- Salva o Nome
                                 return RedirectToAction("Principal", "Estagiario"); // (ou "Home")
                             }
                             else
@@ -80,24 +95,35 @@ namespace ProjetoEstagio.Controllers
                             }
 
                         }
-                        // --- FIM DA LÓGICA DE FILTRAGEM ---
 
-                        // Se for Admin ou Estagiário, ou se for Empresa e passou na checagem,
-                        // ele redireciona normalmente.
-                        
-                    }
+                        // --- 4. LÓGICA DO SUPERVISOR (NOVA) ---
+                        if (usuario.Perfil == Perfil.Supervisor)
+                        {
+                            SupervisorModel supervisor = _supervisorRepository.BuscarPorUsuarioId(usuario.Id);
+                            if (supervisor != null)
+                            {
+                                // Salva o ID da EMPRESA a qual o supervisor pertence
+                                _sessao.SalvarEmpresaIdNaSessao(supervisor.EmpresaId);
+                                nomeExibicao = supervisor.Nome;
+                                _sessao.SalvarNomeExibicao(nomeExibicao);
+                                return RedirectToAction("Principal", "Supervisor"); // Dashboard do Supervisor
+                            }
+                            // ... (seu 'else' de erro de integridade) ...
+                        }
+
+                        // --- 5. CORREÇÃO DE LÓGICA ---
+                        // Se for Admin (ou outro perfil sem redirect),
+                        // salva o nome padrão e vai para a Home.
+                        _sessao.SalvarNomeExibicao(nomeExibicao);
+                        return RedirectToAction("Index", "Home");
+                    }
 
                     // Seu código de "Usuário e/ou Senha inválido(s)!" não muda
                     TempData["MensagemErro"] = $"Usuário e/ou Senha inválido(s)! Tente novamente.";
                 }
-                else
-                {
-                    // Seu código de "Por favor, preencha todos os campos." não muda
-                    TempData["MensagemErro"] = "Por favor, preencha todos os campos.";
-                }
 
-                // ... Seu código de limpar modelo e retornar View ...
-                loginModel.Login = string.Empty;
+                // ... Seu código de limpar modelo e retornar View ...
+                loginModel.Login = string.Empty;
                 loginModel.Senha = string.Empty;
                 ModelState.Clear();
                 return View("Index", loginModel);

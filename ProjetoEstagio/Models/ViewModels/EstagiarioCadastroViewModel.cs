@@ -14,13 +14,14 @@ namespace ProjetoEstagio.Models.ViewModels
         [ValidarCPF(ErrorMessage = "O CPF informado não é válido.")]
         public string CPF { get; set; }
 
-        [Required(ErrorMessage = "O Telefone é obrigatório.")]
-        public string Telefone { get; set; }
+        public string? Telefone { get; set; }
 
         [Required(ErrorMessage = "O E-mail é obrigatório.")]
         [EmailAddress(ErrorMessage = "E-mail inválido.")]
-        [Remote(action: "VerificarEmailUnico", controller: "Estagiario", ErrorMessage = "Este E-mail já está cadastrado.")]
+        [Remote(action: "VerificarEmailUnico", controller: "Usuario", ErrorMessage = "Este E-mail já está cadastrado.")]
         public string Email { get; set; }
+
+        public string? NomeCurso { get; set; }
 
         [Required(ErrorMessage = "A Senha é obrigatória.")]
         [DataType(DataType.Password)]

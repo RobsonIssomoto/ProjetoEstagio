@@ -15,6 +15,7 @@ namespace ProjetoEstagio.Repository
 
         public EstagiarioModel Cadastrar(EstagiarioModel estagiario)
         {
+            estagiario.DataCadastro = DateTime.Now;
             _projetoEstagioContext.Estagiarios.Add(estagiario);
             _projetoEstagioContext.SaveChanges();
             return estagiario;
@@ -25,21 +26,10 @@ namespace ProjetoEstagio.Repository
             return _projetoEstagioContext.Estagiarios.ToList();
         }
 
-        public List<EmpresaModel> ListarTodasEmpresas()
-        {
-            return _projetoEstagioContext.Empresas.ToList();
-        }
 
         public EstagiarioModel BuscarPorId(int id)
         {
             return _projetoEstagioContext.Estagiarios.FirstOrDefault(e => e.Id == id);
-        }
-
-        public EstagiarioModel Editar(EstagiarioModel estagiario)
-        {
-            _projetoEstagioContext.Estagiarios.Update(estagiario);
-            _projetoEstagioContext.SaveChanges();
-            return estagiario;
         }
 
         public EstagiarioModel Atualizar(EstagiarioModel estagiario)
@@ -77,6 +67,13 @@ namespace ProjetoEstagio.Repository
             // CORRETO: Compara a Chave Estrangeira (UsuarioId) 
             // com o ID do usuário (usuarioId)
             return _projetoEstagioContext.Estagiarios.FirstOrDefault(e => e.UsuarioId == usuarioId);
+        }
+
+        public async Task<bool> VerificarCPFUnico(string cpf)
+        {
+            // Verifica se já existe um ESTAGIÁRIO com este CPF
+            return await _projetoEstagioContext.Estagiarios
+                                    .AnyAsync(e => e.CPF == cpf); // ou e.CPF == cpfLimpo
         }
     }
 }

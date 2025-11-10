@@ -8,7 +8,7 @@ namespace ProjetoEstagio.Repository
         List<SupervisorModel> ListarTodos();
         List<SupervisorModel> ListarPorEmpresa(int empresaId);
         SupervisorModel BuscarPorId(int id);
-        SupervisorModel Editar(SupervisorModel supervisor);
+        SupervisorModel BuscarPorUsuarioId(int usuarioId);
         SupervisorModel Atualizar(SupervisorModel supervisor);
         bool Deletar(int id);
     }

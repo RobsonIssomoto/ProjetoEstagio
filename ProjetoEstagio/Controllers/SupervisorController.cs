@@ -5,22 +5,24 @@ using ProjetoEstagio.Data;
 using ProjetoEstagio.Helper;
 using ProjetoEstagio.Models;
 using ProjetoEstagio.Models.Enums;
+using ProjetoEstagio.Models.ViewModels;
 using ProjetoEstagio.Repository;
+using ProjetoEstagio.Services;
 
 namespace ProjetoEstagio.Controllers
 {
     public class SupervisorController : Controller
     {
-            private readonly ISupervisorRepository _supervisorRepository;
-            private readonly ISessao _sessao;
-            private readonly ProjetoEstagioContext _context; // <-- Adicionado
+        private readonly ISupervisorService _supervisorService;
+        private readonly ISessao _sessao;
 
-            public SupervisorController(ISupervisorRepository supervisorRepository, ISessao sessao, ProjetoEstagioContext context)
-            {
-                _supervisorRepository = supervisorRepository;
-                _sessao = sessao;
-                _context = context;
-            }
+        public SupervisorController(
+            ISupervisorService supervisorService,
+            ISessao sessao)
+        {
+            _supervisorService = supervisorService;
+            _sessao = sessao;
+        }
         public IActionResult Index()
         {
             // Busca o usuário logado
@@ -39,7 +41,7 @@ namespace ProjetoEstagio.Controllers
             if (usuarioLogado.Perfil == Perfil.Admin)
             {
                 // Se for Admin, lista todos de todas as empresas
-                supervisores = _supervisorRepository.ListarTodos();
+                supervisores = _supervisorService.ListarTodos();
             }
             else if (usuarioLogado.Perfil == Perfil.Representante)
             {
@@ -55,7 +57,7 @@ namespace ProjetoEstagio.Controllers
                 }
 
                 // Busca apenas os supervisores daquela empresa
-                supervisores = _supervisorRepository.ListarPorEmpresa(empresaId.Value);
+                supervisores = _supervisorService.ListarPorEmpresa(empresaId.Value);
             }
             else
             {
@@ -76,81 +78,44 @@ namespace ProjetoEstagio.Controllers
         [HttpGet]
         public IActionResult Cadastrar()
         {
-            UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-            if (usuarioLogado == null)
-            {
-                return StatusCode(401, "Sessão expirada. Faça login novamente.");
-            }
-
-            var supervisor = new SupervisorModel();
-
-            // ===== ADICIONE ESTAS LINHAS =====
-            if (usuarioLogado.Perfil == Perfil.Representante)
-            {
-                int? empresaId = _sessao.BuscarEmpresaIdDaSessao();
-                if (empresaId != null)
-                {
-                    supervisor.EmpresaId = empresaId.Value;
-                }
-            }
-            // ===== FIM =====
-
-            return PartialView("_Cadastrar", supervisor);
+            // Retorna a Partial View com um ViewModel VAZIO
+            return PartialView("_Cadastrar", new SupervisorCadastroViewModel());
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Cadastrar(SupervisorModel supervisor)
+        public IActionResult Cadastrar(SupervisorCadastroViewModel viewModel)
         {
-            Console.WriteLine("===== INÍCIO DO MÉTODO CADASTRAR (MODO NUCLEAR) =====");
-
-            // --- 1. VERIFICAÇÃO DE SESSÃO ---
-            UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-            if (usuarioLogado == null)
+            // O "Modo Nuclear" foi removido. Agora validamos!
+            if (ModelState.IsValid)
             {
-                Console.WriteLine("ERRO: Usuário não logado!");
-                return StatusCode(401, "Sessão expirada. Faça login novamente.");
-            }
-            Console.WriteLine($"Usuário logado: {usuarioLogado.Email}, Perfil: {usuarioLogado.Perfil}");
-
-            // --- 2. COMPLETAR O MODELO ---
-            if (usuarioLogado.Perfil == Perfil.Representante)
-            {
-                int? empresaId = _sessao.BuscarEmpresaIdDaSessao();
-                if (empresaId == null)
+                try
                 {
-                    Console.WriteLine("ERRO: EmpresaId da sessão é null!");
-                    return StatusCode(403, "Erro ao recuperar informações da empresa.");
+                    // 1. Buscar o ID da Empresa que está logada
+                    int? empresaId = _sessao.BuscarEmpresaIdDaSessao();
+                    if (empresaId == null)
+                    {
+                        return StatusCode(403, "Sessão inválida ou sem permissão.");
+                    }
+
+                    // 2. Chamar o Serviço para fazer o trabalho pesado
+                    _supervisorService.RegistrarNovoSupervisor(viewModel, empresaId.Value);
+
+                    // 3. Retornar sucesso (seu código AJAX espera isso)
+                    return Json(new { sucesso = true });
                 }
-                supervisor.EmpresaId = empresaId.Value;
-                Console.WriteLine($"EmpresaId setado no supervisor: {supervisor.EmpresaId}");
-            }
-
-            // --- 3. IGNORANDO O MODELSTATE.ISVALID ---
-            Console.WriteLine("FORÇANDO O CADASTRO (IGNORANDO O MODELSTATE QUEBRADO)");
-
-            try
-            {
-                _supervisorRepository.Cadastrar(supervisor);
-                Console.WriteLine("Cadastro realizado com SUCESSO!");
-                return Json(new { sucesso = true });
-            }
-            catch (Exception ex)
-            {
-                // --- CAPTURA A MENSAGEM DA INNER EXCEPTION ---
-                var innerMessage = ex.InnerException?.Message ?? ex.Message;
-
-                Console.WriteLine($"ERRO DE BANCO DE DADOS: {innerMessage}");
-
-                // --- VERIFICA SE É ERRO DE CPF DUPLICADO ---
-                if (innerMessage.Contains("UNIQUE constraint") || innerMessage.Contains("duplicate key"))
+                catch (Exception ex)
                 {
-                    // Retorna uma mensagem amigável para o AJAX
-                    return StatusCode(500, "Erro: Já existe um supervisor cadastrado com este CPF.");
+                    // Captura erros do serviço (ex: e-mail duplicado)
+                    return StatusCode(500, $"Erro ao cadastrar: {ex.Message}");
                 }
-
-                // Retorna a mensagem de erro interna para o AJAX
-                return StatusCode(500, $"Erro de banco de dados: {innerMessage}");
             }
+
+            // Se o ModelState for inválido (ex: senhas não conferem),
+            // retorna um erro 400 (Bad Request) com as mensagens de validação.
+            // O AJAX deve ser capaz de ler isso.
+            return BadRequest(ModelState);
+
         }
 
 
@@ -166,7 +131,7 @@ namespace ProjetoEstagio.Controllers
                 return StatusCode(401, "Sessão expirada. Faça login novamente."); // <-- Linha nova
             }
 
-            SupervisorModel supervisor = _supervisorRepository.BuscarPorId(id);
+            SupervisorModel supervisor = _supervisorService.BuscarPorId(id);
             if (supervisor == null)
                 return NotFound();
 
@@ -190,7 +155,7 @@ namespace ProjetoEstagio.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Editar(SupervisorModel supervisor)
         {
-            Console.WriteLine("===== INÍCIO DO MÉTODO EDITAR (MODO NUCLEAR) =====");
+            Console.WriteLine("===== INÍCIO DO MÉTODO EDITAR ====="); // O "Modo Nuclear" não é mais necessário
 
             // --- 1. VERIFICAÇÃO DE SESSÃO ---
             UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
@@ -198,32 +163,28 @@ namespace ProjetoEstagio.Controllers
             {
                 return StatusCode(401, "Sessão expirada. Faça login novamente.");
             }
-            Console.WriteLine($"Usuário logado: {usuarioLogado.Email}, Perfil: {usuarioLogado.Perfil}");
-
-            // --- 2. IGNORANDO O MODELSTATE.ISVALID ---
-            Console.WriteLine("FORÇANDO A EDIÇÃO (IGNORANDO O MODELSTATE QUEBRADO)");
-
-            // 3. VERIFICAR PERMISSÕES
+            // ... (Verificação de permissão) ...
             if (usuarioLogado.Perfil == Perfil.Representante)
             {
                 int? empresaId = _sessao.BuscarEmpresaIdDaSessao();
                 if (supervisor.EmpresaId != empresaId.Value)
                 {
-                    Console.WriteLine("ERRO: Tentativa de editar supervisor de outra empresa.");
-                    return StatusCode(403, "Acesso negado. Você não tem permissão para alterar este item.");
+                    return StatusCode(403, "Acesso negado.");
                 }
             }
 
-            // 4. SALVAR NO BANCO
+            // --- 2. CHAMADA AO SERVIÇO (AO INVÉS DO REPOSITÓRIO) ---
             try
             {
-                _supervisorRepository.Editar(supervisor);
+                // _supervisorRepository.Atualizar(supervisor); // <-- Linha antiga
+                _supervisorService.AtualizarSupervisor(supervisor); // <-- NOVA LINHA
+
                 Console.WriteLine("Edição realizada com SUCESSO!");
                 return Json(new { sucesso = true });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"ERRO AO EDITAR NO BANCO: {ex.Message}");
+                Console.WriteLine($"ERRO AO EDITAR: {ex.Message}");
                 return StatusCode(500, $"Erro de banco de dados: {ex.Message}");
             }
         }
@@ -232,42 +193,11 @@ namespace ProjetoEstagio.Controllers
         {
             if (ModelState.IsValid)
             {
-                _supervisorRepository.Editar(supervisor);
+                _supervisorService.AtualizarSupervisor(supervisor);
                 return RedirectToAction("Index");
             }
             return View(supervisor);
         }
-
-        //public IActionResult DeletarConfirmar(int id)
-        //{
-        //    // --- INÍCIO DA VERIFICAÇÃO DE SEGURANÇA ---
-        //    UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-        //    if (usuarioLogado == null)
-        //    {
-        //        return RedirectToAction("Index", "Login");
-        //    }
-
-        //    SupervisorModel supervisor = _supervisorRepository.BuscarPorId(id);
-        //    if (supervisor == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (usuarioLogado.Perfil == Perfil.Representante)
-        //    {
-        //        int? empresaId = _sessao.BuscarEmpresaIdDaSessao();
-
-        //        // VERIFICA SE O SUPERVISOR PERTENCE À EMPRESA DO USUÁRIO
-        //        if (supervisor.EmpresaId != empresaId.Value)
-        //        {
-        //            TempData["MensagemErro"] = "Acesso negado. Este supervisor não pertence à sua empresa.";
-        //            return RedirectToAction("Index"); // Tentando deletar supervisor de outro
-        //        }
-        //    }
-        //    // --- FIM DA VERIFICAÇÃO ---
-
-        //    return View(supervisor);
-        //}
 
         [HttpGet]
         public IActionResult Deletar(int id)
@@ -282,7 +212,7 @@ namespace ProjetoEstagio.Controllers
             }
 
             // --- Buscar Supervisor ---
-            SupervisorModel supervisor = _supervisorRepository.BuscarPorId(id);
+            SupervisorModel supervisor = _supervisorService.BuscarPorId(id);
             if (supervisor == null)
             {
                 return StatusCode(404, "Supervisor não encontrado.");
@@ -302,27 +232,21 @@ namespace ProjetoEstagio.Controllers
             return PartialView("_Deletar", supervisor);
         }
 
-        // O método [HttpGet] DeletarConfirmar(int id) não é mais necessário para este fluxo.
-        // Você pode mantê-lo ou removê-lo.
 
-        // Substitua o seu [HttpGet] Deletar(int id) por este:
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Deletar(SupervisorModel supervisor) // Mudança aqui: Recebe o modelo
+        public IActionResult Deletar(SupervisorModel supervisor)
         {
             Console.WriteLine($"===== INÍCIO DO MÉTODO POST DELETAR (ID: {supervisor.Id}) =====");
 
-            // --- 1. VERIFICAÇÃO DE SESSÃO ---
+            // --- 1. VERIFICAÇÃO DE SESSÃO E PERMISSÃO ---
             UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             if (usuarioLogado == null)
             {
-                Console.WriteLine("ERRO: Usuário não logado!");
-                return StatusCode(401, "Sessão expirada. Faça login novamente.");
+                return StatusCode(401, "Sessão expirada.");
             }
 
-            // --- 2. VERIFICAR PERMISSÕES ---
-            // (Verificamos de novo no POST por segurança)
-            SupervisorModel supervisorParaDeletar = _supervisorRepository.BuscarPorId(supervisor.Id);
+            SupervisorModel supervisorParaDeletar = _supervisorService.BuscarPorId(supervisor.Id);
             if (supervisorParaDeletar == null)
             {
                 return StatusCode(404, "Supervisor não encontrado.");
@@ -333,15 +257,16 @@ namespace ProjetoEstagio.Controllers
                 int? empresaId = _sessao.BuscarEmpresaIdDaSessao();
                 if (supervisorParaDeletar.EmpresaId != empresaId.Value)
                 {
-                    Console.WriteLine("ERRO: Tentativa de deletar supervisor de outra empresa.");
-                    return StatusCode(403, "Acesso negado. Você não tem permissão para excluir este item.");
+                    return StatusCode(403, "Acesso negado.");
                 }
             }
 
-            // --- 3. EXECUTAR A EXCLUSÃO ---
+            // --- 2. CHAMADA AO SERVIÇO (AO INVÉS DO REPOSITÓRIO) ---
             try
             {
-                _supervisorRepository.Deletar(supervisor.Id); // Usamos o ID do modelo
+                // _supervisorRepository.Deletar(supervisor.Id); // <-- Linha antiga
+                _supervisorService.DeletarSupervisor(supervisor.Id); // <-- NOVA LINHA
+
                 Console.WriteLine("Supervisor deletado com SUCESSO!");
                 return Json(new { sucesso = true });
             }
@@ -352,46 +277,19 @@ namespace ProjetoEstagio.Controllers
             }
         }
 
-        [AcceptVerbs("GET", "POST")] // Permite que a validação funcione em GET ou POST
-        public async Task<IActionResult> VerificarEmailUnico(string email)
-        {
-            // Verifica se já existe um USUÁRIO com este e-mail
-            // (Pelo seu modelo, o Email de login fica na UsuarioModel)
-            var emailJaExiste = await _context.Usuarios
-                                      .AnyAsync(u => u.Email.ToUpper() == email.ToUpper());
-
-            if (emailJaExiste)
-            {
-                // Se existe, retorna a mensagem de erro específica
-                return Json($"O E-mail {email} já está em uso.");
-            }
-
-            // Se não existe, a validação passa
-            return Json(true);
-        }
-
-
-        /// <summary>
-        /// Método para validação remota do CNPJ.
-        /// </summary>
-        /// <param name="cnpj">O CNPJ vindo do formulário</param>
+        // MÉTODO DE VALIDAÇÃO [Remote]
         [AcceptVerbs("GET", "POST")]
-        public async Task<IActionResult> VerificarCNPJUnico(string cnpj)
+        public async Task<IActionResult> VerificarCPFUnico(string cpf)
         {
-            // Opcional, mas recomendado: Limpar a formatação do CNPJ (pontos e traços)
-            // var cpfLimpo = cpf.Replace(".", "").Replace("-", "");
+            bool cpfJaExiste = await _supervisorService.VerificarCPFUnico(cpf);
 
-            // Verifica se já existe uma EMPRESA com este CNPJ
-            var cnpjJaExiste = await _context.Empresas
-                                    .AnyAsync(e => e.CNPJ == cnpj); // ou e.CNPJ == cnpjLimpo
-
-            if (cnpjJaExiste)
+            if (cpfJaExiste)
             {
-                return Json($"O CNPJ {cnpj} já está cadastrado.");
+                return Json($"O CPF {cpf} já está cadastrado.");
             }
-
             return Json(true);
         }
+
         public IActionResult Login()
         {
             return View("Login");

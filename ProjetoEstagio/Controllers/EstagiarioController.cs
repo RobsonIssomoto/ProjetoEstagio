@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-// 1. Usings adicionados
 using ProjetoEstagio.Data;
 using ProjetoEstagio.Filters;
 using ProjetoEstagio.Helper;
@@ -9,33 +7,28 @@ using ProjetoEstagio.Models;
 using ProjetoEstagio.Models.Enums;
 using ProjetoEstagio.Models.ViewModels; // <-- Adicionado
 using ProjetoEstagio.Repository;
+using ProjetoEstagio.Services;
 
 
 namespace ProjetoEstagio.Controllers
 {
     public class EstagiarioController : Controller
     {
-        // 3. Dependências Adicionadas
-        private readonly IEstagiarioRepository _estagiarioRepository;
-        private readonly IUsuarioRepository _usuarioRepository; // <-- Adicionado
-        private readonly ProjetoEstagioContext _context; // <-- Adicionado
+        private readonly IEstagiarioService _estagiarioService;
         private readonly ISessao _sessao;
+        // Removidas as injeções de repositório
 
         public EstagiarioController(
-            IEstagiarioRepository estagiarioRepository,
-            IUsuarioRepository usuarioRepository, // <-- Adicionado
-            ProjetoEstagioContext context,
-            ISessao sessao) // <-- Adicionado
+            IEstagiarioService estagiarioService,
+            ISessao sessao)
         {
-            _estagiarioRepository = estagiarioRepository;
-            _usuarioRepository = usuarioRepository; // <-- Adicionado
-            _context = context; // <-- Adicionado
+            _estagiarioService = estagiarioService;
             _sessao = sessao;
         }
 
         public IActionResult Index()
         {
-            List<EstagiarioModel> estagiario = _estagiarioRepository.ListarTodos();
+            List<EstagiarioModel> estagiario = _estagiarioService.ListarTodos();
             return View(estagiario);
         }
 
@@ -50,44 +43,18 @@ namespace ProjetoEstagio.Controllers
         public IActionResult Cadastrar(EstagiarioCadastroViewModel viewModel)
         {
             // Começa a transação (ou salva os dois, ou falha os dois)
-            using (var transaction = _context.Database.BeginTransaction())
             {
                 try
                 {
                     if (ModelState.IsValid)
                     {
-                        // 1. Criar o Objeto Usuario
-                        var usuario = new UsuarioModel();
-                        usuario.Login = viewModel.Email; // Login é o email
-                        usuario.Email = viewModel.Email;
-                        usuario.Perfil = Perfil.Estagiario;
-                        usuario.SetSenhaHash(viewModel.Senha); // Seta o HASH
-
-                        _usuarioRepository.Cadastrar(usuario); // Salva o usuário
-
-                        // 2. Criar o Objeto Estagiario
-                        var estagiario = new EstagiarioModel
-                        {
-                            Nome = viewModel.Nome,
-                            CPF = viewModel.CPF,
-                            Telefone = viewModel.Telefone,
-                            Email = viewModel.Email,
-                            DataCadastro = DateTime.Now,
-                            UsuarioId = usuario.Id // <-- O VÍNCULO!
-                        };
-
-                        _estagiarioRepository.Cadastrar(estagiario); // Salva o perfil
-
-                        // 3. Se tudo deu certo, salva as mudanças no banco
-                        transaction.Commit();
-
+                        _estagiarioService.RegistrarNovoEstagiario(viewModel);
                         TempData["MensagemSucesso"] = "Cadastro realizado! Faça o login.";
                         return RedirectToAction("Index", "Login"); // Redireciona para o Login
                     }
                 }
                 catch (Exception erro)
                 {
-                    transaction.Rollback(); // Desfaz tudo
                     TempData["MensagemErro"] = $"Erro ao cadastrar: {erro.Message}";
                 }
             }
@@ -100,7 +67,7 @@ namespace ProjetoEstagio.Controllers
         [HttpGet]
         public IActionResult Editar(int id)
         {
-            EstagiarioModel estagiario = _estagiarioRepository.BuscarPorId(id);
+            EstagiarioModel estagiario = _estagiarioService.BuscarPorId(id);
             if (estagiario == null) return NotFound();
             return View(estagiario);
         }
@@ -112,7 +79,7 @@ namespace ProjetoEstagio.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    _estagiarioRepository.Atualizar(estagiario);
+                    _estagiarioService.Atualizar(estagiario);
                     TempData["MensagemSucesso"] = "Dados alterados com sucesso";
                     return RedirectToAction("Index");
                 }
@@ -122,12 +89,12 @@ namespace ProjetoEstagio.Controllers
                 TempData["MensagemErro"] = $"Erro {erro.Message} na alteração. Tente novamente";
                 return RedirectToAction("Index");
             }
-            return View("Editar", estagiario);
+            return View("Alterar", estagiario);
         }
 
         public IActionResult DeletarConfirmar(int id)
         {
-            EstagiarioModel estagiario = _estagiarioRepository.BuscarPorId(id);
+            EstagiarioModel estagiario = _estagiarioService.BuscarPorId(id);
             if (estagiario == null) return NotFound();
             return View(estagiario);
         }
@@ -136,7 +103,7 @@ namespace ProjetoEstagio.Controllers
         {
             try
             {
-                bool deletar = _estagiarioRepository.Deletar(id);
+                bool deletar = _estagiarioService.Deletar(id);
                 if (deletar)
                     TempData["MensagemSucesso"] = "Estagiário excluído com sucesso";
                 else
@@ -149,46 +116,20 @@ namespace ProjetoEstagio.Controllers
             return RedirectToAction("Index");
         }
 
-
-
         public IActionResult Principal()
         {
             return View();
 
         }
 
-
-        [AcceptVerbs("GET", "POST")] // Permite que a validação funcione em GET ou POST
-        public async Task<IActionResult> VerificarEmailUnico(string email)
-        {
-            // Verifica se já existe um USUÁRIO com este e-mail
-            // (Pelo seu modelo, o Email de login fica na UsuarioModel)
-            var emailJaExiste = await _context.Usuarios
-                                      .AnyAsync(u => u.Email.ToUpper() == email.ToUpper());
-
-            if (emailJaExiste)
-            {
-                // Se existe, retorna a mensagem de erro específica
-                return Json($"O E-mail {email} já está em uso.");
-            }
-
-            // Se não existe, a validação passa
-            return Json(true);
-        }
-
-        /// <summary>
-        /// Método para validação remota do CPF.
-        /// </summary>
-        /// <param name="cpf">O CPF vindo do formulário</param>
+        /// Método [Remote] para validar CPF
         [AcceptVerbs("GET", "POST")]
         public async Task<IActionResult> VerificarCPFUnico(string cpf)
         {
             // Opcional, mas recomendado: Limpar a formatação do CPF (pontos e traços)
             // var cpfLimpo = cpf.Replace(".", "").Replace("-", "");
 
-            // Verifica se já existe um ESTAGIÁRIO com este CPF
-            var cpfJaExiste = await _context.Estagiarios
-                                    .AnyAsync(e => e.CPF == cpf); // ou e.CPF == cpfLimpo
+            bool cpfJaExiste = await _estagiarioService.VerificarCPFUnico(cpf);
 
             if (cpfJaExiste)
             {
@@ -200,37 +141,70 @@ namespace ProjetoEstagio.Controllers
 
         public IActionResult Login() => View("Login");
 
+        //
+        // GET: /Estagiario/Processo
+        //
+        [HttpGet]
         public IActionResult Processo()
         {
+            var usuario = _sessao.BuscarSessaoDoUsuario();
+            if (usuario == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // Usa o SERVIÇO para buscar o estagiário
+            var estagiario = _estagiarioService.BuscarPorUsuarioId(usuario.Id); //
+            if (estagiario == null)
+            {
+                TempData["MensagemErro"] = "Perfil de estagiário não encontrado.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var viewModel = new SolicitacaoCadastroViewModel
+            {
+                EstagiarioId = estagiario.Id,
+                EstagiarioNome = estagiario.Nome,
+                EstagiarioCurso = estagiario.NomeCurso
+            };
+
+            return View(viewModel);
+        }
+
+        //
+        // POST: /Estagiario/CriarSolicitacao
+        //
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CriarSolicitacao(SolicitacaoCadastroViewModel viewModel)
+        {
+            // Busca os dados do estagiário (Nome/Curso) para recarregar a tela em caso de erro
+            EstagiarioModel estagiario = null;
             try
             {
-                // 1. Busca o ID DO ESTAGIÁRIO salvo na sessão
-                // (Assumindo que sua classe _sessao tenha o método de leitura)
-                int? estagiarioId = _sessao.BuscarEstagiarioIdDaSessao();
-
-                if (estagiarioId == null)
+                if (!ModelState.IsValid)
                 {
-                    TempData["MensagemErro"] = "Sua sessão expirou.";
-                    return RedirectToAction("Index", "Login");
+                    // Se o modelo não for válido, força a recarga da view
+                    throw new InvalidOperationException("ModelState inválido.");
                 }
 
-                // 2. Busca o estagiário COMPLETO usando o repositório
-                //    Este método BuscarPorId DEVE buscar na tabela Estagiarios
-                EstagiarioModel estagiario = _estagiarioRepository.BuscarPorId(estagiarioId.Value);
+                // Chama o SERVIÇO para fazer todo o trabalho
+                _estagiarioService.CriarSolicitacao(viewModel);
 
-                if (estagiario == null)
-                {
-                    TempData["MensagemErro"] = "Erro: Perfil de estagiário não encontrado.";
-                    return RedirectToAction("Index", "Login");
-                }
-
-                // 3. Envia o modelo PREENCHIDO para a View
-                return View(estagiario);
+                TempData["MensagemSucesso"] = "Solicitação de estágio enviada com sucesso!";
+                return RedirectToAction("Index", "Home");
             }
-            catch (Exception erro)
+            catch (Exception ex)
             {
-                TempData["MensagemErro"] = $"Erro ao carregar página: {erro.Message}";
-                return RedirectToAction("Index", "Login");
+                // Se o serviço falhar (ex: "Selecione uma empresa"),
+                // a exceção é capturada aqui.
+                TempData["MensagemErro"] = $"Ocorreu um erro: {ex.Message}";
+
+                // Recarrega os dados do estagiário para a view
+                estagiario = _estagiarioService.BuscarPorId(viewModel.EstagiarioId); //
+                viewModel.EstagiarioNome = estagiario.Nome;
+                viewModel.EstagiarioCurso = estagiario.NomeCurso;
+                return View("Processo", viewModel);
             }
         }
     }

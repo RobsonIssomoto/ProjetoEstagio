@@ -36,11 +36,9 @@ namespace ProjetoEstagio.Repository
             return _projetoEstagioContext.Supervisores.FirstOrDefault(s => s.Id == id);
         }
 
-        public SupervisorModel Editar(SupervisorModel supervisor)
+        public SupervisorModel BuscarPorUsuarioId(int usuarioId)
         {
-            _projetoEstagioContext.Supervisores.Update(supervisor);
-            _projetoEstagioContext.SaveChanges();
-            return supervisor;
+            return _projetoEstagioContext.Supervisores.FirstOrDefault(e => e.UsuarioId == usuarioId);
         }
 
         public SupervisorModel Atualizar(SupervisorModel supervisor)
@@ -52,6 +50,8 @@ namespace ProjetoEstagio.Repository
             supervisorDB.Nome = supervisor.Nome;
             supervisorDB.CPF = supervisor.CPF;
             supervisorDB.Cargo = supervisor.Cargo;
+            supervisorDB.Email = supervisor.Email;
+            supervisorDB.Telefone = supervisor.Telefone;
 
             _projetoEstagioContext.Supervisores.Update(supervisorDB);
             _projetoEstagioContext.SaveChanges();

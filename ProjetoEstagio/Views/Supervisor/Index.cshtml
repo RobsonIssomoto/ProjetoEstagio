@@ -44,7 +44,7 @@
                 {
                     <tr>
                         <td>@supervisor.Nome</td>
-                        <td class="text-start">@supervisor.CPF</td>
+                        <td class="text-start cpf">@supervisor.CPF</td>
                         <td>@supervisor.Cargo</td>
                         <td>
                             <a href="javascript:void(0);"
@@ -60,12 +60,6 @@
                         </td>
                     </tr>
                 }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="4" class="text-center">Nenhum supervisor encontrado.</td>
-                </tr>
             }
         </tbody>
     </table>
@@ -97,7 +91,6 @@
     </div>
 </div>
 
-<!-- Modal Deletar Supervisor -->
 <!-- Modal Deletar Supervisor -->
 <div class="modal fade" id="deletarSupervisorModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">

@@ -53,7 +53,6 @@ namespace ProjetoEstagio.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Telefone")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UsuarioId")
@@ -92,8 +91,11 @@ namespace ProjetoEstagio.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Telefone")
+                    b.Property<string>("NomeCurso")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Telefone")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UsuarioId")
@@ -107,6 +109,87 @@ namespace ProjetoEstagio.Migrations
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("Estagiarios");
+                });
+
+            modelBuilder.Entity("ProjetoEstagio.Models.OrientadorModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CPF")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DataAtualizacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataCadastro")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Departamento")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Telefone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("Orientadores");
+                });
+
+            modelBuilder.Entity("ProjetoEstagio.Models.SolicitacaoEstagioModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DataSubmissao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("EmpresaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EstagiarioId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Observacao")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.HasIndex("EstagiarioId");
+
+                    b.ToTable("SolicitacoesEstagio");
                 });
 
             modelBuilder.Entity("ProjetoEstagio.Models.SupervisorModel", b =>
@@ -126,7 +209,6 @@ namespace ProjetoEstagio.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EmpresaId")
@@ -140,11 +222,61 @@ namespace ProjetoEstagio.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EmpresaId");
 
+                    b.HasIndex("UsuarioId");
+
                     b.ToTable("Supervisores");
+                });
+
+            modelBuilder.Entity("ProjetoEstagio.Models.TermoCompromissoModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CargaHoraria")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DataFim")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DataInicio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Justificativa")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NomeSeguradora")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NumeroApolice")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("OrientadorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SolicitacaoEstagioId")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("ValorBolsa")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrientadorId");
+
+                    b.HasIndex("SolicitacaoEstagioId")
+                        .IsUnique();
+
+                    b.ToTable("TermosCompromisso");
                 });
 
             modelBuilder.Entity("ProjetoEstagio.Models.UsuarioModel", b =>
@@ -192,7 +324,7 @@ namespace ProjetoEstagio.Migrations
                     b.HasOne("ProjetoEstagio.Models.UsuarioModel", "Usuario")
                         .WithMany()
                         .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Usuario");
@@ -203,10 +335,38 @@ namespace ProjetoEstagio.Migrations
                     b.HasOne("ProjetoEstagio.Models.UsuarioModel", "Usuario")
                         .WithMany()
                         .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ProjetoEstagio.Models.OrientadorModel", b =>
+                {
+                    b.HasOne("ProjetoEstagio.Models.UsuarioModel", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ProjetoEstagio.Models.SolicitacaoEstagioModel", b =>
+                {
+                    b.HasOne("ProjetoEstagio.Models.EmpresaModel", "Empresa")
+                        .WithMany("Estagios")
+                        .HasForeignKey("EmpresaId");
+
+                    b.HasOne("ProjetoEstagio.Models.EstagiarioModel", "Estagiario")
+                        .WithMany("Estagios")
+                        .HasForeignKey("EstagiarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Empresa");
+
+                    b.Navigation("Estagiario");
                 });
 
             modelBuilder.Entity("ProjetoEstagio.Models.SupervisorModel", b =>
@@ -217,12 +377,55 @@ namespace ProjetoEstagio.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ProjetoEstagio.Models.UsuarioModel", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("Empresa");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ProjetoEstagio.Models.TermoCompromissoModel", b =>
+                {
+                    b.HasOne("ProjetoEstagio.Models.OrientadorModel", "Orientador")
+                        .WithMany("TermosOrientados")
+                        .HasForeignKey("OrientadorId");
+
+                    b.HasOne("ProjetoEstagio.Models.SolicitacaoEstagioModel", "SolicitacaoEstagio")
+                        .WithOne("TermoCompromisso")
+                        .HasForeignKey("ProjetoEstagio.Models.TermoCompromissoModel", "SolicitacaoEstagioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Orientador");
+
+                    b.Navigation("SolicitacaoEstagio");
                 });
 
             modelBuilder.Entity("ProjetoEstagio.Models.EmpresaModel", b =>
                 {
+                    b.Navigation("Estagios");
+
                     b.Navigation("Supervisores");
+                });
+
+            modelBuilder.Entity("ProjetoEstagio.Models.EstagiarioModel", b =>
+                {
+                    b.Navigation("Estagios");
+                });
+
+            modelBuilder.Entity("ProjetoEstagio.Models.OrientadorModel", b =>
+                {
+                    b.Navigation("TermosOrientados");
+                });
+
+            modelBuilder.Entity("ProjetoEstagio.Models.SolicitacaoEstagioModel", b =>
+                {
+                    b.Navigation("TermoCompromisso")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

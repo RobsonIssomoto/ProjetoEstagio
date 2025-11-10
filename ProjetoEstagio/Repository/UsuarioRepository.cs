@@ -1,4 +1,6 @@
-﻿using ProjetoEstagio.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ProjetoEstagio.Data;
 using ProjetoEstagio.Models;
 
 namespace ProjetoEstagio.Repository
@@ -28,13 +30,6 @@ namespace ProjetoEstagio.Repository
         public UsuarioModel BuscarPorId(int id)
         {
             return _projetoEstagioContext.Usuarios.FirstOrDefault(u => u.Id == id);
-        }
-
-        public UsuarioModel Editar(UsuarioModel usuario)
-        {
-            _projetoEstagioContext.Usuarios.Update(usuario);
-            _projetoEstagioContext.SaveChanges();
-            return usuario;
         }
 
         public UsuarioModel Atualizar(UsuarioModel usuario)
@@ -70,5 +65,12 @@ namespace ProjetoEstagio.Repository
         {
             return _projetoEstagioContext.Usuarios.FirstOrDefault(x => x.Login == login);
         }
+
+        public async Task<bool> VerificarEmailUnico(string email)
+        {
+            return await _projetoEstagioContext.Usuarios
+                             .AnyAsync(u => u.Email.ToUpper() == email.ToUpper());
+        }
+
     }
 }

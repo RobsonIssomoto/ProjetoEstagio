@@ -1,49 +1,67 @@
-﻿@model ProjetoEstagio.Models.SupervisorModel
+﻿@model ProjetoEstagio.Models.ViewModels.SupervisorCadastroViewModel
 
 <form id="form-cadastrar-supervisor" asp-controller="Supervisor" asp-action="Cadastrar" method="post" class="row d-flex justify-content-center" style="font-size: .75em">
 
     @Html.AntiForgeryToken()
 
-    <!-- ESTE DIV DEVE ENVOLVER TODO O CONTEÚDO DO FORMULÁRIO -->
     <div class="col-12 bg-white my-2 p-3 rounded shadow">
 
         <div class="form-group row m-3">
             <label for="Nome">Nome</label>
-            <input type="text" class="form-control" asp-for="Nome" required />
+            <input type="text" class="form-control nome" asp-for="Nome" placeholder="Nome completo"  required />
             <span asp-validation-for="Nome" class="text-danger" style="font-size: .9em;"></span>
         </div>
 
         <div class="form-group row m-3">
             <label for="CPF">CPF</label>
-            <input type="text" class="form-control cpf" asp-for="CPF" required />
+            <input type="text" class="form-control cpf" asp-for="CPF" aceholder="CPF sem pontos e traços" required />
             <span asp-validation-for="CPF" class="text-danger" style="font-size: .9em;"></span>
         </div>
 
 
         <div class="form-group row m-3">
             <label for="Email">E-mail</label>
-            <input type="email" class="form-control" asp-for="Email" required />
+            <input type="email" class="form-control" asp-for="Email" placeholder="exemplo@email.com" required  />
             <span asp-validation-for="Email" class="text-danger" style="font-size: .9em;"></span>
         </div>
 
         <div class="form-group row m-3">
             <label for="Telefone">Telefone</label>
-            <input type="text" class="form-control" asp-for="Telefone" required />
+            <input type="text" class="form-control telefone_com_ddd" asp-for="Telefone" placeholder="(XX)XXXXX-XXXX" />
             <span asp-validation-for="Telefone" class="text-danger" style="font-size: .9em;"></span>
         </div>
 
         <div class="form-group row m-3">
             <label for="Cargo">Cargo</label>
-            <input type="text" class="form-control" asp-for="Cargo" required />
+            <input type="text" class="form-control nome" asp-for="Cargo" placeholder="Nome do Cargo" required />
             <span asp-validation-for="Cargo" class="text-danger" style="font-size: .9em;"></span>
         </div>
 
+        <div class="form-group row m-3">
+            <label asp-for="Senha">Senha</label>
+            <div class="input-icon-wrapper px-0">
+                <input type="password" class="form-control" asp-for="Senha" id="senha" placeholder="Digite a senha" required />
+                <span class="input-icon-toggle">
+                    <i class="bi bi-eye"></i>
+                </span>
+            </div>
+            <span asp-validation-for="Senha" class="text-danger" style="font-size: .9em;"></span>
+        </div>
+
+        <div class="form-group row m-3">
+            <label asp-for="ConfirmarSenha">Confirmar Senha</label>
+            <div class="input-icon-wrapper px-0">
+                <input type="password" class="form-control" asp-for="ConfirmarSenha" placeholder="Confirme a senha" required />
+                <span class="input-icon-toggle">
+                    <i class="bi bi-eye"></i>
+                </span>
+            </div>
+            <span asp-validation-for="ConfirmarSenha" class="text-danger" style="font-size: .9em;"></span>
+        </div>
 
         <div class="form-group row m-3">
             <button type="submit" class="btn btn-danger mb-2">Cadastrar</button>
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
         </div>
-
-    </div> <!-- O DIV FECHA AQUI -->
-
-</form> <!-- O FORM FECHA AQUI -->
+    </div>
+</form>
