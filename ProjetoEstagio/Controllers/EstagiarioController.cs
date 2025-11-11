@@ -67,29 +67,57 @@ namespace ProjetoEstagio.Controllers
         [HttpGet]
         public IActionResult Editar(int id)
         {
-            EstagiarioModel estagiario = _estagiarioService.BuscarPorId(id);
-            if (estagiario == null) return NotFound();
-            return View(estagiario);
+             EstagiarioModel estagiario = _estagiarioService.BuscarPorId(id); 
+             if (estagiario == null) return NotFound(); 
+
+            // Mapeia do Model para a ViewModel
+            var viewModel = new EstagiarioEditarViewModel
+            {
+                Id = estagiario.Id,
+                CPF = estagiario.CPF,
+                Nome = estagiario.Nome,
+                Email = estagiario.Email,
+                Telefone = estagiario.Telefone,
+                NomeCurso = estagiario.NomeCurso
+            };
+
+            return View(viewModel); // Envia a ViewModel para a View
         }
 
         [HttpPost]
-        public IActionResult Alterar(EstagiarioModel estagiario)
+        public IActionResult Alterar(EstagiarioEditarViewModel viewModel) // <-- Recebe a ViewModel
         {
             try
             {
+                // Agora o ModelState.IsValid vai funcionar!
                 if (ModelState.IsValid)
                 {
-                    _estagiarioService.Atualizar(estagiario);
+                    // Mapeia da ViewModel para o Model
+                    EstagiarioModel estagiarioParaAtualizar = new EstagiarioModel
+                    {
+                        Id = viewModel.Id,
+                        Nome = viewModel.Nome,
+                        Email = viewModel.Email,
+                        Telefone = viewModel.Telefone,
+                        NomeCurso = viewModel.NomeCurso
+                    };
+
+                    _estagiarioService.Atualizar(estagiarioParaAtualizar);
                     TempData["MensagemSucesso"] = "Dados alterados com sucesso";
-                    return RedirectToAction("Index");
+
+                    // Redireciona para o Dashboard do Estagiário
+                    return RedirectToAction("Principal");
                 }
             }
             catch (System.Exception erro)
             {
                 TempData["MensagemErro"] = $"Erro {erro.Message} na alteração. Tente novamente";
-                return RedirectToAction("Index");
+                return RedirectToAction("Principal");
             }
-            return View("Alterar", estagiario);
+
+            // Se o ModelState for inválido, retorna a ViewModel
+            // As mensagens de erro [Required] etc. vão aparecer
+            return View("Editar", viewModel);
         }
 
         public IActionResult DeletarConfirmar(int id)
@@ -122,6 +150,34 @@ namespace ProjetoEstagio.Controllers
 
         }
 
+        [HttpGet]
+        public IActionResult MeuPerfil()
+        {
+            try
+            {
+                UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+                if (usuarioLogado == null || usuarioLogado.Perfil != Perfil.Estagiario)
+                {
+                    TempData["MensagemErro"] = "Acesso negado. Faça o login como Estagiário.";
+                    return RedirectToAction("Index", "Login");
+                }
+
+                EstagiarioModel estagiario = _estagiarioService.BuscarPorUsuarioId(usuarioLogado.Id); 
+                if (estagiario == null)
+                {
+                    TempData["MensagemErro"] = "Nenhum perfil de estagiário encontrado para seu usuário.";
+                    return RedirectToAction("Index", "Home");
+                }
+
+                // Redireciona para a Action Editar(id) existente
+                return RedirectToAction("Editar", new { id = estagiario.Id });
+            }
+            catch (Exception ex)
+            {
+                TempData["MensagemErro"] = $"Erro ao localizar perfil: {ex.Message}";
+                return RedirectToAction("Index", "Home");
+            }
+        }
         /// Método [Remote] para validar CPF
         [AcceptVerbs("GET", "POST")]
         public async Task<IActionResult> VerificarCPFUnico(string cpf)
@@ -192,7 +248,7 @@ namespace ProjetoEstagio.Controllers
                 _estagiarioService.CriarSolicitacao(viewModel);
 
                 TempData["MensagemSucesso"] = "Solicitação de estágio enviada com sucesso!";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Principal");
             }
             catch (Exception ex)
             {

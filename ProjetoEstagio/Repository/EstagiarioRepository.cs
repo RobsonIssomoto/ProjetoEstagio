@@ -49,20 +49,30 @@ namespace ProjetoEstagio.Repository
             return _projetoEstagioContext.Estagiarios.FirstOrDefault(e => e.Id == id);
         }
 
+        // Substitua o seu método Atualizar por este:
         public EstagiarioModel Atualizar(EstagiarioModel estagiario)
         {
+            // 1. Busca o estagiário original do banco
             EstagiarioModel estagiarioDB = BuscarPorId(estagiario.Id);
 
-            if (estagiarioDB == null) throw new Exception("Erro na atualização. Empresa não encontrada!");
+            if (estagiarioDB == null) throw new Exception("Erro na atualização. Estagiário não encontrado!");
 
+            // 2. Copia os valores do objeto "estagiario" (vindo do controller)
+            //    para o objeto "estagiarioDB" (vindo do banco)
             estagiarioDB.Nome = estagiario.Nome;
             estagiarioDB.Email = estagiario.Email;
 
+            // --- LINHAS QUE FALTAVAM ---
+            estagiarioDB.Telefone = estagiario.Telefone;
+            estagiarioDB.NomeCurso = estagiario.NomeCurso; // <-- Esta é a linha principal!
+            estagiarioDB.DataAtualizacao = DateTime.Now;
+            // --- FIM DAS LINHAS ---
+
+            // 3. Salva o objeto "estagiarioDB" que foi modificado
             _projetoEstagioContext.Estagiarios.Update(estagiarioDB);
             _projetoEstagioContext.SaveChanges();
 
             return estagiarioDB;
-
         }
 
         public bool Deletar(int id)

@@ -45,24 +45,24 @@ namespace ProjetoEstagio.Repository
         }
 
         // Dentro de EmpresaRepository.cs
+        // Cole isto dentro da classe EmpresaRepository
         public EmpresaModel Atualizar(EmpresaModel empresa)
         {
+            // 1. Busca a empresa original no banco de dados
             EmpresaModel empresaDB = BuscarPorId(empresa.Id);
 
             if (empresaDB == null) throw new Exception("Erro na atualização. Empresa não encontrada!");
 
-            // Campos que serão atualizados:
+            // 2. Atualiza APENAS os campos permitidos
             empresaDB.RazaoSocial = empresa.RazaoSocial;
             empresaDB.Nome = empresa.Nome; // Nome Fantasia
             empresaDB.Email = empresa.Email;
             empresaDB.Telefone = empresa.Telefone;
             empresaDB.DataAtualizacao = DateTime.Now; // Atualiza a data da modificação
 
-            // Campos que NÃO serão atualizados:
-            // empresaDB.CNPJ = ... (Não mexemos no CNPJ)
-            // empresaDB.DataCadastro = ... (Não mexemos na data de cadastro)
-            // empresaDB.UsuarioId = ... (Não mexemos no vínculo com o usuário)
+            // Campos como CNPJ, UsuarioId e DataCadastro NÃO são alterados
 
+            // 3. Salva as mudanças
             _projetoEstagioContext.Empresas.Update(empresaDB);
             _projetoEstagioContext.SaveChanges();
 
