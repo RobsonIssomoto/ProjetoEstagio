@@ -107,34 +107,61 @@ namespace ProjetoEstagio.Controllers
             List<EmpresaModel> empresas = _empresaService.ListarTodos(); //
             return View(empresas);
         }
-
         [HttpGet]
         public IActionResult Editar(int id)
         {
             EmpresaModel empresa = _empresaService.BuscarPorId(id); //
             if (empresa == null) return NotFound();
-            return View(empresa);
+
+            // --- MUDANÇA AQUI ---
+            // Mapeia do Model para a ViewModel
+            var viewModel = new EmpresaEditarViewModel
+            {
+                Id = empresa.Id,
+                CNPJ = empresa.CNPJ,
+                RazaoSocial = empresa.RazaoSocial,
+                Nome = empresa.Nome,
+                Email = empresa.Email,
+                Telefone = empresa.Telefone
+            };
+
+            return View(viewModel); // Envia a ViewModel para a View
         }
 
 
         [HttpPost]
-        public IActionResult Alterar(EmpresaModel empresa)
+        public IActionResult Alterar(EmpresaEditarViewModel viewModel) // <-- MUDANÇA 1: Recebe a ViewModel
         {
             try
             {
+                // MUDANÇA 2: Agora o ModelState.IsValid vai funcionar!
                 if (ModelState.IsValid)
                 {
-                    _empresaService.Atualizar(empresa); //
+                    // MUDANÇA 3: Mapeia da ViewModel para o Model
+                    // (O Repositório só precisa dos campos que atualiza)
+                    EmpresaModel empresaParaAtualizar = new EmpresaModel
+                    {
+                        Id = viewModel.Id,
+                        RazaoSocial = viewModel.RazaoSocial,
+                        Nome = viewModel.Nome,
+                        Email = viewModel.Email,
+                        Telefone = viewModel.Telefone
+                    };
+
+                    _empresaService.Atualizar(empresaParaAtualizar); //
                     TempData["MensagemSucesso"] = "Dados da empresa alterado com sucesso";
-                    return RedirectToAction("Index");
+                    return RedirectToAction("Principal");
                 }
             }
             catch (System.Exception erro)
             {
                 TempData["MensagemErro"] = $"Erro {erro.Message} na alteração dos dados da empresa. Tente novamente";
-                return RedirectToAction("Index");
+                return RedirectToAction("Principal");
             }
-            return View("Editar", empresa);
+
+            // MUDANÇA 4: Se o ModelState for inválido, retorna a ViewModel
+            // (Isso fará as mensagens de erro [Required] aparecerem)
+            return View("Editar", viewModel);
         }
 
         public IActionResult DeletarConfirmar(int id)
@@ -143,7 +170,6 @@ namespace ProjetoEstagio.Controllers
             if (empresa == null) return NotFound();
             return View(empresa);
         }
-
 
         public IActionResult Deletar(int id)
         {
@@ -158,6 +184,42 @@ namespace ProjetoEstagio.Controllers
             {
                 TempData["MensagemErro"] = $"Devido erro: {erro.Message}";
                 return RedirectToAction("Index");
+            }
+        }
+
+        // Coloque este método dentro do seu EmpresaController.cs
+
+        [HttpGet]
+        public IActionResult MeuPerfil()
+        {
+            try
+            {
+                // 1. Busca o usuário logado na sessão
+                UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+
+                // 2. Valida se ele é um Representante (ou o perfil que pode editar)
+                if (usuarioLogado == null || usuarioLogado.Perfil != Perfil.Representante)
+                {
+                    TempData["MensagemErro"] = "Acesso negado. Faça o login como Representante.";
+                    return RedirectToAction("Index", "Login");
+                }
+
+                // 3. Busca a Empresa vinculada a este usuário
+                EmpresaModel empresa = _empresaService.BuscarEmpresaPorUsuarioId(usuarioLogado.Id);
+
+                if (empresa == null)
+                {
+                    TempData["MensagemErro"] = "Nenhuma empresa encontrada para o seu usuário.";
+                    return RedirectToAction("Index", "Home"); // Ou para o Login
+                }
+
+                // 4. REDIRECIONA para a action Editar(id) existente, passando o ID
+                return RedirectToAction("Editar", new { id = empresa.Id });
+            }
+            catch (Exception ex)
+            {
+                TempData["MensagemErro"] = $"Erro ao localizar perfil: {ex.Message}";
+                return RedirectToAction("Index", "Home");
             }
         }
 
@@ -308,6 +370,7 @@ namespace ProjetoEstagio.Controllers
                 return View("PreencherTermo", viewModel);
             }
         }
+
         // --- OUTROS MÉTODOS ---
 
         public IActionResult Login() => View("Login");

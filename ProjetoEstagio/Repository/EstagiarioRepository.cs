@@ -15,10 +15,27 @@ namespace ProjetoEstagio.Repository
 
         public EstagiarioModel Cadastrar(EstagiarioModel estagiario)
         {
-            estagiario.DataCadastro = DateTime.Now;
-            _projetoEstagioContext.Estagiarios.Add(estagiario);
-            _projetoEstagioContext.SaveChanges();
-            return estagiario;
+            try
+            {
+                estagiario.DataCadastro = DateTime.Now;
+                _projetoEstagioContext.Estagiarios.Add(estagiario);
+                _projetoEstagioContext.SaveChanges(); // <-- A falha ocorre AQUI
+                return estagiario;
+            }
+            // Esta é a exceção específica para erros de salvamento do EF
+            catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
+            {
+                // ERRO REAL: Coloque um breakpoint (ponto de depuração) 
+                // AQUI e inspecione a variável 'ex.InnerException.Message'
+
+                // Ou, para ver o erro na tela, jogue a mensagem interna:
+                throw new Exception($"Erro ao salvar no banco: {ex.InnerException?.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                // Captura qualquer outro erro que possa ter ocorrido antes do SaveChanges
+                throw new Exception($"Erro inesperado: {ex.Message}", ex);
+            }
         }
 
         public List<EstagiarioModel> ListarTodos()

@@ -10,7 +10,7 @@ namespace ProjetoEstagio.Models
         public string CPF { get; set; }
         public string? Telefone { get; set; }
         public string Email { get; set; }
-        public string NomeCurso { get; set; }
+        public string? NomeCurso { get; set; }
         public DateTime DataCadastro { get; set; }
         public DateTime? DataAtualizacao { get; set; }
         public int UsuarioId { get; set; }

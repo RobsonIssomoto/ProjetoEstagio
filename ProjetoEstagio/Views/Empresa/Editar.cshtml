@@ -1,36 +1,66 @@
-﻿@model ProjetoEstagio.Models.EmpresaModel
+﻿@model ProjetoEstagio.Models.ViewModels.EmpresaEditarViewModel
 @{
-    ViewData["Title"] = "Editar Empresa";
+    ViewData["Title"] = "Editar Perfil da Empresa";
+    Layout = "_LayoutEmpresa";
 }
 <div class="container mb-4">
-    <form asp-controller="Empresa" asp-action="Alterar" method="post" class="row d-flex justify-content-center" style="font-size: .75em">
-        <div class="col-4 bg-white my-2 p-3 rounded shadow" style="min-width: 380px">
-            <h3 class="text-center mb-3">EDITAR EMPRESA</h3>
+    <form asp-controller="Empresa" asp-action="Alterar" method="post" class="row d-flex justify-content-center" style="font-size: .9em">
+        <div class="col-md-7 col-lg-6 bg-white my-3 p-4 rounded shadow">
+            <h3 class="text-center mb-4">EDITAR PERFIL DA EMPRESA</h3>
 
-            <input type="hidden" asp-for="Id"/>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-            <div class="form-group row m-3">
-                <label for="Nome">Nome</label>
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group mb-3">
+                <label asp-for="CNPJ" class="form-label fw-bold">CNPJ</label>
+                <input type="text" class="form-control bg-light" asp-for="CNPJ" readonly />
+                <small class="form-text text-muted">O CNPJ não pode ser alterado após o cadastro.</small>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="RazaoSocial" class="form-label fw-bold">Razão Social</label>
+                <input type="text" class="form-control" asp-for="RazaoSocial" />
+                <span asp-validation-for="RazaoSocial" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Nome" class="form-label fw-bold">Nome Fantasia</label>
                 <input type="text" class="form-control" asp-for="Nome" />
-                @Html.ValidationMessageFor(x => x.Nome)
+                <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
 
-            <div class="form-group row m-3">
-                <label for="CNPJ">CNPJ</label>
-                <input type="text" class="form-control" asp-for="CNPJ" />
-                @Html.ValidationMessageFor(x => x.CNPJ)
-            </div>
-
-            <div class="form-group row m-3">
-                <label for="Email">Email</label>
+            <div class="form-group mb-3">
+                <label asp-for="Email" class="form-label fw-bold">Email de Contato</label>
                 <input type="email" class="form-control" asp-for="Email">
-                @Html.ValidationMessageFor(x => x.Email)
+                <span asp-validation-for="Email" class="text-danger"></span>
             </div>
 
-            <div class="form-group row m-3">
-                <button type="submit" class="btn btn-danger mb-2">Editar</button>
-                <button type="submit" class="btn btn-outline-secondary">Cancelar</button>
+            <div class="form-group mb-3">
+                <label asp-for="Telefone" class="form-label fw-bold">Telefone</label>
+                <input type="text" class="form-control" asp-for="Telefone" placeholder="(XX) XXXXX-XXXX">
+                <span asp-validation-for="Telefone" class="text-danger"></span>
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="row g-2 justify-content-end">
+
+                <div class="col-6 col-md-3">
+                    <a asp-controller="Empresa" asp-action="Principal" class="btn btn-outline-secondary w-100">Cancelar</a>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">Salvar</button>
+                </div>
             </div>
         </div>
     </form>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
