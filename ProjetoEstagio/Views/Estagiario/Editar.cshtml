@@ -5,39 +5,39 @@
 }
 <div class="container mb-4">
     <form asp-controller="Estagiario" asp-action="Alterar" method="post" class="row d-flex justify-content-center" style="font-size: .9em">
-        <div class="col-md-7 col-lg-6 bg-white my-3 p-4 rounded shadow">
-            <h3 class="text-center mb-4">EDITAR PERFIL DO ESTAGIÁRIO</h3>
+        <div class="col-6 bg-white my-3 p-4 rounded shadow" style="min-width: 380px">
+            <h3 class="text-center mb-4">EDITAR PERFIL</h3>
 
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
             <input type="hidden" asp-for="Id" />
 
             <div class="form-group mb-3">
-                <label asp-for="CPF" class="form-label fw-bold"></label>
+                <label asp-for="CPF"></label>
                 <input type="text" class="form-control bg-light" asp-for="CPF" readonly />
                 <small class="form-text text-muted">O CPF não pode ser alterado após o cadastro.</small>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="Nome" class="form-label fw-bold"></label>
+                <label asp-for="Nome"></label>
                 <input type="text" class="form-control" asp-for="Nome" />
                 <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="Email" class="form-label fw-bold"></label>
+                <label asp-for="Email"></label>
                 <input type="email" class="form-control" asp-for="Email">
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="Telefone" class="form-label fw-bold"></label>
+                <label asp-for="Telefone"></label>
                 <input type="text" class="form-control" asp-for="Telefone" placeholder="(XX) XXXXX-XXXX">
                 <span asp-validation-for="Telefone" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="NomeCurso" class="form-label fw-bold"></label>
+                <label asp-for="NomeCurso"></label>
                 <input type="text" class="form-control" asp-for="NomeCurso">
                 <span asp-validation-for="NomeCurso" class="text-danger"></span>
             </div>

@@ -5,15 +5,13 @@
     ViewData["Title"] = "Processo Estagiário";
 }
 
-@* MUDANÇA 2: Apontar para uma Action específica, ex: "CriarSolicitacao" *@
 <form asp-controller="Estagiario" asp-action="CriarSolicitacao" method="post">
 
-    @* MUDANÇA 3: Enviar o ID do Estagiário de forma oculta *@
     <input type="hidden" asp-for="EstagiarioId" />
 
     <div class="row justify-content-center ">
-        <div class=" card col-12 col-sm-8 bg-white p-4 rounded shadow ">
-            <div class="card-header bg-white border-0">
+        <div class="col-6 col-md-8" style="min-width: 380px">
+            <div class="card-header border-0 text-center mt-3">
                 <h5 class="mb-0 text-center fw-bold ">
                     Início do Processo
                 </h5>
@@ -25,12 +23,16 @@
                     <h5 class="mb-0">Dados Pessoais</h5>
                 </div>
                 <div class="card-body">
-                    <label class="form-label">Nome</label>
-                    @* MUDANÇA 4: Usar as propriedades do ViewModel *@
-                    <input type="text" class="form-control mb-3" asp-for="EstagiarioNome" readonly />
-
-                    <label class="form-label">Curso</label>
-                    <input type="text" class="form-control" asp-for="EstagiarioCurso" readonly />
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" asp-for="EstagiarioNome">Nome</label>
+                            <input type="text" class="form-control" asp-for="EstagiarioNome" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" asp-for="EstagiarioCurso">Curso</label>
+                            <input type="text" class="form-control" asp-for="EstagiarioCurso" readonly />
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -39,23 +41,22 @@
                     <h5 class="mb-0">Dados da Empresa</h5>
                 </div>
                 <div class="card-body">
-                    <label class="form-label">Pesquisar Nome da Empresa</label>
-                    <input type="search" class="form-control mb-2"
-                           placeholder="Pesquisar por nome ou CNPJ"
-                           id="busca-empresa-input"
-                           autocomplete="off" />
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Pesquisar Nome da Empresa</label>
+                            <input type="search" class="form-control mb-2"
+                                   placeholder="Pesquisar por nome ou CNPJ"
+                                   id="busca-empresa-input"
+                                   autocomplete="off" />
 
-                    <div id="busca-empresa-resultados" class="list-group">
+                            <div id="busca-empresa-resultados" class="list-group">
+                            </div>
+                            <input type="hidden" asp-for="EmpresaId" id="empresa-id-selecionada" /> 
+                            <a href="#" class="small mt-2 d-block" id="btn-convidar-empresa">
+                                Enviar convite para cadastro de empresa
+                            </a>
+                        </div>
                     </div>
-
-                    @* MUDANÇA 5: Vincular o ID da empresa ao ViewModel *@
-                    <input type="hidden" asp-for="EmpresaId" id="empresa-id-selecionada" />
-
-                    <a href="#" class="small mt-2 d-block" id="btn-convidar-empresa">
-                        Enviar convite para cadastro de empresa
-                    </a>
-
-                    @* (Aqui você pode adicionar um modal que preencha o "EmailConvite") *@
                 </div>
             </div>
 
@@ -64,18 +65,24 @@
                     <h5 class="mb-0">Observações</h5>
                 </div>
                 <div class="card-body">
-                    <label class="form-label">Dados Adicionais (opcional)</label>
-                    @* MUDANÇA 6: Vincular o textarea ao ViewModel *@
-                    <textarea class="form-control" asp-for="Observacao" rows="5" placeholder="Inclua informações adicionais, se necessário"></textarea>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label" asp-for="Observacao">Dados Adicionais (opcional)</label>
+                            <textarea class="form-control" asp-for="Observacao" rows="5" placeholder="Inclua informações adicionais, se necessário"></textarea> 
+                        </div>
+                    </div>
                 </div>
             </div>
+
             <div class="d-flex flex-column gap-2 my-2">
                 <button type="submit" class="btn btn-primary w-100">Enviar</button>
                 <a class="btn btn-outline-secondary w-100" asp-controller="Home" asp-action="Index">Cancelar</a>
             </div>
+
         </div>
     </div>
 </form>
+
 @section Scripts {
     <script>
         $(document).ready(function () {
@@ -84,13 +91,13 @@
             var $resultadosBusca = $('#busca-empresa-resultados');
             var $campoEmpresaId = $('#empresa-id-selecionada');
 
-            // 1. Ação de busca (AJAX)
+
             $inputBusca.on('keyup', function () {
                 var termo = $(this).val();
 
                 if (termo.length < 3) {
                     $resultadosBusca.empty();
-                    return;
+              return;
                 }
 
                 // Chama a Action no EmpresaController
@@ -107,40 +114,34 @@
                                 item.data('id', empresa.id); // Armazena o ID no item
                                 item.data('nome', empresa.nome); // Armazena o nome
                                 $resultadosBusca.append(item);
-                            });
+                           });
                         } else {
                             $resultadosBusca.append('<span class="list-group-item text-muted">Nenhuma empresa encontrada.</span>');
-                        }
+                  }
                     }
                 });
-            });
+          });
 
             // 2. Ação de clique no resultado
-            // MUDANÇA AQUI: Usamos 'mousedown' em vez de 'click'
-            // 'mousedown' dispara antes de 'blur', resolvendo o problema sem 'setTimeout'
             $resultadosBusca.on('mousedown', '.list-group-item-action', function (e) {
-                e.preventDefault(); // Impede o link de navegar E de roubar o foco
+                e.preventDefault();
 
-                var idSelecionado = $(this).data('id');
+             var idSelecionado = $(this).data('id');
                 var nomeSelecionado = $(this).data('nome');
 
                 // Preenche os campos
                 $campoEmpresaId.val(idSelecionado);
                 $inputBusca.val(nomeSelecionado); // Coloca o nome limpo no input
 
-                // Limpa os resultados
+              // Limpa os resultados
                 $resultadosBusca.empty();
             });
-
             // 3. Lógica de 'blur' (limpar)
-            // Esta lógica agora funciona, pois o 'mousedown' já preencheu o campo
             $inputBusca.on('blur', function() {
-                // Se o usuário sair do campo e ele estiver vazio, limpa o ID
                 if ($(this).val() === '') {
-                    $campoEmpresaId.val('');
+                  $campoEmpresaId.val('');
                 }
             });
-
         });
     </script>
 }
