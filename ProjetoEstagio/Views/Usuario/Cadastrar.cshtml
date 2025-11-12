@@ -1,47 +1,65 @@
-﻿@model ProjetoEstagio.Models.UsuarioModel
-@using ProjetoEstagio.Models.Enums;
+﻿@model ProjetoEstagio.Models.ViewModels.UsuarioCadastroViewModel
 @{
     ViewData["Title"] = "Cadastrar Usuário";
+    // Usando o layout do Admin para esta área
+    Layout = "_LayoutAdmin";
 }
-<div class="container mb-4">
-    <form asp-controller="Usuario" asp-action="Cadastrar" method="post" class="row d-flex justify-content-center" style="font-size: .75em">
-        <div class="col-4 bg-white my-2 p-3 rounded shadow" style="min-width: 380px">
-            <h3 class="text-center mb-3">CADASTRAR USUÁRIO</h3>
-            <div class="form-group row m-3">
-                <label for="Nome">Nome</label>
-                <input type="text" class="form-control" asp-for="Login" />
-                @* @Html.ValidationMessageFor(x => x.Login) *@
-            </div>
 
-            <div class="form-group row m-3">
-                <label for="Email">Email</label>
-                <input type="text" class="form-control" asp-for="Email" />
-                @Html.ValidationMessageFor(x => x.Email)
-            </div>
+<h3 class="fw-bold">Novo Usuário</h3>
+<p class="text-muted">Crie um novo usuário de acesso (Admin ou Orientador).</p>
 
-            <div class="form-group row m-3">
-                <label for="Perfil">Perfil</label>
-                <select asp-for="Perfil" class="form-select">
-                    <option value="0">Selecione</option>
-                    <option value="@Perfil.Admin">Administrador</option>
-                    <option value="@Perfil.Estagiario">Estagiário</option>
-                    <option value="@Perfil.Representante">Representante</option>
-                    
-                </select>
-                @* @Html.ValidationMessageFor(x => x.Senha) *@
-            </div>
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
 
+                <form asp-controller="Usuario" asp-action="Cadastrar" method="post">
 
-            <div class="form-group row m-3">
-                <label for="Senha">Senha</label>
-                <input type="password" class="form-control" asp-for="Senha">
-                @Html.ValidationMessageFor(x => x.Senha)
-            </div>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-            <div class="form-group row m-3">
-                <button type="submit" class="btn btn-danger mb-2">Cadastrar</button>
-                <a class="btn btn-outline-secondary" asp-action="Index" asp-controller="Usuario" role="button">Cancelar</a>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">E-mail (Login)</label>
+                        <input type="email" class="form-control" asp-for="Email">
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Perfil" class="form-label">Perfil de Acesso</label>
+                        <select class="form-select" asp-for="Perfil"
+                                asp-items="Html.GetEnumSelectList<ProjetoEstagio.Models.Enums.Perfil>()">
+                            <option value="">Selecione um perfil...</option>
+                        </select>
+                        <span asp-validation-for="Perfil" class="text-danger small"></span>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Senha" class="form-label">Senha</label>
+                            <input type="password" class="form-control" asp-for="Senha">
+                            <span asp-validation-for="Senha" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ConfirmarSenha" class="form-label">Confirmar Senha</label>
+                            <input type="password" class="form-control" asp-for="ConfirmarSenha">
+                            <span asp-validation-for="ConfirmarSenha" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary">Cadastrar Usuário</button>
+                        <a class="btn btn-outline-secondary" asp-action="Index">Cancelar</a>
+                    </div>
+
+                </form>
             </div>
         </div>
-    </form>
+    </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

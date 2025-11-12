@@ -129,6 +129,86 @@ namespace ProjetoEstagio.Services
             return _orientadorRepository.ListarTodos();
         }
 
+        public List<TermoCompromissoModel> ListarTermosPendentesDeOrientador()
+        {
+            // Esta consulta busca todos os Termos que:
+            // 1. Já foram 'Aprovados' pela empresa (Status.Aprovado).
+            // 2. Ainda não têm um 'OrientadorId' (OrientadorId == null).
+            var termosPendentes = _context.TermosCompromisso
+                .Include(t => t.SolicitacaoEstagio)
+                    .ThenInclude(s => s.Estagiario) // Traz o nome do Estagiário
+                .Include(t => t.SolicitacaoEstagio)
+                    .ThenInclude(s => s.Empresa) // Traz o nome da Empresa
+                .Where(t => t.OrientadorId == null && t.SolicitacaoEstagio.Status == Status.Aprovado)
+                .AsNoTracking()
+                .ToList();
+
+            return termosPendentes;
+        }
+
+        // --- IMPLEMENTAÇÃO DO PASSO 2 (ATRIBUIR O ORIENTADOR) ---
+
+        public void AtribuirOrientador(int termoId, int orientadorId)
+        {
+            // Usamos uma transação para garantir que a atribuição
+            // e a mudança de status ocorram juntas.
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    // 1. Busca o Termo E a Solicitação vinculada
+                    var termo = _context.TermosCompromisso
+                        .Include(t => t.SolicitacaoEstagio)
+                        .FirstOrDefault(t => t.Id == termoId);
+
+                    if (termo == null)
+                    {
+                        throw new Exception("Termo de Compromisso não encontrado.");
+                    }
+
+                    // 2. (Opcional, mas recomendado) Verifica se o Orientador existe
+                    var orientador = _orientadorRepository.BuscarPorId(orientadorId);
+                    if (orientador == null)
+                    {
+                        throw new Exception("Orientador selecionado não foi encontrado.");
+                    }
+
+                    // 3. ATRIBUI o orientador ao Termo
+                    termo.OrientadorId = orientadorId;
+
+                    // 4. ATUALIZA o Status da Solicitação
+                    // O estágio agora sai de "Aprovado" (pela empresa)
+                    // e vai para "Em Andamento" (aprovado pela instituição).
+                    termo.SolicitacaoEstagio.Status = Status.EmAndamento;
+
+                    // 5. Salva tudo
+                    _context.SaveChanges(); // O EF Core é inteligente o bastante para salvar o Termo e a Solicitação
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw; // Relança o erro para o Controller
+                }
+            }
+        }
+
+        public List<TermoCompromissoModel> ListarTodosOsTermos()
+        {
+            // Esta consulta busca TODOS os termos e
+            // inclui todos os dados relacionados para a tabela.
+            var todosOsTermos = _context.TermosCompromisso
+                .Include(t => t.SolicitacaoEstagio)
+                    .ThenInclude(s => s.Estagiario) // Traz o Estagiário
+                .Include(t => t.SolicitacaoEstagio)
+                    .ThenInclude(s => s.Empresa) // Traz a Empresa
+                .Include(t => t.Orientador) // <-- Traz o Orientador (se houver)
+                .AsNoTracking()
+                .OrderByDescending(t => t.SolicitacaoEstagio.DataSubmissao) // Mais novos primeiro
+                .ToList();
+
+            return todosOsTermos;
+        }
         public async Task<bool> VerificarCPFUnico(string cpf)
         {
             // Valida direto no contexto para usar Async

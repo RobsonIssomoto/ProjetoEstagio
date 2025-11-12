@@ -1,0 +1,50 @@
+﻿@model ProjetoEstagio.Models.OrientadorModel
+
+<form id="form-editar-orientador" asp-controller="Orientador" asp-action="Editar" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="UsuarioId" />
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="Nome" class="form-label">Nome Completo</label>
+            <input type="text" asp-for="Nome" class="form-control">
+            <span asp-validation-for="Nome" class="text-danger small"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="CPF" class="form-label">CPF</label>
+            <input type="text" asp-for="CPF" class="form-control cpf">
+            <span asp-validation-for="CPF" class="text-danger small"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="Telefone" class="form-label">Telefone (Opcional)</label>
+            <input type="text" asp-for="Telefone" class="form-control telefone_com_ddd">
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="Departamento" class="form-label">Departamento</label>
+            <input type="text" asp-for="Departamento" class="form-control">
+            <span asp-validation-for="Departamento" class="text-danger small"></span>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label">E-mail (Login)</label>
+        <input type="email" asp-for="Email" class="form-control">
+        <span asp-validation-for="Email" class="text-danger small"></span>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+    </div>
+</form>
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+<script>
+    $(document).ready(function() {
+        aplicarMascarasGlobais('#editarOrientadorModal .modal-body');
+    });
+</script>

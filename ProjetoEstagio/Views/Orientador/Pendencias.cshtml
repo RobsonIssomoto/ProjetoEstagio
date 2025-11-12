@@ -1,0 +1,89 @@
+﻿@* MUDANÇA 1: Usar o ViewModel que criamos *@
+@model ProjetoEstagio.Models.ViewModels.PendenciasOrientadorViewModel
+
+@{
+    ViewData["Title"] = "Pendências de Orientação";
+    // MUDANÇA 2: Apontar para o Layout do Admin (presumindo que exista)
+    // Se o nome for diferente (ex: _Layout.cshtml), ajuste aqui.
+    Layout = "_LayoutAdmin";
+}
+
+
+<h3 class="fw-bold">Pendências de Orientação</h3>
+<p class="text-muted">Atribua orientadores aos termos de estágio que já foram aprovados pelas empresas.</p>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white p-4">
+        <h5 class="mb-0 fw-bold">Termos Aguardando Orientador</h5>
+        <p class="text-muted mb-0 small">Somente termos com status "Aprovado" pela empresa são listados aqui.</p>
+    </div>
+
+    <div class="table-responsive p-3">
+
+        @if (Model.TermosPendentes != null && Model.TermosPendentes.Any())
+        {
+            <table id="pendenciasTable" class="table table-striped table-bordered table-hover align-middle mb-0" style="width:100%">
+                <thead class="table-light">
+                    <tr>
+                        <th>Estudante</th>
+                        <th>Empresa</th>
+                        <th>Curso</th>
+                        <th>Data da Solicitação</th>
+                        <th class="text-center" style="width: 300px;">Atribuir Orientador</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var termo in Model.TermosPendentes)
+                    {
+                        <tr>
+                            <td>@termo.SolicitacaoEstagio.Estagiario.Nome</td>
+                            <td>@termo.SolicitacaoEstagio.Empresa.Nome</td>
+                            <td>@termo.SolicitacaoEstagio.Estagiario.NomeCurso</td>
+                            <td>@termo.SolicitacaoEstagio.DataSubmissao.ToString("dd/MM/yyyy")</td>
+
+                            <td>
+                                <form asp-controller="Orientador" asp-action="Atribuir" method="post" class="d-flex flex-nowrap gap-2">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden" name="TermoIdSelecionado" value="@termo.Id" />
+
+                                    <select name="OrientadorIdSelecionado" class="form-select form-select-sm"
+                                            asp-items="Model.OrientadoresDisponiveis" required>
+                                        <option value="">Selecione...</option>
+                                    </select>
+
+                                    <button type="submit" class="btn btn-primary btn-sm" title="Atribuir">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="p-4 text-center text-muted">
+                <p class="mb-0">Não há nenhuma pendência de orientação no momento.</p>
+            </div>
+        }
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#pendenciasTable').DataTable({
+                // Opcional: Adiciona tradução (seus layouts já carregam o JS)
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Portuguese-Brasil.json"
+                },
+                // Ordena pela data de solicitação (coluna 3, índice 0), mais antiga primeiro
+                "order": [[ 3, "asc" ]]
+            });
+        });
+    </script>
+}

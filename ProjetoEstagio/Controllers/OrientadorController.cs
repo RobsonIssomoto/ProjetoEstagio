@@ -6,6 +6,7 @@ using ProjetoEstagio.Models.Enums;
 using ProjetoEstagio.Models.ViewModels;
 using ProjetoEstagio.Services;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ProjetoEstagio.Controllers
 {
@@ -150,6 +151,91 @@ namespace ProjetoEstagio.Controllers
             {
                 return StatusCode(500, $"Erro ao deletar: {ex.Message}");
             }
+        }
+
+        // GET: /Orientador/Pendencias
+        [HttpGet]
+        public IActionResult Pendencias()
+        {
+            // 1. Segurança: Reutiliza a mesma lógica do seu Index
+            UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            if (usuarioLogado == null || usuarioLogado.Perfil != Perfil.Admin)
+            {
+                TempData["MensagemErro"] = "Você não tem permissão para acessar esta página.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 2. Busca os dados usando os serviços
+            var termosPendentes = _orientadorService.ListarTermosPendentesDeOrientador();
+            var orientadores = _orientadorService.ListarTodos(); //
+
+            // 3. Monta o ViewModel
+            var viewModel = new PendenciasOrientadorViewModel
+            {
+                TermosPendentes = termosPendentes,
+
+                // Cria o SelectList para o dropdown
+                OrientadoresDisponiveis = new SelectList(orientadores, "Id", "Nome")
+            };
+
+            // 4. Envia o ViewModel para a nova View (que criaremos a seguir)
+            return View(viewModel);
+        }
+
+        // GET: /Orientador/Estagios
+        [HttpGet]
+        public IActionResult Estagios()
+        {
+            // 1. Segurança
+            UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            if (usuarioLogado == null || usuarioLogado.Perfil != Perfil.Admin)
+            {
+                TempData["MensagemErro"] = "Você não tem permissão para acessar esta página.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 2. Chama o novo método do serviço
+            List<TermoCompromissoModel> todosOsTermos = _orientadorService.ListarTodosOsTermos();
+
+            // 3. Envia a lista para a nova View
+            return View(todosOsTermos);
+        }
+
+        // POST: /Orientador/Atribuir
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Atribuir(PendenciasOrientadorViewModel viewModel)
+        {
+            // 1. Segurança
+            UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            if (usuarioLogado == null || usuarioLogado.Perfil != Perfil.Admin)
+            {
+                return StatusCode(403, "Acesso negado.");
+            }
+
+            try
+            {
+                // 2. Validação básica
+                if (viewModel.TermoIdSelecionado <= 0 || viewModel.OrientadorIdSelecionado <= 0)
+                {
+                    throw new Exception("Seleção inválida.");
+                }
+
+                // 3. Chama o serviço que implementamos no passo anterior
+                _orientadorService.AtribuirOrientador(
+                    viewModel.TermoIdSelecionado,
+                    viewModel.OrientadorIdSelecionado
+                );
+
+                TempData["MensagemSucesso"] = "Orientador atribuído com sucesso!";
+            }
+            catch (Exception ex)
+            {
+                TempData["MensagemErro"] = $"Erro ao atribuir: {ex.Message}";
+            }
+
+            // 4. Retorna para a página de pendências
+            return RedirectToAction("Pendencias");
         }
 
         // MÉTODO DE VALIDAÇÃO [Remote]

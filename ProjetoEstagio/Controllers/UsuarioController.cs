@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjetoEstagio.Filters;
 using ProjetoEstagio.Models;
+using ProjetoEstagio.Models.ViewModels;
 using ProjetoEstagio.Repository;
 
 namespace ProjetoEstagio.Controllers
@@ -20,19 +21,36 @@ namespace ProjetoEstagio.Controllers
             return View(usuarios);
         }
 
+        // --- MÉTODO GET ATUALIZADO ---
+        // (Ele agora usa o ViewModel)
         public IActionResult Cadastrar()
         {
-            return View();
+            return View(new UsuarioCadastroViewModel()); // <-- MUDANÇA
         }
 
+        // --- MÉTODO POST ATUALIZADO ---
+        // (Ele recebe o ViewModel e CRIPTOGRAFA a senha)
         [HttpPost]
-        public IActionResult Cadastrar(UsuarioModel usuario)
+        public IActionResult Cadastrar(UsuarioCadastroViewModel viewModel) // <-- MUDANÇA
         {
             try
             {
                 if (ModelState.IsValid)
                 {
+                    // 1. Cria o UsuarioModel a partir do ViewModel
+                    var usuario = new UsuarioModel
+                    {
+                        Login = viewModel.Email,
+                        Email = viewModel.Email,
+                        Perfil = viewModel.Perfil
+                    };
+
+                    // 2. CHAMA O SETSENHAHASH (A CORREÇÃO)
+                    usuario.SetSenhaHash(viewModel.Senha); // 
+
+                    // 3. Salva no repositório
                     _usuarioRepository.Cadastrar(usuario);
+
                     TempData["MensagemSucesso"] = "Usuário cadastrado com sucesso";
                     return RedirectToAction("Index");
                 }
@@ -42,7 +60,9 @@ namespace ProjetoEstagio.Controllers
                 TempData["MensagemErro"] = $"Erro {erro.Message} no cadastro de usuário. Tente novamente";
                 return RedirectToAction("Index");
             }
-            return View(usuario);
+
+            // Se o ModelState for inválido, retorna o ViewModel para a View
+            return View(viewModel);
         }
 
         public IActionResult DeletarConfirmar(int id)

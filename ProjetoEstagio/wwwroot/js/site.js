@@ -526,7 +526,171 @@
     });
 
 
+    // ===================================================================
+    // ORIENTADOR - CADASTRAR (LOAD)
+    // (Cópia do padrão Supervisor)
+    // ===================================================================
+    $(document).on('click', '.btn-cadastrar-orientador', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/Orientador/Cadastrar', // URL CORRETA
+            type: 'GET',
+            success: function (result) {
+                var modalBodySelector = '#cadastrarOrientadorModal .modal-body'; // ID CORRETO
+                $(modalBodySelector).html(result);
+                setupModalForm(modalBodySelector); // Chama sua função [cite: 106]
+
+                var modal = new bootstrap.Modal(document.getElementById('cadastrarOrientadorModal')); // ID CORRETO
+                modal.show();
+            },
+            error: function (xhr, status, error) {
+                // (Seu handler de erro)
+                if (xhr.status === 401) {
+                    alert("Sua sessão expirou. Você será redirecionado.");
+                    window.location.href = '/Login/Index';
+                } else {
+                    alert("Erro ao carregar o formulário. Tente novamente.");
+                }
+            }
+        });
+    });
+
+    // ===================================================================
+    // ORIENTADOR - EDITAR (LOAD)
+    // (Cópia do padrão Supervisor)
+    // ===================================================================
+    $(document).on('click', '.btn-edit-orientador', function (e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        $.ajax({
+            url: '/Orientador/Editar/' + id, // URL CORRETA
+            type: 'GET',
+            success: function (result) {
+                var modalBodySelector = '#editarOrientadorModal .modal-body'; // ID CORRETO
+                $(modalBodySelector).html(result);
+                setupModalForm(modalBodySelector); // Chama sua função [cite: 106]
+
+                var modal = new bootstrap.Modal(document.getElementById('editarOrientadorModal')); // ID CORRETO
+                modal.show();
+            },
+            error: function (xhr, status, error) {
+                // (Seu handler de erro)
+                if (xhr.status === 401) {
+                    alert("Sua sessão expirou.");
+                    window.location.href = '/Login/Index';
+                } else {
+                    alert("Erro ao carregar o formulário de edição.");
+                }
+            }
+        });
+    });
+
+    // ===================================================================
+    // ORIENTADOR - DELETAR (LOAD)
+    // (Cópia do padrão Supervisor)
+    // ===================================================================
+    $(document).on('click', '.btn-deletar-orientador', function (e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        $.ajax({
+            url: '/Orientador/Deletar/' + id, // URL CORRETA
+            type: 'GET',
+            success: function (result) {
+                var modalBodySelector = '#deletarOrientadorModal .modal-body'; // ID CORRETO
+                $(modalBodySelector).html(result);
+                setupModalForm(modalBodySelector); // Chama sua função [cite: 106]
+
+                var modal = new bootstrap.Modal(document.getElementById('deletarOrientadorModal')); // ID CORRETO
+                modal.show();
+            },
+            error: function (xhr, status, error) {
+                // (Seu handler de erro)
+                if (xhr.status === 401) {
+                    alert("Sua sessão expirou.");
+                    window.location.href = '/Login/Index';
+                } else {
+                    alert("Erro ao carregar o formulário de exclusão.");
+                }
+            }
+        });
+    });
+
+
+    // ===================================================================
+    // ORIENTADOR - SUBMIT CADASTRO
+    // (Cópia do padrão Supervisor)
+    // ===================================================================
+    $(document).on('submit', '#form-cadastrar-orientador', function (e) {
+        e.preventDefault();
+        var $form = $(this);
+        if (!$form.valid()) { return; }
+
+        // (Aqui você pode adicionar a lógica de limpar máscaras se necessário)
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: $form.serialize(),
+            success: function (result) {
+                window.location.reload(); // Sucesso
+            },
+            error: function (xhr, status, error) {
+                // (Seu handler de erro)
+                alert("Ocorreu um erro no servidor. Tente novamente.\nDetalhe: " + (xhr.responseText || error));
+            }
+        });
+    });
+
+    // ===================================================================
+    // ORIENTADOR - SUBMIT EDIÇÃO
+    // (Cópia do padrão Supervisor)
+    // ===================================================================
+    $(document).on('submit', '#form-editar-orientador', function (e) {
+        e.preventDefault();
+        var $form = $(this);
+        if (!$form.valid()) { return; }
+
+        // (Aqui você pode adicionar a lógica de limpar máscaras se necessário)
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: $form.serialize(),
+            success: function (result) {
+                window.location.reload(); // Sucesso
+            },
+            error: function (xhr, status, error) {
+                // (Seu handler de erro)
+                alert("Ocorreu um erro no servidor. Tente novamente.\nDetalhe: " + (xhr.responseText || error));
+            }
+        });
+    });
+
+    // ===================================================================
+    // ORIENTADOR - SUBMIT DELETAR
+    // (Cópia do padrão Supervisor)
+    // ===================================================================
+    $(document).on('submit', '#form-deletar-orientador', function (e) {
+        e.preventDefault();
+        var $form = $(this);
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: $form.serialize(),
+            success: function (result) {
+                window.location.reload(); // Sucesso
+            },
+            error: function (xhr, status, error) {
+                // (Seu handler de erro)
+                alert("Ocorreu um erro no servidor. Tente novamente.\nDetalhe: " + (xhr.responseText || error));
+            }
+        });
+    });
+
+
 }); // Fim do $(document).ready()
+
 
 
 // ===================================================================

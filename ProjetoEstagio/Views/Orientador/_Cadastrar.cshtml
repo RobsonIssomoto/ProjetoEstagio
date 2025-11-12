@@ -1,0 +1,83 @@
+﻿@model ProjetoEstagio.Models.ViewModels.OrientadorCadastroViewModel
+@*
+Este arquivo é uma Partial View, ele não tem Layout.
+Ele será carregado DENTRO do modal na Index.cshtml
+*@
+
+<form id="form-cadastrar-orientador" asp-controller="Orientador" asp-action="Cadastrar" method="post">
+
+    @Html.AntiForgeryToken()
+
+    <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Novo Orientador</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <div class="modal-body p-4">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Nome" class="form-label">Nome Completo</label>
+                <input type="text" asp-for="Nome" class="form-control">
+                <span asp-validation-for="Nome" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="CPF" class="form-label">CPF</label>
+                <input type="text" asp-for="CPF" class="form-control">
+                <span asp-validation-for="CPF" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Telefone" class="form-label">Telefone (Opcional)</label>
+                <input type="text" asp-for="Telefone" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="Departamento" class="form-label">Departamento</label>
+                <input type="text" asp-for="Departamento" class="form-control" placeholder="Ex: Tecnologia">
+                <span asp-validation-for="Departamento" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <hr>
+        <p class="text-muted small">O E-mail será usado para login.</p>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label">E-mail (Login)</label>
+            <input type="email" asp-for="Email" class="form-control">
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Senha" class="form-label">Senha</label>
+                <input type="password" asp-for="Senha" class="form-control">
+                <span asp-validation-for="Senha" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="ConfirmarSenha" class="form-label">Confirmar Senha</label>
+                <input type="password" asp-for="ConfirmarSenha" class="form-control">
+                <span asp-validation-for="ConfirmarSenha" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+    </div>
+</form>
+
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+
+<script>
+    $(document).ready(function() {
+        // As máscaras só funcionam se o seu _Layout carregar o jquery.mask.js
+        $('input[name="CPF"]').mask('000.000.000-00', { reverse: false });
+        $('input[name="Telefone"]').mask('(00) 00000-0000');
+    });
+</script>

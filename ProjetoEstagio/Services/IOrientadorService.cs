@@ -11,6 +11,9 @@ namespace ProjetoEstagio.Services
         void DeletarOrientador(int orientadorId);
         OrientadorModel BuscarPorId(int id);
         List<OrientadorModel> ListarTodos();
+        List<TermoCompromissoModel> ListarTermosPendentesDeOrientador();
+        List<TermoCompromissoModel> ListarTodosOsTermos();
+        void AtribuirOrientador(int termoId, int orientadorId);
         Task<bool> VerificarCPFUnico(string cpf);
     }
 }
