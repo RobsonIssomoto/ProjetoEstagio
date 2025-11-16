@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetoEstagio.Data;
 
@@ -11,9 +12,11 @@ using ProjetoEstagio.Data;
 namespace ProjetoEstagio.Migrations
 {
     [DbContext(typeof(ProjetoEstagioContext))]
-    partial class ProjetoEstagioContextModelSnapshot : ModelSnapshot
+    [Migration("20251115151023_Plano de Atividades e Supervisor no Termo de Compromisso")]
+    partial class PlanodeAtividadeseSupervisornoTermodeCompromisso
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -241,9 +244,6 @@ namespace ProjetoEstagio.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CaminhoArquivo")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("CargaHoraria")
                         .HasColumnType("int");
 
@@ -254,9 +254,6 @@ namespace ProjetoEstagio.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Justificativa")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NomeArquivo")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NomeSeguradora")

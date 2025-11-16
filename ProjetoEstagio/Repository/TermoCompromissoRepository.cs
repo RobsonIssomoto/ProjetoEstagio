@@ -33,6 +33,9 @@ namespace ProjetoEstagio.Repository
                     .ThenInclude(s => s.Estagiario)         // Da Solicitação, inclui o Estagiário
                 .Include(t => t.SolicitacaoEstagio)         // Inclui a Solicitação de novo
                     .ThenInclude(s => s.Empresa)            // Da Solicitação, inclui a Empresa
+                .Include(t => t.Supervisor) // Carrega o Supervisor
+                .Include(t => t.Orientador) // Carrega o Orientador
+                .AsNoTracking() // Boa prática para relatórios (só leitura)
                 .FirstOrDefault(t => t.Id == id);           // Filtra pelo ID do Termo
         }
         public TermoCompromissoModel Atualizar(TermoCompromissoModel termo)
@@ -50,7 +53,18 @@ namespace ProjetoEstagio.Repository
             termoDB.DataFim = termo.DataFim;
             termoDB.NumeroApolice = termo.NumeroApolice;
             termoDB.NomeSeguradora = termo.NomeSeguradora;
-            // O OrientadorId será atualizado pelo Admin
+            termoDB.Justificativa = termo.Justificativa; // (importante para a rejeição)
+
+            // --- ESTAS SÃO AS LINHAS DA CORREÇÃO ---
+            // Salva os campos que o EmpresaService enviou
+            termoDB.PlanoDeAtividades = termo.PlanoDeAtividades;
+            termoDB.SupervisorId = termo.SupervisorId;
+            // ------------------------------------
+
+            // O OrientadorId e os caminhos de arquivo serão atualizados pelo OrientadorService
+            termoDB.OrientadorId = termo.OrientadorId;
+            termoDB.NomeArquivo = termo.NomeArquivo;
+            termoDB.CaminhoArquivo = termo.CaminhoArquivo;
 
             _context.TermosCompromisso.Update(termoDB);
             _context.SaveChanges();

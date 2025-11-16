@@ -8,6 +8,8 @@ using ProjetoEstagio.Models.Enums;
 using ProjetoEstagio.Models.ViewModels; // <-- Adicionado
 using ProjetoEstagio.Repository;
 using ProjetoEstagio.Services;
+using System.Linq;
+using System.IO;
 
 
 namespace ProjetoEstagio.Controllers
@@ -146,8 +148,57 @@ namespace ProjetoEstagio.Controllers
 
         public IActionResult Principal()
         {
-            return View();
+            try
+            {
+                // 1. Buscar o Estagiário logado (lógica que você já tem)
+                UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+                if (usuarioLogado == null || usuarioLogado.Perfil != Perfil.Estagiario)
+                {
+                    return RedirectToAction("Index", "Login");
+                }
 
+                EstagiarioModel estagiario = _estagiarioService.BuscarPorUsuarioId(usuarioLogado.Id);
+                if (estagiario == null)
+                {
+                    TempData["MensagemErro"] = "Perfil de estagiário não encontrado.";
+                    return RedirectToAction("Index", "Home");
+                }
+
+                // 2. Chamar o serviço para listar as solicitações
+                // (O serviço já foi atualizado no passo anterior)
+                List<SolicitacaoEstagioModel> solicitacoes = _estagiarioService.ListarSolicitacoes(estagiario.Id);
+
+                // 3. Montar o novo ViewModel
+                var viewModel = new EstagiarioDashboardViewModel
+                {
+                    Solicitacoes = solicitacoes,
+
+                    // Lógica para os cartões
+                    ProcessosPendentesCount = solicitacoes.Count(s =>
+                        s.Status == Status.Pendente ||
+                        s.Status == Status.Aprovado),
+
+                    // Lógica para o botão "Iniciar"
+                    PossuiProcessoAtivoOuPendente = solicitacoes.Any(s =>
+                        s.Status == Status.Pendente ||
+                        s.Status == Status.Aprovado ||
+                        s.Status == Status.EmAndamento),
+
+                    // (Valores estáticos por enquanto)
+                    RelatoriosPendentesCount = 0,
+                    DocumentosPendentesCount = solicitacoes.Count(s =>
+                        s.Status == Status.EmAndamento &&
+                        s.TermoCompromisso?.CaminhoArquivo != null)
+                };
+
+                // 4. Enviar o NOVO ViewModel para a View
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["MensagemErro"] = $"Erro ao carregar painel: {ex.Message}";
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         [HttpGet]
@@ -261,6 +312,32 @@ namespace ProjetoEstagio.Controllers
                 viewModel.EstagiarioNome = estagiario.Nome;
                 viewModel.EstagiarioCurso = estagiario.NomeCurso;
                 return View("Processo", viewModel);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult DownloadTermo(int termoId)
+        {
+            try
+            {
+                // 1. Buscar o Estagiário logado
+                UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+                EstagiarioModel estagiario = _estagiarioService.BuscarPorUsuarioId(usuarioLogado.Id);
+                if (estagiario == null)
+                {
+                    return StatusCode(403, "Acesso negado.");
+                }
+
+                // 2. Chama o serviço (que contém a lógica de segurança)
+                var resultado = _estagiarioService.PrepararDownloadTermo(termoId, estagiario.Id);
+
+                // 3. Retorna o arquivo
+                return File(resultado.FileContents, "application/pdf", resultado.NomeArquivo);
+            }
+            catch (Exception ex)
+            {
+                TempData["MensagemErro"] = $"Erro ao baixar o arquivo: {ex.Message}";
+                return RedirectToAction("Principal");
             }
         }
     }

@@ -89,26 +89,24 @@
             color: rgba(255,255,255,0.8);
         }
 </style>
+
 <div id="bdSidebar"
      class="d-flex flex-column flex-shrink-0 px-3 pt-3 bg-danger text-white offcanvas-md offcanvas-start shadow-sm"
      style="width: 230px;"
      tabindex="-1" aria-labelledby="bdSidebarLabel">
 
-    <!-- Botão de fechar no mobile -->
     <button type="button"
             class="btn-close btn-close-white d-md-none ms-auto mb-3"
             data-bs-toggle="offcanvas"
             data-bs-target="#bdSidebar"
             aria-label="Fechar"></button>
 
-    <!-- Logo / título -->
     <a href="#" class="navbar-brand text-center mb-3 text-white text-decoration-none">
         <h5 class="fw-bold m-0">SGE</h5>
     </a>
 
     <hr class="border-light my-2">
 
-    <!-- Menu -->
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item mb-2">
             <a asp-controller="Empresa" asp-action="Principal" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-2">
@@ -121,32 +119,34 @@
                 <i class="fa-solid fa-user"></i> Perfil
             </a>
         </li>
+
         <li class="nav-item mb-2">
-            <a asp-controller="Orientador" asp-action="Pendencias" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-2">
-                <i class="fa-solid fa-building"></i> Orientadores
+            <a href="#estagios-submenu" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="estagios-submenu"
+               class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-2 dropdown-toggle">
+                <i class="fa-solid fa-folder-open"></i> Estágios
             </a>
+
+            <div class="collapse" id="estagios-submenu">
+                <ul class="nav flex-column ps-4 mt-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="Orientador" asp-action="Pendencias" style="padding-left: 0.5rem !important;">
+                            <i class="fa-solid fa-hourglass-half" style="width: 18px; text-align: center;"></i> Pendências
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="Orientador" asp-action="Estagios" style="padding-left: 0.5rem !important;">
+                            <i class="fa-solid fa-database" style="width: 18px; text-align: center;"></i> Histórico
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </li>
-        <li class="nav-item">
-            <a class="nav-link text-white" asp-controller="Orientador" asp-action="Pendencias">
-                <i class="fa-solid fa-hourglass-half me-2"></i> Pendências
+        <li class="nav-item mb-2">
+            <a asp-controller="Orientador" asp-action="Index" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-2">
+                <i class="fa-solid fa-graduation-cap"></i> Orientadores
             </a>
         </li>
 
-        <li class="nav-item">
-            <a class="nav-link text-white" asp-controller="Orientador" asp-action="Estagios">
-                <i class="fa-solid fa-folder-open me-2"></i> Todos os Estágios
-            </a>
-        </li>
-        <li class="nav-item mb-2">
-            <a href="#" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-2">
-                <i class="fa-solid fa-graduation-cap"></i> Estagiários
-            </a>
-        </li>
-        <li class="nav-item mb-2">
-            <a href="#" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-2">
-                <i class="fas fa-file-alt"></i> Documentos
-            </a>
-        </li>
         <li class="nav-item mb-2">
             <a href="#" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-2">
                 <i class="fas fa-cog"></i> Configuração
@@ -161,7 +161,6 @@
 
     <hr class="border-light mt-auto">
 
-    <!-- Rodapé -->
     <div class="text-center small opacity-75">
         <i class="fa-solid fa-book me-2"></i> SGE Fatec
     </div>

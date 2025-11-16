@@ -8,6 +8,8 @@
     getDataTable('#estagiarioTable');
     getDataTable('#supervisorTable');
     getDataTable('#solicitacoesTable');
+    getDataTable('#pendenciasTable');
+    getDataTable('#estagiosTable');
 
     // ==========================================================
     //  !!!! PASSO 1: APLIQUE AS MÁSCARAS NO CARREGAMENTO DA PÁGINA !!!!
@@ -688,6 +690,61 @@
         });
     });
 
+    // ===================================================================
+    // ORIENTADOR - ALTERAR (LOAD)
+    // (Segue o padrão do btn-deletar-orientador)
+    // ===================================================================
+    $(document).on('click', '.btn-alterar-orientador', function (e) {
+        e.preventDefault();
+        var id = $(this).data('id'); // Pega o TermoId
+
+        $.ajax({
+            url: '/Orientador/AlterarOrientador/' + id, // Action HttpGet
+            type: 'GET',
+            success: function (result) {
+                // Seta o HTML no modal correto
+                var modalBodySelector = '#alterarOrientadorModal .modal-body';
+                $(modalBodySelector).html(result);
+
+                // Ativa a validação (chama a função global)
+                setupModalForm(modalBodySelector);
+
+                // Mostra o modal
+                var modal = new bootstrap.Modal(document.getElementById('alterarOrientadorModal'));
+                modal.show();
+            },
+            error: function (xhr, status, error) {
+                // (Seu handler de erro padrão)
+                alert("Erro ao carregar o formulário: " + (xhr.responseText || error));
+            }
+        });
+    });
+
+    // ===================================================================
+    // ORIENTADOR - SUBMIT ALTERAR
+    // (Segue o padrão do form-deletar-orientador)
+    // ===================================================================
+    $(document).on('submit', '#form-alterar-orientador', function (e) {
+        e.preventDefault();
+        var $form = $(this);
+        if (!$form.valid()) { return; } // Verifica a validação
+
+        $.ajax({
+            url: $form.attr('action'), // Action HttpPost
+            type: 'POST',
+            data: $form.serialize(),
+            success: function (result) {
+                // O controller retorna { sucesso: true }
+                if (result.sucesso) {
+                    window.location.reload(); // Recarrega a página de Estágios
+                }
+            },
+            error: function (xhr, status, error) {
+                // (Seu handler de erro padrão)
+                alert("Ocorreu um erro ao salvar: " + (xhr.responseText || error));
+            }
+        });
+    });
 
 }); // Fim do $(document).ready()
 

@@ -7,21 +7,21 @@
 <div class="row justify-content-center">
     <div class="col-12 col-lg-10 col-xl-8">
 
-        @* MUDANÇA 1: O <form> agora aponta para "SalvarTermo" como ação padrão *@
         <form asp-action="SalvarTermo" method="post">
 
             <input type="hidden" asp-for="TermoId" />
             <input type="hidden" asp-for="SolicitacaoId" />
 
-            <!-- Para exibir erros de validação -->
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+            }
 
             <div class="card-header text-center mt-3">
                 <h3 class="fw-bold">Termo de Compromisso</h3>
                 <p class="text-muted">Preencha os dados contratuais para aprovar ou rejeite a solicitação.</p>
             </div>
 
-            <!-- Card 1: Informações dos Envolvidos (Igual ao seu) -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">Informações dos Envolvidos</h5>
@@ -44,13 +44,22 @@
                 </div>
             </div>
 
-            <!-- Card 2: Detalhes do Contrato (Igual ao seu) -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">Detalhes do Contrato (Obrigatório para Aprovar)</h5>
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
+
+                        <div class="col-12">
+                            <label asp-for="SupervisorId" class="form-label"></label>
+                            <select asp-for="SupervisorId"
+                                    class="form-select"
+                                    asp-items="@Model.SupervisoresDisponiveis">
+                                <option value="">-- Selecione um supervisor --</option>
+                            </select>
+                            <span asp-validation-for="SupervisorId" class="text-danger small"></span>
+                        </div>
                         <div class="col-md-6">
                             <label asp-for="CargaHoraria" class="form-label"></label>
                             <input type="number" asp-for="CargaHoraria" class="form-control" />
@@ -85,7 +94,16 @@
                 </div>
             </div>
 
-            <!-- MUDANÇA 2: Card de Rejeição Adicionado -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Plano de Atividades (Obrigatório para Aprovar)</h5>
+                </div>
+                <div class="card-body">
+                    <label asp-for="PlanoDeAtividades" class="form-label"></label>
+                    <textarea asp-for="PlanoDeAtividades" class="form-control" rows="8"></textarea>
+                    <span asp-validation-for="PlanoDeAtividades" class="text-danger small"></span>
+                </div>
+            </div>
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-warning-subtle">
                     <h5 class="mb-0">Ação Alternativa: Rejeitar</h5>
@@ -98,22 +116,14 @@
             </div>
 
 
-            <!-- MUDANÇA 3: Botões de Ação Atualizados -->
             <div class="d-flex flex-column flex-md-row gap-2 my-2">
-
-                <!-- Botão PROSSEGUIR (Salvar) -->
-                <!-- Este botão usa a action padrão do <form> ("SalvarTermo") -->
                 <button type="submit" class="btn btn-danger btn-lg flex-grow-1">
                     <i class="fa-solid fa-save me-2"></i> Prosseguir e Aprovar
                 </button>
-
-                <!-- Botão REJEITAR -->
-                <!-- Este botão usa 'asp-action' para enviar para a Action 'RejeitarTermo' -->
                 <button type="submit" class="btn btn-secondary btn-lg"
                         asp-action="RejeitarTermo">
                     <i class="fa-solid fa-times me-2"></i> Rejeitar Solicitação
                 </button>
-
                 <a class="btn btn-outline-secondary btn-lg" asp-action="Principal" asp-controller="Empresa">Cancelar</a>
             </div>
 
@@ -121,3 +131,11 @@
 
     </div>
 </div>
+
+
+@section Scripts {
+    @{
+        // Isso ativa a validação do lado do cliente (jQuery Unobtrusive)
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

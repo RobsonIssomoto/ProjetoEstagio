@@ -1,5 +1,6 @@
 ﻿using ProjetoEstagio.Models;
 using ProjetoEstagio.Models.ViewModels;
+using System.Collections.Generic;
 
 namespace ProjetoEstagio.Services
 {
@@ -18,5 +19,7 @@ namespace ProjetoEstagio.Services
         bool Deletar(int id);
         EstagiarioModel BuscarPorUsuarioId(int usuarioId); // Você tinha isso no repositório
         void CriarSolicitacao(SolicitacaoCadastroViewModel viewModel);
+        List<SolicitacaoEstagioModel> ListarSolicitacoes(int estagiarioId);
+        (byte[] FileContents, string NomeArquivo) PrepararDownloadTermo(int termoId, int estagiarioId);
     }
 }

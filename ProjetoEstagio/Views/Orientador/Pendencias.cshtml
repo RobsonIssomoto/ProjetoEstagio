@@ -1,16 +1,12 @@
-﻿@* MUDANÇA 1: Usar o ViewModel que criamos *@
-@model ProjetoEstagio.Models.ViewModels.PendenciasOrientadorViewModel
+﻿@model ProjetoEstagio.Models.ViewModels.PendenciasOrientadorViewModel
 
 @{
     ViewData["Title"] = "Pendências de Orientação";
-    // MUDANÇA 2: Apontar para o Layout do Admin (presumindo que exista)
-    // Se o nome for diferente (ex: _Layout.cshtml), ajuste aqui.
     Layout = "_LayoutAdmin";
 }
 
-
 <h3 class="fw-bold">Pendências de Orientação</h3>
-<p class="text-muted">Atribua orientadores aos termos de estágio que já foram aprovados pelas empresas.</p>
+<p class="text-muted">Atribua um orientador a cada termo para finalizar a aprovação e gerar o documento oficial.</p>
 
 <div class="card shadow-sm">
     <div class="card-header bg-white p-4">
@@ -71,19 +67,3 @@
         }
     </div>
 </div>
-
-
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            $('#pendenciasTable').DataTable({
-                // Opcional: Adiciona tradução (seus layouts já carregam o JS)
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Portuguese-Brasil.json"
-                },
-                // Ordena pela data de solicitação (coluna 3, índice 0), mais antiga primeiro
-                "order": [[ 3, "asc" ]]
-            });
-        });
-    </script>
-}

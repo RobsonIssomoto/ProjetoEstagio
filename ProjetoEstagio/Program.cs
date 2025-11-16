@@ -3,6 +3,7 @@ using ProjetoEstagio.Data;
 using ProjetoEstagio.Helper;
 using ProjetoEstagio.Repository;
 using ProjetoEstagio.Services;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,7 @@ builder.Services.AddScoped<IOrientadorService, OrientadorService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<ISolicitacaoEstagioRepository, SolicitacaoEstagioRepository>();
 builder.Services.AddScoped<ITermoCompromissoRepository, TermoCompromissoRepository>();
+builder.Services.AddScoped<IArquivoService, ArquivoService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ISessao, Sessao>();
@@ -31,7 +33,10 @@ builder.Services.AddSession(o =>
     o.Cookie.HttpOnly = true;
     o.Cookie.IsEssential = true;
 });
-    
+
+
+QuestPDF.Settings.License = LicenseType.Community;
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

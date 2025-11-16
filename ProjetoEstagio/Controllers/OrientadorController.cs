@@ -7,6 +7,9 @@ using ProjetoEstagio.Models.ViewModels;
 using ProjetoEstagio.Services;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Hosting; // <-- 1. ADICIONE ESTE USING
+using ProjetoEstagio.Repository;   // <-- 2. ADICIONE ESTE USING
+using System.IO;                   // <-- 3. ADICIONE ESTE USING
 
 namespace ProjetoEstagio.Controllers
 {
@@ -14,11 +17,19 @@ namespace ProjetoEstagio.Controllers
     {
         private readonly IOrientadorService _orientadorService;
         private readonly ISessao _sessao;
+        private readonly ITermoCompromissoRepository _termoRepository;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public OrientadorController(IOrientadorService orientadorService, ISessao sessao)
+        public OrientadorController(
+            IOrientadorService orientadorService, 
+            ISessao sessao, 
+            ITermoCompromissoRepository termoRepository,
+            IWebHostEnvironment webHostEnvironment)
         {
             _orientadorService = orientadorService;
             _sessao = sessao;
+            _termoRepository = termoRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // Página principal para listar todos os orientadores
@@ -236,6 +247,107 @@ namespace ProjetoEstagio.Controllers
 
             // 4. Retorna para a página de pendências
             return RedirectToAction("Pendencias");
+        }
+
+        [HttpGet]
+        public IActionResult DownloadTermo(int termoId)
+        {
+            try
+            {
+                // 1. Busca o termo no banco para pegar os nomes dos arquivos
+                var termo = _termoRepository.BuscarPorId(termoId);
+
+                // 2. Validações de segurança
+                if (termo == null || string.IsNullOrEmpty(termo.CaminhoArquivo))
+                {
+                    return NotFound("Arquivo não encontrado ou o termo não existe.");
+                }
+
+                // (Opcional: Adicionar verificação de segurança se o Admin pode baixar isso)
+
+                // 3. Monta o caminho absoluto do arquivo
+                // (Ex: C:\seuprojeto\wwwroot\arquivos\termos\TCE_Joao_26.pdf)
+                string caminhoAbsoluto = Path.Combine(_webHostEnvironment.WebRootPath, termo.CaminhoArquivo.TrimStart(Path.DirectorySeparatorChar));
+
+                if (!System.IO.File.Exists(caminhoAbsoluto))
+                {
+                    TempData["MensagemErro"] = "Erro: O arquivo não foi encontrado no servidor.";
+                    return RedirectToAction("Estagios");
+                }
+
+                // 4. Lê os bytes do arquivo e envia para o navegador
+                byte[] fileBytes = System.IO.File.ReadAllBytes(caminhoAbsoluto);
+
+                // Retorna o arquivo para download
+                return File(fileBytes, "application/pdf", termo.NomeArquivo);
+            }
+            catch (Exception ex)
+            {
+                TempData["MensagemErro"] = $"Erro ao baixar o arquivo: {ex.Message}";
+                return RedirectToAction("Estagios");
+            }
+        }
+
+        // GET: /Orientador/AlterarOrientador/5
+        [HttpGet]
+        public IActionResult AlterarOrientador(int id) // Recebe o TermoId
+        {
+            // 1. Segurança (só Admin)
+            UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            if (usuarioLogado == null || usuarioLogado.Perfil != Perfil.Admin)
+            {
+                return StatusCode(403, "Acesso negado.");
+            }
+
+            // 2. Busca os dados
+            // (O _termoRepository foi injetado no construtor)
+            var termo = _termoRepository.BuscarCompletoPorId(id);
+            if (termo == null) return NotFound();
+
+            var orientadores = _orientadorService.ListarTodos();
+
+            // 3. Monta o ViewModel com o nome correto
+            var viewModel = new OrientadorAlterarViewModel
+            {
+                TermoId = termo.Id,
+                EstagiarioNome = termo.SolicitacaoEstagio.Estagiario.Nome,
+                NovoOrientadorId = termo.OrientadorId ?? 0,
+                //OrientadorAtualNome = termo.Orientador?.Nome ?? "Nenhum",
+                OrientadoresDisponiveis = new SelectList(orientadores, "Id", "Nome", termo.OrientadorId)
+            };
+
+            // 4. Retorna a Partial View (que criaremos a seguir)
+            return PartialView("_AlterarOrientador", viewModel);
+        }
+
+        // POST: /Orientador/AlterarOrientador
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AlterarOrientador(OrientadorAlterarViewModel viewModel) // Recebe o ViewModel correto
+        {
+            // 1. Segurança (só Admin)
+            UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            if (usuarioLogado == null || usuarioLogado.Perfil != Perfil.Admin)
+            {
+                return StatusCode(403, "Acesso negado.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // 2. Chama o serviço que criamos
+                    _orientadorService.AlterarOrientadorDoTermo(viewModel.TermoId, viewModel.NovoOrientadorId);
+                    return Json(new { sucesso = true });
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Erro ao alterar: {ex.Message}");
+                }
+            }
+
+            // Se o ModelState for inválido (ex: não selecionou um novo orientador)
+            return BadRequest(ModelState);
         }
 
         // MÉTODO DE VALIDAÇÃO [Remote]

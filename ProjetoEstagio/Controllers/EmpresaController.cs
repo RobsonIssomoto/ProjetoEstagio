@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering; //Para SelectList
 using ProjetoEstagio.Models;
 using ProjetoEstagio.Models.Enums;
 using ProjetoEstagio.Models.ViewModels;
 using ProjetoEstagio.Services; // Sua camada de serviço
 using ProjetoEstagio.Helper; // Para ISessao
-using System.Linq;         // Para .Count()
+using System.Linq;         // Para .Count() 
+using System.IO;
 
 namespace ProjetoEstagio.Controllers
 {
@@ -88,7 +90,7 @@ namespace ProjetoEstagio.Controllers
             var solicitacoes = _empresaService.ListarSolicitacoes(empresa.Id); //
 
             // 4. Montar o ViewModel para a View
-            var viewModel = new DashboardEmpresaViewModel
+            var viewModel = new EmpresaDashBoardViewModel
             {
                 PedidosPendentesCount = solicitacoes.Count(s => s.Status == Status.Pendente),
                 PedidosDeEstagio = solicitacoes
@@ -258,7 +260,7 @@ namespace ProjetoEstagio.Controllers
         {
             try
             {
-                // --- INÍCIO DA VERIFICAÇÃO E CRIAÇÃO ---
+                // --- 1. BUSCA DE DADOS (JÁ EXISTENTE) ---
                 UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
                 EmpresaModel empresaLogada = _empresaService.BuscarEmpresaPorUsuarioId(usuarioLogado.Id);
                 if (usuarioLogado == null || empresaLogada == null)
@@ -266,37 +268,49 @@ namespace ProjetoEstagio.Controllers
                     return StatusCode(403, "Sessão inválida.");
                 }
 
-                // Esta linha busca ou cria o termo, e já o retorna com todos os Includes
+                // --- 2. BUSCAR A LISTA DE SUPERVISORES (NOVO) ---
+                // (Usando o método que o seu serviço já possui)
+                var empresaComSupervisores = _empresaService.BuscarComSupervisores(empresaLogada.Id);
+                var supervisoresDaEmpresa = empresaComSupervisores?.Supervisores ?? new List<SupervisorModel>();
+
+
+                // --- 3. BUSCAR/CRIAR O TERMO (JÁ EXISTENTE) ---
                 TermoCompromissoModel termo = _empresaService.BuscarOuCriarTermoPorSolicitacao(solicitacaoId, empresaLogada.Id);
 
                 if (termo == null)
                 {
                     return StatusCode(404, "Termo de Compromisso não encontrado.");
                 }
-                // --- FIM DA VERIFICAÇÃO E CRIAÇÃO ---
 
-
-                // --- CORREÇÃO AQUI: Mapeamento do Model para o ViewModel ---
+                // --- 4. MAPEAMENTO ATUALIZADO PARA O VIEWMODEL ---
                 var viewModel = new TermoPreenchimentoViewModel
                 {
                     TermoId = termo.Id,
                     SolicitacaoId = termo.SolicitacaoEstagioId,
 
-                    // Os dados de Aluno e Empresa agora vão funcionar
+                    // Dados de exibição
                     EstagiarioNome = termo.SolicitacaoEstagio.Estagiario.Nome,
                     EmpresaNome = termo.SolicitacaoEstagio.Empresa.Nome,
 
-                    // A lógica das datas padrão também vai funcionar
-                    // (Assumindo que o seu TermoCompromissoModel.cs tem 'DateTime?')
+                    // Dados do contrato (com valores padrão)
                     CargaHoraria = termo.CargaHoraria ?? 0,
                     ValorBolsa = termo.ValorBolsa ?? 0.0,
                     DataInicio = termo.DataInicio ?? DateTime.Now,
                     DataFim = termo.DataFim ?? DateTime.Now.AddMonths(6),
                     NumeroApolice = termo.NumeroApolice,
                     NomeSeguradora = termo.NomeSeguradora,
-                    Justificativa = termo.Justificativa
+                    Justificativa = termo.Justificativa,
+
+                    // Preenche o Plano de Atividades salvo
+                    PlanoDeAtividades = termo.PlanoDeAtividades,
+
+                    // Preenche o Supervisor salvo
+                    SupervisorId = termo.SupervisorId,
+
+                    // Cria o SelectList para o dropdown, já selecionando o ID salvo
+                    SupervisoresDisponiveis = new SelectList(supervisoresDaEmpresa, "Id", "Nome", termo.SupervisorId)
                 };
-                // --- FIM DA CORREÇÃO ---
+                // --- FIM DA ATUALIZAÇÃO ---
 
                 return View(viewModel);
             }
@@ -311,13 +325,36 @@ namespace ProjetoEstagio.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult SalvarTermo(TermoPreenchimentoViewModel viewModel)
         {
+            // --- INÍCIO DA CORREÇÃO ---
             // Lógica de repopular em caso de erro
-            Action<TermoPreenchimentoViewModel> repopularViewModel = (vm) => { /* ... (código anterior) ... */ };
+            Action<TermoPreenchimentoViewModel> repopularViewModel = (vm) => {
+                try
+                {
+                    // Esta lógica é uma mini-versão do HttpGet PreencherTermo
+                    var usuario = _sessao.BuscarSessaoDoUsuario();
+                    var empresa = _empresaService.BuscarEmpresaPorUsuarioId(usuario.Id);
 
-            // A validação [Required] dos campos do ViewModel
-            // garante que CargaHoraria, ValorBolsa, etc., foram preenchidos
+                    // 1. Recarregar a lista de Supervisores
+                    var empresaComSupervisores = _empresaService.BuscarComSupervisores(empresa.Id);
+                    var supervisores = empresaComSupervisores?.Supervisores ?? new List<SupervisorModel>();
+                    vm.SupervisoresDisponiveis = new SelectList(supervisores, "Id", "Nome", vm.SupervisorId);
+
+                    // 2. Recarregar dados do Termo (para os nomes readonly)
+                    var termo = _empresaService.BuscarOuCriarTermoPorSolicitacao(vm.SolicitacaoId, empresa.Id);
+                    vm.EstagiarioNome = termo.SolicitacaoEstagio.Estagiario.Nome;
+                    vm.EmpresaNome = termo.SolicitacaoEstagio.Empresa.Nome;
+                }
+                catch (Exception ex)
+                {
+                    // Se até a repopulação falhar, apenas registre
+                    Console.WriteLine($"Erro ao repopular ViewModel: {ex.Message}");
+                }
+            };
+            // --- FIM DA CORREÇÃO ---
+
             if (!ModelState.IsValid)
             {
+                // Agora esta linha vai funcionar e preencher o dropdown
                 repopularViewModel(viewModel);
                 return View("PreencherTermo", viewModel);
             }
@@ -328,7 +365,6 @@ namespace ProjetoEstagio.Controllers
                 EmpresaModel empresaLogada = _empresaService.BuscarEmpresaPorUsuarioId(usuarioLogado.Id);
                 if (usuarioLogado == null || empresaLogada == null) return StatusCode(403, "Sessão inválida.");
 
-                // Chama o novo serviço de "Salvar"
                 _empresaService.SalvarTermo(viewModel, empresaLogada.Id);
 
                 TempData["MensagemSucesso"] = "Dados do contrato salvos e estágio aprovado com sucesso!";
@@ -337,24 +373,42 @@ namespace ProjetoEstagio.Controllers
             catch (Exception ex)
             {
                 TempData["MensagemErro"] = $"Erro ao salvar: {ex.Message}";
+                // Também repopula aqui em caso de exceção
                 repopularViewModel(viewModel);
                 return View("PreencherTermo", viewModel);
             }
         }
 
 
-        // --- ADICIONE ESTE MÉTODO (para o botão "Rejeitar") ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult RejeitarTermo(TermoPreenchimentoViewModel viewModel)
         {
+            // --- INÍCIO DA CORREÇÃO ---
+            Action<TermoPreenchimentoViewModel> repopularViewModel = (vm) => {
+                try
+                {
+                    var usuario = _sessao.BuscarSessaoDoUsuario();
+                    var empresa = _empresaService.BuscarEmpresaPorUsuarioId(usuario.Id);
+
+                    var empresaComSupervisores = _empresaService.BuscarComSupervisores(empresa.Id);
+                    var supervisores = empresaComSupervisores?.Supervisores ?? new List<SupervisorModel>();
+                    vm.SupervisoresDisponiveis = new SelectList(supervisores, "Id", "Nome", vm.SupervisorId);
+
+                    var termo = _empresaService.BuscarOuCriarTermoPorSolicitacao(vm.SolicitacaoId, empresa.Id);
+                    vm.EstagiarioNome = termo.SolicitacaoEstagio.Estagiario.Nome;
+                    vm.EmpresaNome = termo.SolicitacaoEstagio.Empresa.Nome;
+                }
+                catch (Exception ex) { Console.WriteLine($"Erro ao repopular ViewModel: {ex.Message}"); }
+            };
+            // --- FIM DA CORREÇÃO ---
+
             try
             {
                 UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
                 EmpresaModel empresaLogada = _empresaService.BuscarEmpresaPorUsuarioId(usuarioLogado.Id);
                 if (usuarioLogado == null || empresaLogada == null) return StatusCode(403, "Sessão inválida.");
 
-                // Chama o novo serviço de "Rejeitar"
                 _empresaService.RejeitarTermo(viewModel, empresaLogada.Id);
 
                 TempData["MensagemSucesso"] = "Solicitação rejeitada com sucesso.";
@@ -365,9 +419,35 @@ namespace ProjetoEstagio.Controllers
                 TempData["MensagemErro"] = $"Erro ao rejeitar: {ex.Message}";
 
                 // Recarrega a página em caso de erro
-                Action<TermoPreenchimentoViewModel> repopularViewModel = (vm) => { /* ... (código anterior) ... */ };
                 repopularViewModel(viewModel);
                 return View("PreencherTermo", viewModel);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult DownloadTermo(int termoId)
+        {
+            try
+            {
+                // 1. Buscar a Empresa logada (lógica da sua Action Principal)
+                UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+                EmpresaModel empresa = _empresaService.BuscarEmpresaPorUsuarioId(usuarioLogado.Id);
+
+                if (empresa == null || usuarioLogado.Perfil != Perfil.Representante)
+                {
+                    return StatusCode(403, "Acesso negado.");
+                }
+
+                // 2. Chama o serviço (que contém a lógica de segurança)
+                var resultado = _empresaService.PrepararDownloadTermo(termoId, empresa.Id);
+
+                // 3. Retorna o arquivo
+                return File(resultado.FileContents, "application/pdf", resultado.NomeArquivo);
+            }
+            catch (Exception ex)
+            {
+                TempData["MensagemErro"] = $"Erro ao baixar o arquivo: {ex.Message}";
+                return RedirectToAction("Principal");
             }
         }
 

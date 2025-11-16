@@ -5,6 +5,9 @@ using ProjetoEstagio.Models;
 using ProjetoEstagio.Models.ViewModels;
 using ProjetoEstagio.Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting; 
+using System.IO;                  
+using System.Collections.Generic;
 
 namespace ProjetoEstagio.Services
 {
@@ -14,17 +17,24 @@ namespace ProjetoEstagio.Services
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly ProjetoEstagioContext _context;
         private readonly ISolicitacaoEstagioRepository _solicitacaoRepository;
+        private readonly ITermoCompromissoRepository _termoRepository;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public EstagiarioService(
             IEstagiarioRepository estagiarioRepository,
             IUsuarioRepository usuarioRepository,
             ProjetoEstagioContext context,
-            ISolicitacaoEstagioRepository solicitacaoRepository) // <-- Adicionado
+            ISolicitacaoEstagioRepository solicitacaoRepository,
+            ITermoCompromissoRepository termoRepository,     // Adicionado
+            IWebHostEnvironment webHostEnvironment
+            ) // <-- Adicionado
         {
             _estagiarioRepository = estagiarioRepository; //
             _usuarioRepository = usuarioRepository; //
             _context = context; //
             _solicitacaoRepository = solicitacaoRepository; // <-- Adicionado
+            _termoRepository = termoRepository;         // Adicionado
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public List<EstagiarioModel> ListarTodos()
@@ -106,6 +116,48 @@ namespace ProjetoEstagio.Services
             }
         }
 
+        public List<SolicitacaoEstagioModel> ListarSolicitacoes(int estagiarioId)
+        {
+            // Simplesmente repassa a chamada para o repositório
+            // Precisamos incluir o Termo para saber se o arquivo existe
+            return _context.SolicitacoesEstagio
+                .Include(s => s.Empresa)
+                .Include(s => s.TermoCompromisso) // <-- Importante para o botão de download
+                .Where(s => s.EstagiarioId == estagiarioId)
+                .OrderByDescending(s => s.DataSubmissao)
+                .ToList();
+        }
+
+        public (byte[] FileContents, string NomeArquivo) PrepararDownloadTermo(int termoId, int estagiarioId)
+        {
+            // 1. Busca o Termo e seus dados de Estagiário
+            var termo = _termoRepository.BuscarCompletoPorId(termoId);
+
+            // 2. Validações de Segurança
+            if (termo == null || string.IsNullOrEmpty(termo.CaminhoArquivo))
+            {
+                throw new Exception("Arquivo não encontrado ou o termo não existe.");
+            }
+
+            // A VERIFICAÇÃO DE SEGURANÇA CRUCIAL:
+            // O estagiário logado (estagiarioId) é o dono deste termo?
+            if (termo.SolicitacaoEstagio.EstagiarioId != estagiarioId)
+            {
+                throw new Exception("Acesso negado. Este termo não pertence a você.");
+            }
+
+            // 3. Monta o caminho absoluto (Ex: C:\seuprojeto\wwwroot\...)
+            string caminhoAbsoluto = Path.Combine(_webHostEnvironment.WebRootPath, termo.CaminhoArquivo.TrimStart(Path.DirectorySeparatorChar));
+
+            if (!File.Exists(caminhoAbsoluto))
+            {
+                throw new Exception("Erro: O arquivo não foi encontrado no servidor.");
+            }
+
+            // 4. Lê o arquivo e retorna os dados para o Controller
+            byte[] fileBytes = File.ReadAllBytes(caminhoAbsoluto);
+            return (fileBytes, termo.NomeArquivo);
+        }
         public async Task<bool> VerificarCPFUnico(string cpf)
         {
             return await _estagiarioRepository.VerificarCPFUnico(cpf);

@@ -1,15 +1,20 @@
 ﻿@model List<ProjetoEstagio.Models.OrientadorModel>
+
 @{
-    Layout = "_LayoutAdmin";
     ViewData["Title"] = "Gestão de Orientadores";
+    Layout = "_LayoutAdmin";
 }
 
-<div class="container mt-4">
-    <div class="text-center">
-        <h2>@ViewData["Title"]</h2>
+<h3 class="fw-bold">Gestão de Orientadores</h3>
+<p class="text-muted">Cadastre, edite ou remova os professores que podem atuar como orientadores de estágio. </p>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white p-4">
+        <h5 class="mb-0 fw-bold">Professores Cadastrados</h5>
+        <p class="text-muted mb-0 small">Use o botão "Adicionar Novo Orientador" para incluir um novo professor no sistema.</p>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center p-3 mb-3">
         <a href="javascript:void(0);" class="btn btn-success btn-cadastrar-orientador">
             <i class="fas fa-plus-circle"></i> Adicionar Novo Orientador
         </a>
@@ -27,44 +32,45 @@
             @TempData["MensagemErro"]
         </div>
     }
-
-    <table id="orientadoresTable" class="table table-striped table-bordered table-hover" style="width:100%">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th class="text-start">CPF</th>
-                <th>Email</th>
-                <th>Departamento</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null && Model.Any())
-            {
-                foreach (var orientador in Model)
+    <div class="table-responsive p-3">
+        <table id="orientadoresTable" class="table table-striped table-bordered table-hover" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th class="text-start">CPF</th>
+                    <th>Email</th>
+                    <th>Departamento</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
                 {
-                    <tr>
-                        <td>@orientador.Nome</td>
-                        <td class="text-start">@orientador.CPF</td>
-                        <td>@orientador.Email</td>
-                        <td>@orientador.Departamento</td>
-                        <td>
-                            <a href="javascript:void(0);"
-                               class="btn btn-primary btn-sm btn-edit-orientador"
-                               data-id="@orientador.Id">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </a>
-                            <a href="javascript:void(0);"
-                               class="btn btn-danger btn-sm btn-deletar-orientador"
-                               data-id="@orientador.Id">
-                                <i class="fa-solid fa-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
+                    foreach (var orientador in Model)
+                    {
+                        <tr>
+                            <td>@orientador.Nome</td>
+                            <td class="text-start">@orientador.CPF</td>
+                            <td>@orientador.Email</td>
+                            <td>@orientador.Departamento</td>
+                            <td>
+                                <a href="javascript:void(0);"
+                                   class="btn btn-primary btn-sm btn-edit-orientador"
+                                   data-id="@orientador.Id">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a href="javascript:void(0);"
+                                   class="btn btn-danger btn-sm btn-deletar-orientador"
+                                   data-id="@orientador.Id">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
                 }
-            }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <div class="modal fade" id="cadastrarOrientadorModal" tabindex="-1" aria-hidden="true">

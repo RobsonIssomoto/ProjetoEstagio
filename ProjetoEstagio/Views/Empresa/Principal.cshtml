@@ -1,4 +1,4 @@
-﻿@model ProjetoEstagio.Models.ViewModels.DashboardEmpresaViewModel
+﻿@model ProjetoEstagio.Models.ViewModels.EmpresaDashBoardViewModel
 @using ProjetoEstagio.Models.Enums
 
 @{
@@ -181,6 +181,17 @@
                                     <a asp-action="PreencherTermo" asp-route-solicitacaoId="@pedido.Id"
                                        class="btn btn-outline-danger btn-sm" title="Ver Motivo">
                                         <i class="fa-solid fa-magnifying-glass"></i> Ver Motivo
+                                    </a>
+                                }
+                                @* NOVO Botão de Download (só aparece se o PDF existir) *@
+                                @if (pedido.Status == Status.EmAndamento && pedido.TermoCompromisso?.CaminhoArquivo != null)
+                                {
+                                    <a asp-controller="Empresa"
+                                       asp-action="DownloadTermo"
+                                       asp-route-termoId="@pedido.TermoCompromisso.Id"
+                                       class="btn btn-success btn-sm ms-1"
+                                       title="Baixar Termo de Compromisso (PDF)">
+                                        <i class="fa-solid fa-file-pdf"></i>
                                     </a>
                                 }
                             </td>

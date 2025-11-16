@@ -4,6 +4,8 @@ using ProjetoEstagio.Models.ViewModels;
 using ProjetoEstagio.Models;
 using ProjetoEstagio.Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace ProjetoEstagio.Services
 {
@@ -14,6 +16,7 @@ namespace ProjetoEstagio.Services
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly ISolicitacaoEstagioRepository _solicitacaoRepository;
         private readonly ITermoCompromissoRepository _termoRepository;
+        private readonly IWebHostEnvironment _webHostEnvironment; //
         private readonly ProjetoEstagioContext _context;
 
         public EmpresaService(
@@ -21,12 +24,14 @@ namespace ProjetoEstagio.Services
             IUsuarioRepository usuarioRepository,
             ISolicitacaoEstagioRepository solicitacaoRepository,
             ITermoCompromissoRepository termoRepository,
-            ProjetoEstagioContext context) // Adicionado
+            IWebHostEnvironment webHostEnvironment, 
+        ProjetoEstagioContext context) // Adicionado
         {
             _empresaRepository = empresaRepository;
             _usuarioRepository = usuarioRepository;
             _solicitacaoRepository = solicitacaoRepository;
             _termoRepository = termoRepository;
+            _webHostEnvironment = webHostEnvironment;
             _context = context;
         }
 
@@ -57,7 +62,12 @@ namespace ProjetoEstagio.Services
 
         public List<SolicitacaoEstagioModel> ListarSolicitacoes(int empresaId)
         {
-            return _solicitacaoRepository.ListarPorEmpresaId(empresaId);
+            return _context.SolicitacoesEstagio
+                .Include(s => s.Estagiario) // Necessário para a tabela
+                .Include(s => s.TermoCompromisso) // <-- Importante para o botão
+                .Where(s => s.EmpresaId == empresaId)
+                .OrderByDescending(s => s.DataSubmissao)
+                .ToList();
         }
 
         public EmpresaModel Cadastrar(EmpresaModel empresa)
@@ -211,6 +221,8 @@ namespace ProjetoEstagio.Services
                     termoDB.NumeroApolice = viewModel.NumeroApolice;
                     termoDB.NomeSeguradora = viewModel.NomeSeguradora;
                     termoDB.Justificativa = null; // Limpa a justificativa, pois está aprovando
+                    termoDB.PlanoDeAtividades = viewModel.PlanoDeAtividades;
+                    termoDB.SupervisorId = viewModel.SupervisorId;
 
                     _termoRepository.Atualizar(termoDB);
 
@@ -298,6 +310,36 @@ namespace ProjetoEstagio.Services
 
             var termoCompleto = _termoRepository.BuscarCompletoPorId(termoId);
             return termoCompleto;
+        }
+
+        public (byte[] FileContents, string NomeArquivo) PrepararDownloadTermo(int termoId, int empresaId)
+        {
+            // 1. Busca o Termo
+            var termo = _termoRepository.BuscarCompletoPorId(termoId);
+
+            // 2. Validações
+            if (termo == null || string.IsNullOrEmpty(termo.CaminhoArquivo))
+            {
+                throw new Exception("Arquivo não encontrado ou o termo não existe.");
+            }
+
+            // 3. VERIFICAÇÃO DE SEGURANÇA (A mudança crucial)
+            // A empresa logada (empresaId) é a dona deste termo?
+            if (termo.SolicitacaoEstagio.EmpresaId != empresaId)
+            {
+                throw new Exception("Acesso negado. Este termo não pertence à sua empresa.");
+            }
+
+            // 4. Monta o caminho e lê o arquivo
+            string caminhoAbsoluto = Path.Combine(_webHostEnvironment.WebRootPath, termo.CaminhoArquivo.TrimStart(Path.DirectorySeparatorChar));
+
+            if (!File.Exists(caminhoAbsoluto))
+            {
+                throw new Exception("Erro: O arquivo não foi encontrado no servidor.");
+            }
+
+            byte[] fileBytes = File.ReadAllBytes(caminhoAbsoluto);
+            return (fileBytes, termo.NomeArquivo);
         }
         public async Task<bool> VerificarCNPJUnico(string cnpj)
         {

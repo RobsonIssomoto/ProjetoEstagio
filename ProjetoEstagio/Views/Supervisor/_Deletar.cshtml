@@ -7,28 +7,29 @@
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="EmpresaId" />
 
-    <div class="alert alert-danger" role="alert">
-        <strong>Atenção!</strong> Tem certeza que deseja excluir este supervisor? Esta ação não pode ser desfeita.
-    </div>
+
 
     <div class="col-12 bg-white my-2 p-3 rounded shadow">
+        <div class="form-group row m-3 alert alert-danger" role="alert">
+            <strong class="p-0">Atenção!</strong>Tem certeza que deseja excluir este supervisor? Esta ação não pode ser desfeita.
+        </div>
 
         <div class="form-group row m-3">
             <label for="Nome">Nome</label>
             <!-- MUDANÇA: "readonly" para "disabled" -->
-            <input type="text" class="form-control" asp-for="Nome" disabled />
+            <input type="text" class="form-control bg-light" asp-for="Nome" disabled />
         </div>
 
         <div class="form-group row m-3">
             <label for="CPF">CPF</label>
             <!-- MUDANÇA: "readonly" para "disabled" -->
-            <input type="text" class="form-control cpf" asp-for="CPF" disabled />
+            <input type="text" class="form-control cpf bg-light" asp-for="CPF" disabled />
         </div>
 
         <div class="form-group row m-3">
             <label for="Cargo">Cargo</label>
             <!-- MUDANÇA: "readonly" para "disabled" -->
-            <input type="text" class="form-control" asp-for="Cargo" disabled />
+            <input type="text" class="form-control bg-light" asp-for="Cargo" disabled />
         </div>
 
         <div class="form-group row m-3">

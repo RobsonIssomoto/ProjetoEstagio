@@ -6,6 +6,8 @@ using ProjetoEstagio.Models.Enums;
 using ProjetoEstagio.Models.ViewModels;
 using ProjetoEstagio.Repository;
 using System.Threading.Tasks;
+using ProjetoEstagio.Documentos; // <-- 1. ADICIONE O USING DO DOCUMENTO
+using QuestPDF.Fluent;           // <-- 2. ADICIONE O USING DO QUESTPDF
 
 namespace ProjetoEstagio.Services
 {
@@ -13,17 +15,31 @@ namespace ProjetoEstagio.Services
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IOrientadorRepository _orientadorRepository;
-        private readonly ProjetoEstagioContext _context; // Para transações e 'AnyAsync'
+        private readonly ProjetoEstagioContext _context;
 
+        // --- 3. ADICIONE AS NOVAS DEPENDÊNCIAS ---
+        private readonly ITermoCompromissoRepository _termoRepository;
+        private readonly IArquivoService _arquivoService;
+        private readonly ISolicitacaoEstagioRepository _solicitacaoRepository;
+
+        // --- 4. ATUALIZE O CONSTRUTOR ---
         public OrientadorService(
             IUsuarioRepository usuarioRepository,
             IOrientadorRepository orientadorRepository,
-            ProjetoEstagioContext context)
+            ProjetoEstagioContext context,
+            ITermoCompromissoRepository termoRepository,     // Adicionado
+            IArquivoService arquivoService,                   // Adicionado
+            ISolicitacaoEstagioRepository solicitacaoRepository) // Adicionado
         {
             _usuarioRepository = usuarioRepository;
             _orientadorRepository = orientadorRepository;
             _context = context;
+            _termoRepository = termoRepository;
+            _arquivoService = arquivoService;
+            _solicitacaoRepository = solicitacaoRepository;
         }
+
+        // --- SEUS MÉTODOS EXISTENTES (COPIADOS DO SEU ARQUIVO) ---
 
         public void RegistrarNovoOrientador(OrientadorCadastroViewModel viewModel)
         {
@@ -46,9 +62,9 @@ namespace ProjetoEstagio.Services
                     {
                         Login = viewModel.Email,
                         Email = viewModel.Email,
-                        Perfil = Perfil.Orientador //
+                        Perfil = Perfil.Orientador
                     };
-                    usuario.SetSenhaHash(viewModel.Senha); //
+                    usuario.SetSenhaHash(viewModel.Senha);
 
                     _usuarioRepository.Cadastrar(usuario); // Salva o usuário
 
@@ -59,7 +75,7 @@ namespace ProjetoEstagio.Services
                         CPF = viewModel.CPF,
                         Telefone = viewModel.Telefone,
                         Email = viewModel.Email,
-                        Departamento = viewModel.Departamento, //
+                        Departamento = viewModel.Departamento,
                         UsuarioId = usuario.Id  // Vincula ao usuário
                     };
 
@@ -74,6 +90,7 @@ namespace ProjetoEstagio.Services
                 }
             }
         }
+
 
         public void AtualizarOrientador(OrientadorModel orientador)
         {
@@ -90,8 +107,20 @@ namespace ProjetoEstagio.Services
             }
         }
 
+
         public void DeletarOrientador(int orientadorId)
         {
+
+            bool estaVinculado = _context.TermosCompromisso.Any(t => t.OrientadorId == orientadorId);
+
+            if (estaVinculado)
+            {
+                // 2. Lança uma exceção "amigável". O OrientadorController 
+                //    vai capturar isso (no catch) e o seu site.js 
+                //    vai mostrar essa mensagem no alert() de erro.
+                throw new InvalidOperationException("Este Orientador não pode ser excluído, pois ele já está vinculado a um ou mais Termos de Compromisso.");
+            }
+
             // Lógica transacional para garantir que o Orientador e o Usuário sejam deletados
             using (var transaction = _context.Database.BeginTransaction())
             {
@@ -119,26 +148,27 @@ namespace ProjetoEstagio.Services
             }
         }
 
+
         public OrientadorModel BuscarPorId(int id)
         {
             return _orientadorRepository.BuscarPorId(id);
         }
+
 
         public List<OrientadorModel> ListarTodos()
         {
             return _orientadorRepository.ListarTodos();
         }
 
+
         public List<TermoCompromissoModel> ListarTermosPendentesDeOrientador()
         {
-            // Esta consulta busca todos os Termos que:
-            // 1. Já foram 'Aprovados' pela empresa (Status.Aprovado).
-            // 2. Ainda não têm um 'OrientadorId' (OrientadorId == null).
+            // ... (Seu código existente, está correto) 
             var termosPendentes = _context.TermosCompromisso
                 .Include(t => t.SolicitacaoEstagio)
-                    .ThenInclude(s => s.Estagiario) // Traz o nome do Estagiário
+                    .ThenInclude(s => s.Estagiario)
                 .Include(t => t.SolicitacaoEstagio)
-                    .ThenInclude(s => s.Empresa) // Traz o nome da Empresa
+                    .ThenInclude(s => s.Empresa)
                 .Where(t => t.OrientadorId == null && t.SolicitacaoEstagio.Status == Status.Aprovado)
                 .AsNoTracking()
                 .ToList();
@@ -146,43 +176,72 @@ namespace ProjetoEstagio.Services
             return termosPendentes;
         }
 
-        // --- IMPLEMENTAÇÃO DO PASSO 2 (ATRIBUIR O ORIENTADOR) ---
+
+        // --- 5. MÉTODO "ATRIBUIRORIENTADOR" ATUALIZADO (O GATILHO) ---
 
         public void AtribuirOrientador(int termoId, int orientadorId)
         {
             // Usamos uma transação para garantir que a atribuição
-            // e a mudança de status ocorram juntas.
+            // e a geração do PDF ocorram juntas.
             using (var transaction = _context.Database.BeginTransaction())
             {
                 try
                 {
-                    // 1. Busca o Termo E a Solicitação vinculada
-                    var termo = _context.TermosCompromisso
-                        .Include(t => t.SolicitacaoEstagio)
-                        .FirstOrDefault(t => t.Id == termoId);
-
-                    if (termo == null)
+                    // 1. Busca o Termo (sem includes, apenas para salvar o ID e os caminhos)
+                    var termoParaSalvar = _termoRepository.BuscarPorId(termoId);
+                    if (termoParaSalvar == null)
                     {
                         throw new Exception("Termo de Compromisso não encontrado.");
                     }
 
-                    // 2. (Opcional, mas recomendado) Verifica se o Orientador existe
-                    var orientador = _orientadorRepository.BuscarPorId(orientadorId);
-                    if (orientador == null)
+                    // 2. Busca a Solicitação vinculada
+                    var solicitacao = _solicitacaoRepository.BuscarPorId(termoParaSalvar.SolicitacaoEstagioId);
+                    if (solicitacao == null)
                     {
-                        throw new Exception("Orientador selecionado não foi encontrado.");
+                        throw new Exception("Solicitação de estágio não encontrada.");
                     }
 
                     // 3. ATRIBUI o orientador ao Termo
-                    termo.OrientadorId = orientadorId;
+                    termoParaSalvar.OrientadorId = orientadorId;
 
                     // 4. ATUALIZA o Status da Solicitação
-                    // O estágio agora sai de "Aprovado" (pela empresa)
-                    // e vai para "Em Andamento" (aprovado pela instituição).
-                    termo.SolicitacaoEstagio.Status = Status.EmAndamento;
+                    solicitacao.Status = Status.EmAndamento;
+                    _solicitacaoRepository.Atualizar(solicitacao); // Salva a mudança de status
 
-                    // 5. Salva tudo
-                    _context.SaveChanges(); // O EF Core é inteligente o bastante para salvar o Termo e a Solicitação
+                    // --- INÍCIO DA GERAÇÃO DO PDF ---
+
+                    // 5. Busca o Termo COMPLETO (com todos os includes)
+                    //    (Usando o método que atualizamos no ITermoCompromissoRepository)
+                    var termoCompletoParaPdf = _termoRepository.BuscarCompletoPorId(termoId);
+
+                    // 6. Atualiza o objeto completo com o OrientadorId que acabamos de atribuir
+                    //    e busca o objeto Orientador para injetar no PDF
+                    termoCompletoParaPdf.OrientadorId = orientadorId;
+                    termoCompletoParaPdf.Orientador = _orientadorRepository.BuscarPorId(orientadorId);
+
+                    // 7. Validação de dados (Supervisor deve existir)
+                    if (termoCompletoParaPdf.Supervisor == null)
+                    {
+                        throw new Exception("Erro de dados: O Supervisor não foi encontrado para este termo.");
+                    }
+
+                    // 8. Instancia o template do QuestPDF
+                    var documentoPdf = new TermoCompromissoDocument(termoCompletoParaPdf);
+
+                    // 9. Gera o PDF em memória (bytes)
+                    byte[] pdfBytes = documentoPdf.GeneratePdf();
+
+                    // 10. Salva o PDF no disco (usando o ArquivoService)
+                    (string nomeArquivo, string caminhoRelativo) = _arquivoService.SalvarTermoDeCompromisso(pdfBytes, termoCompletoParaPdf);
+
+                    // 11. Salva os caminhos no banco de dados
+                    termoParaSalvar.NomeArquivo = nomeArquivo;
+                    termoParaSalvar.CaminhoArquivo = caminhoRelativo;
+                    _termoRepository.Atualizar(termoParaSalvar); // Salva o Termo com o OrientadorId e os caminhos
+
+                    // --- FIM DA GERAÇÃO DO PDF ---
+
+                    // 12. Salva tudo no banco
                     transaction.Commit();
                 }
                 catch (Exception)
@@ -193,25 +252,61 @@ namespace ProjetoEstagio.Services
             }
         }
 
+        // --- SEUS MÉTODOS EXISTENTES (COPIADOS DO SEU ARQUIVO) ---
+
         public List<TermoCompromissoModel> ListarTodosOsTermos()
         {
-            // Esta consulta busca TODOS os termos e
-            // inclui todos os dados relacionados para a tabela.
+            // ... (Seu código existente, está correto) 
             var todosOsTermos = _context.TermosCompromisso
                 .Include(t => t.SolicitacaoEstagio)
-                    .ThenInclude(s => s.Estagiario) // Traz o Estagiário
+                    .ThenInclude(s => s.Estagiario)
                 .Include(t => t.SolicitacaoEstagio)
-                    .ThenInclude(s => s.Empresa) // Traz a Empresa
-                .Include(t => t.Orientador) // <-- Traz o Orientador (se houver)
+                    .ThenInclude(s => s.Empresa)
+                .Include(t => t.Orientador)
                 .AsNoTracking()
-                .OrderByDescending(t => t.SolicitacaoEstagio.DataSubmissao) // Mais novos primeiro
+                .OrderByDescending(t => t.SolicitacaoEstagio.DataSubmissao)
                 .ToList();
 
             return todosOsTermos;
         }
+
+        public List<TermoCompromissoModel> ListarTermosPorOrientador(int orientadorId)
+        {
+            // ... (Seu código existente)
+            var termos = _context.TermosCompromisso
+                .Include(t => t.SolicitacaoEstagio)
+                    .ThenInclude(s => s.Estagiario)
+                .Include(t => t.SolicitacaoEstagio)
+                    .ThenInclude(s => s.Empresa)
+                .Where(t => t.OrientadorId == orientadorId)
+                .AsNoTracking()
+                .OrderByDescending(t => t.SolicitacaoEstagio.DataSubmissao)
+                .ToList();
+
+            return termos;
+        }
+
+        // --- ADICIONE ESTA NOVA IMPLEMENTAÇÃO ---
+        public void AlterarOrientadorDoTermo(int termoId, int novoOrientadorId)
+        {
+            // 1. Busca o termo original do banco (com tracking)
+            var termoDB = _context.TermosCompromisso.FirstOrDefault(t => t.Id == termoId);
+
+            if (termoDB == null)
+            {
+                throw new Exception("Termo de Compromisso não encontrado.");
+            }
+
+            // 2. Apenas altera o ID do orientador
+            termoDB.OrientadorId = novoOrientadorId;
+
+            // 3. Salva a mudança (não precisa do repositório, _context é mais direto)
+            _context.SaveChanges();
+        }
+
         public async Task<bool> VerificarCPFUnico(string cpf)
         {
-            // Valida direto no contexto para usar Async
+            // ... (Seu código existente, está correto) [cite: 177-180]
             return await _context.Orientadores.AnyAsync(o => o.CPF == cpf);
         }
     }

@@ -1,6 +1,8 @@
 ﻿// Models/ViewModels/TermoPreenchimentoViewModel.cs
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ProjetoEstagio.Models.ViewModels
 {
@@ -21,12 +23,11 @@ namespace ProjetoEstagio.Models.ViewModels
         public string OrientadorNome { get; set; } = "Aguardando designação";
 
         // --- Dados do Formulário (Preenchidos pela Empresa) ---
-
-        [Required(ErrorMessage = "A Carga Horária é obrigatória.")]
+        [Range(20, 30, ErrorMessage = "A Carga Horária deve ser um valor positivo (ex: 30).")]
         [Display(Name = "Carga Horária Semanal")]
         public int CargaHoraria { get; set; }
 
-        [Required(ErrorMessage = "O Valor da Bolsa é obrigatório.")]
+        [Range(0.0, double.MaxValue, ErrorMessage = "O Valor da Bolsa não pode ser negativo.")]
         [Display(Name = "Valor da Bolsa (R$)")]
         public double ValorBolsa { get; set; }
 
@@ -47,6 +48,19 @@ namespace ProjetoEstagio.Models.ViewModels
         [Required(ErrorMessage = "O Nome da Seguradora é obrigatório.")]
         [Display(Name = "Nome da Seguradora")]
         public string NomeSeguradora { get; set; }
+
+        [Required(ErrorMessage = "É obrigatório selecionar um supervisor.")]
+        [Display(Name = "Supervisor Responsável (da Empresa)")]
+        public int? SupervisorId { get; set; } // Guarda o ID do supervisor selecionado
+
+        // Esta lista será preenchida pelo Controller
+        [ValidateNever]
+        public SelectList SupervisoresDisponiveis { get; set; }
+
+        [Required(ErrorMessage = "O Plano de Atividades é obrigatório.")]
+        [Display(Name = "Plano de Atividades de Estágio (PAE)")]
+        [DataType(DataType.MultilineText)]
+        public string PlanoDeAtividades { get; set; }
 
         [Display(Name = "Justificativa (em caso de rejeição)")]
         public string? Justificativa { get; set; }

@@ -12,17 +12,20 @@ namespace ProjetoEstagio.Controllers
         private readonly IEmpresaRepository _empresaRepository;
         private readonly IEstagiarioRepository _estagiarioRepository;
         private readonly ISupervisorRepository _supervisorRepository;
+        private readonly IOrientadorRepository _orientadorRepository;
         private readonly ISessao _sessao;
         public LoginController(IUsuarioRepository usuarioRepository,
             IEmpresaRepository empresaRepository,
             IEstagiarioRepository estagiarioRepository,
             ISupervisorRepository supervisorRepository,
+            IOrientadorRepository orientadorRepository,
             ISessao sessao)
         {
             _usuarioRepository = usuarioRepository;
             _empresaRepository = empresaRepository;
             _estagiarioRepository = estagiarioRepository;
             _supervisorRepository = supervisorRepository;
+            _orientadorRepository = orientadorRepository;
             _sessao = sessao;
         }
 
@@ -108,9 +111,39 @@ namespace ProjetoEstagio.Controllers
                                 _sessao.SalvarNomeExibicao(nomeExibicao);
                                 return RedirectToAction("Principal", "Supervisor"); // Dashboard do Supervisor
                             }
-                            // ... (seu 'else' de erro de integridade) ...
+                            else
+                            {
+                                TempData["MensagemErro"] = "Erro de integridade de dados: Usuário supervisor não localizado. Contate o suporte.";
+                                _sessao.RemoverSessaoDoUsuario();
+                                return View("Index", loginModel);
+                            }
+
+                        }
+                        if (usuario.Perfil == Perfil.Orientador)
+                        {
+                            OrientadorModel orientador = _orientadorRepository.BuscarPorUsuarioId(usuario.Id);
+                            if (orientador != null)
+                            {
+                                nomeExibicao = orientador.Nome;
+                                _sessao.SalvarNomeExibicao(nomeExibicao);
+                                return RedirectToAction("MeuPainel", "Orientador");
+                            }
+                            else
+                            {
+                                TempData["MensagemErro"] = "Erro de integridade de dados: Usuário orientador não localizado. Contate o suporte.";
+                                _sessao.RemoverSessaoDoUsuario();
+                                return View("Index", loginModel);
+                            }
+                        }
+                        // --- FIM DA CORREÇÃO ---
+
+                        if (usuario.Perfil == Perfil.Admin)
+                        {
+                            _sessao.SalvarNomeExibicao(nomeExibicao);
+                            return RedirectToAction("Pendencias", "Orientador");
                         }
 
+                            
                         // --- 5. CORREÇÃO DE LÓGICA ---
                         // Se for Admin (ou outro perfil sem redirect),
                         // salva o nome padrão e vai para a Home.

@@ -1,0 +1,35 @@
+﻿@model ProjetoEstagio.Models.ViewModels.OrientadorAlterarViewModel
+
+<form id="form-alterar-orientador" asp-controller="Orientador" asp-action="AlterarOrientador" method="post">
+
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="TermoId" />
+
+    <div class="modal-body p-4">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="mb-3">
+            <label asp-for="EstagiarioNome" class="form-label"></label>
+            <input type="text" asp-for="EstagiarioNome" class="form-control" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="NovoOrientadorId" class="form-label"></label>
+            <select asp-for="NovoOrientadorId"
+                    class="form-select"
+                    asp-items="@Model.OrientadoresDisponiveis">
+                <option value="">-- Selecione o orientador --</option>
+            </select>
+            <span asp-validation-for="NovoOrientadorId" class="text-danger small"></span>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar Alteração</button>
+    </div>
+</form>
+
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}

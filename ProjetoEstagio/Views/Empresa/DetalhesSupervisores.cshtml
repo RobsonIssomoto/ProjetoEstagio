@@ -1,41 +1,41 @@
 ﻿@* Define que o modelo de dados desta página é um objeto 'EmpresaModel' *@
-@model ProjetoEstagio.Models.EmpresaModel
+@* @model ProjetoEstagio.Models.EmpresaModel *@
 
-@{
-    ViewData["Title"] = "Supervisores da Empresa";
-}
+@* @{ *@
+@*     ViewData["Title"] = "Supervisores da Empresa"; *@
+@* } *@
 
-<h1>@Model.Nome</h1>
-<p><strong>CNPJ:</strong> @Model.CNPJ</p>
-<hr />
+@* <h1>@Model.Nome</h1> *@
+@* <p><strong>CNPJ:</strong> @Model.CNPJ</p> *@
+@* <hr /> *@
 
-<h3>Supervisores Associados</h3>
+@* <h3>Supervisores Associados</h3> *@
 
-@if (Model.Supervisores != null && Model.Supervisores.Any())
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Nome do Supervisor</th>
-                <th>Cargo</th>
-                <th>CPF</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var supervisor in Model.Supervisores)
-            {
-                <tr>
-                    <td>@supervisor.Nome</td>
-                    <td>@supervisor.Cargo</td>
-                    <td>@supervisor.CPF</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>Nenhum supervisor encontrado para esta empresa.</p>
-}
-<br />
-<a asp-action="Index">Voltar para a lista de empresas</a>
+@* @if (Model.Supervisores != null && Model.Supervisores.Any()) *@
+@* { *@
+@*     <table class="table table-striped"> *@
+@*         <thead> *@
+@*             <tr> *@
+@*                 <th>Nome do Supervisor</th> *@
+@*                 <th>Cargo</th> *@
+@*                 <th>CPF</th> *@
+@*             </tr> *@
+@*         </thead> *@
+@*         <tbody> *@
+@*             @foreach (var supervisor in Model.Supervisores) *@
+@*             { *@
+@*                 <tr> *@
+@*                     <td>@supervisor.Nome</td> *@
+@*                     <td>@supervisor.Cargo</td> *@
+@*                     <td>@supervisor.CPF</td> *@
+@*                 </tr> *@
+@*             } *@
+@*         </tbody> *@
+@*     </table> *@
+@* } *@
+@* else *@
+@* { *@
+@*     <p>Nenhum supervisor encontrado para esta empresa.</p> *@
+@* } *@
+@* <br /> *@
+@* <a asp-action="Index">Voltar para a lista de empresas</a> *@

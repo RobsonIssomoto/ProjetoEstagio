@@ -26,6 +26,9 @@ namespace ProjetoEstagio.Services
         TermoCompromissoModel BuscarOuCriarTermoPorSolicitacao(int solicitacaoId, int empresaIdLogada);
         //TermoCompromissoModel BuscarTermoCompleto(int termoId);
         //void SalvarTermoPreenchido(TermoPreenchimentoViewModel viewModel);
+        (byte[] FileContents, string NomeArquivo) PrepararDownloadTermo(int termoId, int empresaId);
+
         Task<bool> VerificarCNPJUnico(string cnpj);
+
     }
 }
