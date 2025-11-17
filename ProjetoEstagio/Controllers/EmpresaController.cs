@@ -233,22 +233,29 @@ namespace ProjetoEstagio.Controllers
             return View(empresa);
         }
 
-        
+
         [HttpGet]
         public async Task<IActionResult> BuscarEmpresas(string termoDeBusca)
         {
-            if (string.IsNullOrEmpty(termoDeBusca))
+            if (string.IsNullOrEmpty(termoDeBusca) || termoDeBusca.Length < 3)
             {
                 return Json(new List<EmpresaModel>());
             }
 
-            // Busca no serviço (presumindo que ListarTodos() busca no repositório)
-            // Para otimizar, crie um método "BuscarPorNome(termo)" no seu service/repositório
+            // Busca no serviço (o ideal é mover essa lógica para o EmpresaService)
             var empresas = _empresaService.ListarTodos()
-                .Where(e => e.Nome.Contains(termoDeBusca, StringComparison.OrdinalIgnoreCase) ||
-                            e.CNPJ.Contains(termoDeBusca))
-                .Select(e => new { e.Id, e.Nome, e.CNPJ }) // Retorna só os dados necessários
-                .Take(5) // Limita a 5 resultados
+                .Where(e =>
+                    // --- MUDANÇA 1: ADICIONADO A BUSCA POR RAZÃOSOCIAL ---
+                    e.RazaoSocial.Contains(termoDeBusca, StringComparison.OrdinalIgnoreCase) ||
+                    e.Nome.Contains(termoDeBusca, StringComparison.OrdinalIgnoreCase) ||
+                    e.CNPJ.Contains(termoDeBusca))
+                .Select(e => new {
+                    e.Id,
+                    // --- MUDANÇA 2: GARANTE QUE RAZÃOSOCIAL SEJA ENVIADA ---
+                    e.RazaoSocial,
+                    e.CNPJ
+                })
+                .Take(5)
                 .ToList();
 
             return Json(empresas);
@@ -290,7 +297,7 @@ namespace ProjetoEstagio.Controllers
 
                     // Dados de exibição
                     EstagiarioNome = termo.SolicitacaoEstagio.Estagiario.Nome,
-                    EmpresaNome = termo.SolicitacaoEstagio.Empresa.Nome,
+                    EmpresaNome = termo.SolicitacaoEstagio.Empresa.RazaoSocial,
 
                     // Dados do contrato (com valores padrão)
                     CargaHoraria = termo.CargaHoraria ?? 0,

@@ -28,7 +28,7 @@ namespace ProjetoEstagio.Controllers
         public class EmpresaBuscaDTO
         {
             public int Id { get; set; }
-            public string Nome { get; set; }
+            public string RazaoSocial { get; set; }
             public string CNPJ { get; set; }
         }
 
@@ -58,7 +58,7 @@ namespace ProjetoEstagio.Controllers
                 .Select(e => new EmpresaBuscaDTO // Seleciona só os dados necessários
                 {
                     Id = e.Id,
-                    Nome = e.Nome, // Mantenha o Nome Fantasia como principal
+                    RazaoSocial = e.RazaoSocial,
                     CNPJ = e.CNPJ
                 })
                 .Take(10) // Limita a 10 resultados

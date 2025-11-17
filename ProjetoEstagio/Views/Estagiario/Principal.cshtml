@@ -1,112 +1,126 @@
 ﻿@model ProjetoEstagio.Models.ViewModels.EstagiarioDashboardViewModel
-@using ProjetoEstagio.Models.Enums // Para usar o Status
+@using ProjetoEstagio.Models.Enums
 @{
-    Layout = "_LayoutEstagiario";
     ViewData["Title"] = "Principal Estagiário";
+    Layout = "_LayoutEstagiario";
 }
 <style>
     /* Estilo dos cards do dashboard (que você já tinha) */
     .dashboard-card {
-        transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
     }
 
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            filter: brightness(1.1);
-        }
+    .dashboard-card:hover {
+    transform: translateY(-5px);
+    filter: brightness(1.1);
+    }
 
     /* --- LÓGICA DO STEPPER CORRIGIDA --- */
     .stepper-wrapper {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
     }
 
     .stepper-item {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
     }
 
-        /* --- LINHA (::after) --- */
-        /* Desenha a linha DEPOIS da bolha */
-        .stepper-item::after {
-            content: "";
-            position: absolute;
-            top: 12px; /* Alinha no centro da bolha */
-            left: 50%; /* Começa no centro da bolha */
-            width: 100%; /* Vai até a próxima bolha */
-            height: 3px;
-            background-color: #e0e0e0; /* Cinza padrão */
-            z-index: 1; /* Fica atrás da bolha */
-        }
+    /* --- LINHA (::after) --- */
+    /* Desenha a linha DEPOIS da bolha */
+    .stepper-item::after {
+    content: "";
+    position: absolute;
+    top: 12px; /* Alinha no centro da bolha */
+    left: 50%; /* Começa no centro da bolha */
+    width: 100%; /* Vai até a próxima bolha */
+    height: 3px;
+    background-color: #e0e0e0; /* Cinza padrão */
+    z-index: 1; /* Fica atrás da bolha */
+    }
 
-        /* Remove a linha do ÚLTIMO item */
-        .stepper-item:last-child::after {
-            content: none;
-        }
+    /* Remove a linha do ÚLTIMO item */
+    .stepper-item:last-child::after {
+    content: none;
+    }
 
     /* --- BOLHA (Dot) --- */
     .stepper-dot {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background-color: #e0e0e0; /* Cinza padrão */
-        z-index: 2; /* Fica na frente da linha */
-        transition: all 0.3s ease;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #e0e0e0; /* Cinza padrão */
+    z-index: 2; /* Fica na frente da linha */
+    transition: all 0.3s ease;
     }
 
     /* --- RÓTULO (Label) --- */
     .stepper-label {
-        text-align: center;
-        margin-top: 0.75rem;
-        font-size: 0.9rem;
-        color: #6c757d;
-        font-weight: 500;
+    text-align: center;
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
     }
 
     /* --- CLASSES DINÂMICAS --- */
 
     /* Etapa Concluída (Verde) */
     .stepper-item.completed .stepper-dot {
-        background-color: var(--bs-success);
+    background-color: var(--bs-success);
     }
 
     .stepper-item.completed .stepper-label {
-        color: var(--bs-success);
-        font-weight: 500; /* Alterado para peso normal */
+    color: var(--bs-success);
+    font-weight: 500; /* Alterado para peso normal */
     }
     /* A LINHA *DEPOIS* de um item completo fica verde */
     .stepper-item.completed::after {
-        background-color: var(--bs-success);
+    background-color: var(--bs-success);
     }
 
     /* Etapa Ativa (Verde) */
     .stepper-item.active .stepper-dot {
-        background-color: var(--bs-success);
-        transform: scale(1.2);
+    background-color: var(--bs-success);
+    transform: scale(1.2);
     }
 
     .stepper-item.active .stepper-label {
-        color: var(--bs-success);
-        font-weight: 700;
+    color: var(--bs-success);
+    font-weight: 700;
     }
 </style>
-<div class="card shadow px-4 pb-4">
-    <div class="card-header bg-white border-0 p-4">
-        <h5 class="mb-0 text-center fw-bold">Minhas Pendências</h5>
+
+<h3 class="fw-bold">Gestão da Documentação do Estágio</h3>
+<p class="text-muted">Inicie, consulte os documentos do seu estágio. </p>
+
+
+<div class="card shadow p-3">
+    <div class="card-header bg-white border-0">
+        <h5 class="mb-0 fw-bold">Minhas Pendências</h5>
     </div>
 
-    <div class="row g-3">
+    <div class="row g-3 p-3">
         <div class="col-12 col-md-4">
             <div class="card text-bg-primary h-100 dashboard-card shadow-sm">
                 <div class="card-body pb-0">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <div class="fs-1 fw-bold">@Model.ProcessosPendentesCount</div>
-                            <h5 class="mb-0">Processo Pendente</h5>
+                            @if (Model.ProcessosPendentesCount <= 1)
+                            {
+                                <div class="fs-1 fw-bold">@Model.ProcessosPendentesCount</div>
+                                <h5 class="mb-0">Processo Pendente</h5>
+                            }
+                            else
+                            {
+                                <div class="fs-1 fw-bold">@Model.ProcessosPendentesCount</div>
+                                <h5 class="mb-0">Processos Pendentes</h5>
+                            }
+
                         </div>
                         <i class="fas fa-file-signature fs-1 opacity-50"></i>
                     </div>
@@ -142,13 +156,12 @@
 
 <div class="card shadow my-4">
     <div class="card-header bg-white border-0 p-4">
-        <h5 class="mb-0 text-center fw-bold">Visão Geral do Estágio</h5>
-        <p class="text-center text-muted mb-4">Gerencie seu pedido de estágio e monitore o andamento dele.</p>
+        <h5 class="mb-0 fw-bold">Visão Geral do Estágio</h5>
+        <p class="text-muted mb-4">Gerencie seu pedido de estágio e monitore o andamento dele.</p>
     </div>
 
-    <div class="card-body p-4 p-md-5">
-
-        <h6 class="fw-semibold mb-4 text-center">Status Atual do Processo</h6>
+    <div class="card-body">
+        <h6 class="fw-semibold text-center mb-4">Status Atual do Processo</h6>
         <div class="stepper-wrapper">
             <div class="stepper-item active">
                 <div class="stepper-dot"></div>
@@ -166,87 +179,93 @@
         }
         else
         {
-            <div class="alert alert-info" role="alert">
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
                 Você já possui um processo de estágio em andamento ou pendente.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         }
     </div>
 </div>
+<div class="card shadow my-4">
+    <div class="card shadow-sm p-3" id="tabela-solicitacoes">
+        <div class="card-header bg-white p-4">
+            <h5 class="mb-0 fw-bold">Meus Processos</h5>
+        </div>
 
-
-<div classa="card shadow-sm" id="tabela-solicitacoes">
-    <div class="card-header bg-white p-4">
-        <h5 class="mb-0 fw-bold">Meus Processos</h5>
-    </div>
-
-    <div class="table-responsive p-3">
-        <table id="meusEstagiosTable" class="table table-striped table-bordered table-hover align-middle mb-0" style="width:100%">
-            <thead class="table-light">
-                <tr>
-                    <th>Empresa</th>
-                    <th>Data da Solicitação</th>
-                    <th>Status</th>
-                    <th class="text-center">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var solicitacao in Model.Solicitacoes)
-                {
+        <div class="table-responsive p-3">
+            <table id="meusEstagiosTable" class="table table-striped table-bordered table-hover align-middle mb-0" style="width:100%">
+                <thead class="table-light">
                     <tr>
-                        <td>
-                            @(solicitacao.Empresa?.Nome ?? "Aguardando Vínculo")
-                        </td>
-                        <td>@solicitacao.DataSubmissao.ToString("dd/MM/yyyy")</td>
-
-                        <td>
-                            @if (solicitacao.Status == Status.Pendente)
-                            {
-                                <span class="badge text-bg-warning">Pendente (Empresa)</span>
-                            }
-                            else if (solicitacao.Status == Status.Aprovado)
-                            {
-                                <span class="badge text-bg-info">Aprovado (Aguard. Instituição)</span>
-                            }
-                            else if (solicitacao.Status == Status.EmAndamento)
-                            {
-                                <span class="badge text-bg-primary">Em Andamento</span>
-                            }
-                            else if (solicitacao.Status == Status.Rejeitado)
-                            {
-                                <span class="badge text-bg-danger">Rejeitado</span>
-                            }
-                            else
-                            {
-                                <span class="badge text-bg-secondary">@solicitacao.Status</span>
-                            }
-                        </td>
-
-                        <td class="text-center">
-                            @if (solicitacao.Status == Status.EmAndamento && solicitacao.TermoCompromisso?.CaminhoArquivo != null)
-                            {
-                                <a class="btn btn-success btn-sm"
-                                   asp-controller="Estagiario"
-                                   asp-action="DownloadTermo"
-                                   asp-route-termoId="@solicitacao.TermoCompromisso.Id"
-                                   title="Baixar Termo de Compromisso">
-                                    <i class="fa-solid fa-file-pdf"></i> Baixar TCE
-                                </a>
-                            }
-                            else if (solicitacao.Status == Status.Rejeitado && solicitacao.TermoCompromisso?.Justificativa != null)
-                            {
-                                <button type="button" class="btn btn-outline-danger btn-sm"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-title="@solicitacao.TermoCompromisso.Justificativa">
-                                    <i class="fa-solid fa-eye"></i> Ver Motivo
-                                </button>
-                            }
-                        </td>
+                        <th>Representante</th>
+                        <th>Empresa</th>
+                        <th>Data da Solicitação</th>
+                        <th>Status</th>
+                        <th class="text-center">Ações</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var solicitacao in Model.Solicitacoes)
+                    {
+                        <tr>
+                            <td>
+                                @(solicitacao.Empresa?.Nome)
+                            </td>
+                            <td>
+                                @(solicitacao.Empresa?.RazaoSocial ?? "Aguardando Vínculo")
+                            </td>
+                            <td>@solicitacao.DataSubmissao.ToString("dd/MM/yyyy")</td>
+
+                            <td>
+                                @if (solicitacao.Status == Status.Pendente)
+                                {
+                                    <span class="badge text-bg-warning">Pendente (Empresa)</span>
+                                }
+                                else if (solicitacao.Status == Status.Aprovado)
+                                {
+                                    <span class="badge text-bg-info">Aprovado (Aguard. Instituição)</span>
+                                }
+                                else if (solicitacao.Status == Status.EmAndamento)
+                                {
+                                    <span class="badge text-bg-primary">Em Andamento</span>
+                                }
+                                else if (solicitacao.Status == Status.Rejeitado)
+                                {
+                                    <span class="badge text-bg-danger">Rejeitado</span>
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-secondary">@solicitacao.Status</span>
+                                }
+                            </td>
+
+                            <td class="text-center">
+                                @if (solicitacao.Status == Status.EmAndamento && solicitacao.TermoCompromisso?.CaminhoArquivo != null)
+                                {
+                                    <a class="btn btn-success btn-sm  text-nowrap"
+                                       asp-controller="Estagiario"
+                                       asp-action="DownloadTermo"
+                                       asp-route-termoId="@solicitacao.TermoCompromisso.Id"
+                                       title="Baixar Termo de Compromisso">
+                                        <i class="fa-solid fa-file-pdf"></i> Baixar TCE
+                                    </a>
+                                }
+                                else if (solicitacao.Status == Status.Rejeitado && solicitacao.TermoCompromisso?.Justificativa != null)
+                                {
+                                    <button type="button" class="btn btn-outline-danger btn-sm"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-title="@solicitacao.TermoCompromisso.Justificativa">
+                                        <i class="fa-solid fa-eye"></i> Ver Motivo
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+
 
 @section Scripts {
     <script>

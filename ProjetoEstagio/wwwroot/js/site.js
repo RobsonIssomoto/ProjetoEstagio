@@ -7,9 +7,11 @@
     getDataTable('#usuarioTable');
     getDataTable('#estagiarioTable');
     getDataTable('#supervisorTable');
+    getDataTable('#orientadoresTable');
     getDataTable('#solicitacoesTable');
     getDataTable('#pendenciasTable');
     getDataTable('#estagiosTable');
+    getDataTable('#meusEstagiosTable');
 
     // ==========================================================
     //  !!!! PASSO 1: APLIQUE AS MÁSCARAS NO CARREGAMENTO DA PÁGINA !!!!
@@ -49,7 +51,6 @@
     // ===================================================================
 
     // 1. Função Debounce (Impede muitas chamadas à API)
-    //    (Pode deixar esta função como está, fora do document.ready se quiser)
     let timeoutId_empresa = null;
     const debounceBusca = (funcao, delay) => {
         return function (...args) {
@@ -97,11 +98,11 @@
             const $item = $('<a></a>')
                 .attr('href', '#')
                 .addClass('list-group-item list-group-item-action item-busca-empresa')
-                .html(`${empresa.nome} <br> <small class="text-muted">${empresa.cnpj}</small>`);
+                .html(`${empresa.razaoSocial} <br> <small class="text-muted">${empresa.cnpj}</small>`); // <-- LINHA CORRIGIDA
 
             // Salva os dados no próprio elemento
             $item.data('id', empresa.id);
-            $item.data('nome', empresa.nome);
+            $item.data('nome', empresa.razaoSocial);
 
             $resultadosDiv.append($item);
         });
@@ -206,9 +207,9 @@
 
         // Máscara de nome não precisa do 'clearIfNotMatch'
         $contexto.find('.nome').mask('A', {
-            'translation': {
+            translation: {
                 A: {
-                    pattern: /[A-Za-z\s+]/,
+                    pattern: /[A-Za-zÀ-ÿ\s]/,
                     recursive: true
                 }
             }

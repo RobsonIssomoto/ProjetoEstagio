@@ -40,7 +40,7 @@ namespace ProjetoEstagio.Documentos
                 .Page(page =>
                 {
                     page.Margin(50); // Margem de 50 pontos
-
+                    page.DefaultTextStyle(style => style.FontSize(10));
                     // Chama o método de conteúdo diretamente
                     page.Content().Element(ComposeContent);
                 });
@@ -64,18 +64,23 @@ namespace ProjetoEstagio.Documentos
                 // --- 1. DADOS DAS PARTES ---
 
                 col.Item().Text("CONCEDENTE:").SemiBold();
-                col.Item().Text($"{_empresa.RazaoSocial}, CNPJ: {_empresa.CNPJ}");
-                col.Item().Text($"Representada por (Supervisor): {_supervisor.Nome} (Cargo: {_supervisor.Cargo})");
+                col.Item().Text($"Razão Social: {_empresa.RazaoSocial}");
+                col.Item().Text($"CNPJ: {_empresa.CNPJ}");
+                col.Item().Text($"Representada por: {_supervisor.Nome}");
+                col.Item().Text($"Cargo: {_supervisor.Cargo}");
                 col.Item().PaddingBottom(10); // Espaço
 
                 col.Item().Text("ESTAGIÁRIO(A):").SemiBold();
-                col.Item().Text($"{_estagiario.Nome}, CPF: {_estagiario.CPF}");
+                col.Item().Text($"Nome: {_estagiario.Nome}");
+                col.Item().Text($"CPF: {_estagiario.CPF}");
                 col.Item().Text($"Curso: {_estagiario.NomeCurso}");
                 col.Item().PaddingBottom(10); // Espaço
 
                 col.Item().Text("INSTITUIÇÃO DE ENSINO:").SemiBold();
-                col.Item().Text("Faculdade de Tecnologia de Atibaia (CNPJ: 62.823.257/0309-46");
-                col.Item().Text($"Professor Orientador: {_orientador.Nome} (Depto: {_orientador.Departamento})");
+                col.Item().Text("Razão Social: Faculdade de Tecnologia de Atibaia");
+                col.Item().Text("CNPJ: 62.823.257/0309-46");
+                col.Item().Text($"Professor Orientador: {_orientador.Nome}");
+                col.Item().Text($"Depto: {_orientador.Departamento}");
                 col.Item().PaddingBottom(20); // Espaço
 
                 // --- 2. CLÁUSULAS (DADOS DO FORMULÁRIO) ---

@@ -22,8 +22,9 @@
                 <thead class="table-light">
                     <tr>
                         <th>Estudante</th>
-                        <th>Empresa</th>
                         <th>Curso</th>
+                        <th>Representante</th>
+                        <th>Empresa</th>
                         <th>Data da Solicitação</th>
                         <th class="text-center" style="width: 300px;">Atribuir Orientador</th>
                     </tr>
@@ -33,8 +34,9 @@
                     {
                         <tr>
                             <td>@termo.SolicitacaoEstagio.Estagiario.Nome</td>
-                            <td>@termo.SolicitacaoEstagio.Empresa.Nome</td>
                             <td>@termo.SolicitacaoEstagio.Estagiario.NomeCurso</td>
+                            <td>@termo.SolicitacaoEstagio.Empresa.Nome</td>
+                            <td>@termo.SolicitacaoEstagio.Empresa.RazaoSocial</td>
                             <td>@termo.SolicitacaoEstagio.DataSubmissao.ToString("dd/MM/yyyy")</td>
 
                             <td>

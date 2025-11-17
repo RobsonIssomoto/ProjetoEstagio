@@ -20,6 +20,8 @@
             <thead class="table-light">
                 <tr>
                     <th>Estudante</th>
+                    <th>Curso</th>
+                    <th>Representante</th>
                     <th>Empresa</th>
                     <th>Orientador (Instituição)</th>
                     <th>Status</th>
@@ -34,7 +36,9 @@
 
                     <tr>
                         <td>@solicitacao.Estagiario.Nome</td>
+                        <td>@solicitacao.Estagiario.NomeCurso</td>
                         <td>@solicitacao.Empresa.Nome</td>
+                        <td>@solicitacao.Empresa.RazaoSocial</td>
 
                         <td>
                             @if (termo.Orientador != null)

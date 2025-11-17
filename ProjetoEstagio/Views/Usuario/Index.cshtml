@@ -18,14 +18,17 @@
 
     @if (TempData["MensagemSucesso"] != null)
     {
-        <div class="alert alert-success" role="alert">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             @TempData["MensagemSucesso"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
+
     @if (TempData["MensagemErro"] != null)
     {
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
             @TempData["MensagemErro"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
@@ -42,7 +45,7 @@
         <tbody>
             @if (Model != null && Model.Any())
             {
-                foreach (UsuarioModel usuario in Model)
+                foreach (var usuario in Model)
                 {
                     <tr>
                         <td>@usuario.Id</td>
@@ -50,30 +53,35 @@
                         <td>@usuario.Email</td>
                         <td>@usuario.DataCadastro</td>
                         <td class="d-flex no-wrap">
-                            <a asp-action="Editar" asp-route-id="@usuario.Id" class="btn btn-primary btn-sm me-1"><i class="fa-solid fa-pen-to-square"></i></a>
-                            <a asp-action="DeletarConfirmar" asp-route-id="@usuario.Id" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></a>
+                            <a asp-action="Editar" asp-route-id="@usuario.Id" class="btn btn-primary btn-sm me-1">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            <a asp-action="DeletarConfirmar" asp-route-id="@usuario.Id" class="btn btn-danger btn-sm">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
                         </td>
                     </tr>
                 }
             }
             else
             {
+                <!-- Linha vazia padrão (necessária para manter a estrutura da tabela) -->
                 <tr>
-                    <td colspan="4" class="text-center">Nenhuma empreasa encontrada.</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
                 </tr>
             }
         </tbody>
     </table>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info text-center mt-2">
+            Nenhum usuário encontrado.
+        </div>
+    }
+
 </div>
-
-
-
-
-
-
-
-
-
-
-
-

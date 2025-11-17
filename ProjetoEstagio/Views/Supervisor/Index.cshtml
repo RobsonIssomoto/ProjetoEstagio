@@ -1,15 +1,20 @@
 ﻿@model List<ProjetoEstagio.Models.SupervisorModel>
-@{
-    Layout = "_LayoutEmpresa";
-    ViewData["Title"] = "INDEX SUPERVISORES";
-}
 
-<div class="container mt-4">
-    <div class="text-center">
-        <h2>@ViewData["Title"]</h2>
+@{
+    ViewData["Title"] = "Gestão de Supervisores";
+    Layout = "_LayoutEmpresa";
+}
+'
+<h3 class="fw-bold">Gestão de Supervisores</h3>
+<p class="text-muted">Cadastre, edite ou remova os funcionários que podem atuar como supervisores de estágio. </p>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white p-4">
+        <h5 class="mb-0 fw-bold">Supervisores Cadastrados</h5>
+        <p class="text-muted mb-0 small">Use o botão "Adicionar Novo Supervisor" para incluir um novo supervisor no sistema.</p>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center p-3 mb-3">
         <a href="javascript:void(0);" class="btn btn-success btn-cadastrar-supervisor">
             <i class="fas fa-plus-circle"></i> Adicionar Novo Supervisor
         </a>
@@ -28,41 +33,43 @@
         </div>
     }
 
-    <table id="supervisorTable" class="table table-striped table-bordered table-hover" style="width:100%">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th class="text-start">CPF</th>
-                <th>Cargo</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null && Model.Any())
-            {
-                foreach (var supervisor in Model)
+    <div class="table-responsive p-3">
+        <table id="supervisorTable" class="table table-striped table-bordered table-hover" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th class="text-start">CPF</th>
+                    <th>Cargo</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
                 {
-                    <tr>
-                        <td>@supervisor.Nome</td>
-                        <td class="text-start cpf">@supervisor.CPF</td>
-                        <td>@supervisor.Cargo</td>
-                        <td>
-                            <a href="javascript:void(0);"
-                               class="btn btn-primary btn-sm btn-edit-supervisor"
-                               data-id="@supervisor.Id">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </a>
-                            <a href="javascript:void(0);"
-                               class="btn btn-danger btn-sm btn-deletar-supervisor"
-                               data-id="@supervisor.Id">
-                                <i class="fa-solid fa-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
+                    foreach (var supervisor in Model)
+                    {
+                        <tr>
+                            <td>@supervisor.Nome</td>
+                            <td class="text-start cpf">@supervisor.CPF</td>
+                            <td>@supervisor.Cargo</td>
+                            <td>
+                                <a href="javascript:void(0);"
+                                   class="btn btn-primary btn-sm btn-edit-supervisor"
+                                   data-id="@supervisor.Id">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a href="javascript:void(0);"
+                                   class="btn btn-danger btn-sm btn-deletar-supervisor"
+                                   data-id="@supervisor.Id">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
                 }
-            }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Modal Cadastrar Supervisor -->

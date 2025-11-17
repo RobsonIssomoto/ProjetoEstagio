@@ -16,8 +16,8 @@ namespace ProjetoEstagio.Models.ViewModels
         [Display(Name = "Estagiário")]
         public string EstagiarioNome { get; set; }
 
-        [Display(Name = "Empresa")]
-        public string EmpresaNome { get; set; }
+        [Display(Name = "Razão Social")] // <-- CORREÇÃO DO NOME
+        public string EmpresaNome { get; set; }
 
         [Display(Name = "Orientador")]
         public string OrientadorNome { get; set; } = "Aguardando designação";
