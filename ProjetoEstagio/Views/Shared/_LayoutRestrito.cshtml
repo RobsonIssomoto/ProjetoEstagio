@@ -1,0 +1,118 @@
+﻿@using ProjetoEstagio.Models
+@using ProjetoEstagio.Helper
+@inject ISessao _sessao
+
+@{
+    // Lógica para obter o nome do usuário
+    UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+    string nomeExibicao = _sessao.BuscarNomeExibicao();
+    
+    if (string.IsNullOrEmpty(nomeExibicao) && usuarioLogado != null)
+    {
+        nomeExibicao = usuarioLogado.Login;
+    }
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SGE</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://kit.fontawesome.com/b02dd4a413.js" crossorigin="anonymous"></script>
+
+    <style>
+        /* Ajuste para centralizar o conteúdo verticalmente */
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-danger border-bottom box-shadow mb-3" data-bs-theme="dark">
+            <div class="container-fluid">
+                
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                    SGE
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
+                    
+                    <ul class="navbar-nav">
+                        @if (usuarioLogado != null)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-white d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-circle-user fa-lg"></i>
+                                    <span class="fw-semibold">@nomeExibicao</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                    <li>
+                                        <span class="dropdown-item-text text-muted small">
+                                            Logado como <strong>@usuarioLogado.Perfil.ToString()</strong>
+                                        </span>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" asp-controller="Login" asp-action="Logout">
+                                            <i class="fa-solid fa-right-from-bracket me-2"></i> Sair
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="btn btn-outline-light btn-sm" asp-controller="Login" asp-action="Index">Login</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container text-center mt-4">
+        <img src="~/img/ftc.png" style="max-width: 120px" class="img-fluid opacity-75" alt="Logo Fatec" />
+    </div>
+
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+
+    <footer class="border-top footer text-muted text-center  mt-auto py-3">
+        <div class="container">
+            <small>
+                Fatec Atibaia Avenida Jerônimo de Camargo – 421 (CIEM III) Caetetuba Atibaia – SP - CEP: 12951-540
+                <br>
+                &copy; @DateTime.Now.Year - ProjetoEstagio - <a href="https://fatecatibaia.cps.sp.gov.br/" class="text-decoration-none">Fatec</a>
+            </small>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

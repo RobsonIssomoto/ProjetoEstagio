@@ -747,6 +747,43 @@
         });
     });
 
+    // ===================================================================
+    // ALTERAR SENHA (AJAX GLOBAL)
+    // ===================================================================
+    $(document).on('submit', '#form-alterar-senha', function (e) {
+        e.preventDefault();
+        var $form = $(this);
+        var $msgDiv = $('#msg-alterar-senha');
+        var $btn = $form.find('button[type="submit"]');
+
+        // Feedback visual de carregamento
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+        $msgDiv.html('');
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: $form.serialize(),
+            success: function (response) {
+                // Sucesso!
+                $msgDiv.html('<div class="alert alert-success">' + response.mensagem + '</div>');
+                $form[0].reset(); // Limpa os campos de senha
+
+                // Remove o alerta após 5 segundos
+                setTimeout(function () { $msgDiv.empty(); }, 5000);
+            },
+            error: function (xhr) {
+                // Erro (Senha incorreta ou validação)
+                var erroMsg = xhr.responseText || "Erro ao alterar senha.";
+                $msgDiv.html('<div class="alert alert-danger">' + erroMsg + '</div>');
+            },
+            complete: function () {
+                // Restaura o botão
+                $btn.prop('disabled', false).text('Alterar');
+            }
+        });
+    });
+
 }); // Fim do $(document).ready()
 
 

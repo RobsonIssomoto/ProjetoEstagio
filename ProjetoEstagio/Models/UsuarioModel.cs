@@ -23,7 +23,6 @@ namespace ProjetoEstagio.Models
         public UsuarioModel() { }
 
         // --- 3. MÉTODO NOVO PARA CRIAR O HASH ---
-        // (O EstagiarioController vai chamar este método)
         public void SetSenhaHash(string senha)
         {
             if (string.IsNullOrEmpty(senha))
@@ -44,6 +43,17 @@ namespace ProjetoEstagio.Models
             }
             // Compara a senha digitada com o hash salvo no banco
             return BCrypt.Net.BCrypt.Verify(senha, this.Senha);
+        }
+        public string GerarNovaSenha()
+        {
+            // 1. Gera a senha aleatória (texto plano)
+            string novaSenha = Guid.NewGuid().ToString().Substring(0, 8);
+
+            // 2. Criptografa ela antes de salvar na propriedade 'Senha'
+            SetSenhaHash(novaSenha);
+
+            // 3. Retorna a senha em texto plano (para enviar por e-mail)
+            return novaSenha;
         }
     }
 }

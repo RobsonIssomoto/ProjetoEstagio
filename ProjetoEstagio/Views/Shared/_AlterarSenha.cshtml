@@ -1,0 +1,53 @@
+﻿@model ProjetoEstagio.Models.ViewModels.AlterarSenhaViewModel
+
+<form id="form-alterar-senha" asp-controller="Usuario" asp-action="AlterarSenha" method="post">
+    
+    <input type="hidden" name="Id" id="UsuarioIdSenha" value="@Model.Id" />
+
+    <div class="form-group mb-3">
+        <label asp-for="SenhaAtual" class="fw-bold"></label>
+        <div class="input-icon-wrapper">
+            <input type="password" asp-for="SenhaAtual" class="form-control" placeholder="Digite sua senha atual" />  
+            <span class="input-icon-toggle">
+                        <i class="bi bi-eye"></i>
+                    </span>
+                </div>
+        <span asp-validation-for="SenhaAtual" class="text-danger small"></span>
+    </div>
+    
+    <div class="form-group mb-3">
+        <label asp-for="NovaSenha" class="fw-bold"></label>
+         <div class="input-icon-wrapper">
+            <input type="password" asp-for="NovaSenha" class="form-control" placeholder="Nova senha" />   
+            <span class="input-icon-toggle">
+                        <i class="bi bi-eye"></i>
+                    </span>
+                </div>
+        <span asp-validation-for="NovaSenha" class="text-danger small"></span>
+    </div>
+
+    <div class="form-group mb-4">
+        <label asp-for="ConfirmarNovaSenha" class="fw-bold"></label>
+        <div class="input-icon-wrapper">
+            <input type="password" asp-for="ConfirmarNovaSenha" class="form-control" placeholder="Repita a nova senha" />
+            <span class="input-icon-toggle">
+                        <i class="bi bi-eye"></i>
+                    </span>
+                </div>
+        <span asp-validation-for="ConfirmarNovaSenha" class="text-danger small"></span>
+    </div>
+
+    
+                  
+
+                    
+
+
+    <div class="d-grid">
+        <button type="submit" class="btn btn-warning text-dark fw-bold">
+            Atualizar Senha
+        </button>
+    </div>
+    
+    <div id="msg-alterar-senha" class="mt-3 text-center"></div>
+</form>

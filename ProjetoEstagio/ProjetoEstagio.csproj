@@ -14,6 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\SenhaController.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="Views\Empresa\CadastroEstagio.cshtml" />
     <Content Remove="Views\Estagiario\Cadastro.cshtml" />
     <Content Remove="Views\Estagiario\Login.cshtml" />

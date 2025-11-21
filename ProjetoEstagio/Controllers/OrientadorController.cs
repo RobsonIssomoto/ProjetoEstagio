@@ -1,4 +1,4 @@
-﻿// Controllers/OrientadorController.cs
+﻿
 using Microsoft.AspNetCore.Mvc;
 using ProjetoEstagio.Helper;
 using ProjetoEstagio.Models;
@@ -7,12 +7,14 @@ using ProjetoEstagio.Models.ViewModels;
 using ProjetoEstagio.Services;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Hosting; // <-- 1. ADICIONE ESTE USING
-using ProjetoEstagio.Repository;   // <-- 2. ADICIONE ESTE USING
-using System.IO;                   // <-- 3. ADICIONE ESTE USING
+using Microsoft.AspNetCore.Hosting; 
+using ProjetoEstagio.Repository;  
+using System.IO;
+using ProjetoEstagio.Filters;             
 
 namespace ProjetoEstagio.Controllers
 {
+    
     public class OrientadorController : Controller
     {
         private readonly IOrientadorService _orientadorService;
@@ -288,7 +290,6 @@ namespace ProjetoEstagio.Controllers
             }
         }
 
-        // GET: /Orientador/AlterarOrientador/5
         [HttpGet]
         public IActionResult AlterarOrientador(int id) // Recebe o TermoId
         {

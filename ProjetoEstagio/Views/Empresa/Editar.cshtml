@@ -14,37 +14,42 @@
             <input type="hidden" asp-for="Id" />
 
             <div class="form-group mb-3">
-                <label asp-for="CNPJ" class="form-label fw-bold">CNPJ</label>
+                <label asp-for="CNPJ" class=" fw-bold">CNPJ</label>
                 <input type="text" class="form-control bg-light" asp-for="CNPJ" readonly />
                 <small class="form-text text-muted">O CNPJ não pode ser alterado após o cadastro.</small>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="RazaoSocial" class="form-label fw-bold">Razão Social</label>
+                <label asp-for="Email" class=" fw-bold">Email de Contato</label>
+                <input type="email" class="form-control" asp-for="Email">
+                <small class="form-text text-muted">O E-mail não pode ser alterado após o cadastro.</small>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="RazaoSocial" class=" fw-bold">Razão Social</label>
                 <input type="text" class="form-control" asp-for="RazaoSocial" />
                 <span asp-validation-for="RazaoSocial" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="Nome" class="form-label fw-bold">Nome Representante</label>
+                <label asp-for="Nome" class=" fw-bold">Nome Representante</label>
                 <input type="text" class="form-control" asp-for="Nome" />
                 <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="Email" class="form-label fw-bold">Email de Contato</label>
-                <input type="email" class="form-control" asp-for="Email">
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
+            
 
             <div class="form-group mb-3">
-                <label asp-for="Telefone" class="form-label fw-bold">Telefone</label>
+                <label asp-for="Telefone" class=" fw-bold">Telefone</label>
                 <input type="text" class="form-control" asp-for="Telefone" placeholder="(XX) XXXXX-XXXX">
                 <span asp-validation-for="Telefone" class="text-danger"></span>
             </div>
 
-            <hr class="my-4" />
 
+            
+            <hr class="my-4" />
+            
             <div class="row g-2 justify-content-end">
 
                 <div class="col-6 col-md-3">

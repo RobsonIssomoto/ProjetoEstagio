@@ -7,9 +7,11 @@ using ProjetoEstagio.Services; // Sua camada de serviço
 using ProjetoEstagio.Helper; // Para ISessao
 using System.Linq;         // Para .Count() 
 using System.IO;
+using ProjetoEstagio.Filters;
 
 namespace ProjetoEstagio.Controllers
 {
+    
     public class EmpresaController : Controller
     {
         private readonly IEmpresaService _empresaService;
@@ -25,7 +27,8 @@ namespace ProjetoEstagio.Controllers
 
         // --- LÓGICA DE CADASTRO PÚBLICO ---
 
-        // GET: /Empresa/Cadastrar?token=...
+        
+
         public IActionResult Cadastrar(string? token) // Aceita o token da URL
         {
             var viewModel = new EmpresaCadastroViewModel();
@@ -65,7 +68,7 @@ namespace ProjetoEstagio.Controllers
 
         // --- DASHBOARD DO REPRESENTANTE ---
 
-        // GET: /Empresa/Principal
+        [Autorizacao(Perfil.Representante)]
         public IActionResult Principal()
         {
             // 1. Obter o usuário (Representante) logado
@@ -103,12 +106,14 @@ namespace ProjetoEstagio.Controllers
 
         // --- MÉTODOS DE ADMIN (CRUD) ---
 
-        // GET: /Empresa/Index (Lista de Empresas para o Admin)
+        [Autorizacao(Perfil.Admin, Perfil.Representante, Perfil.Supervisor)]
         public IActionResult Index()
         {
             List<EmpresaModel> empresas = _empresaService.ListarTodos(); //
             return View(empresas);
         }
+
+        [Autorizacao(Perfil.Admin, Perfil.Representante)]
         [HttpGet]
         public IActionResult Editar(int id)
         {
@@ -130,7 +135,7 @@ namespace ProjetoEstagio.Controllers
             return View(viewModel); // Envia a ViewModel para a View
         }
 
-
+        [Autorizacao(Perfil.Admin, Perfil.Representante)]
         [HttpPost]
         public IActionResult Alterar(EmpresaEditarViewModel viewModel) // <-- MUDANÇA 1: Recebe a ViewModel
         {
@@ -166,6 +171,7 @@ namespace ProjetoEstagio.Controllers
             return View("Editar", viewModel);
         }
 
+        [Autorizacao(Perfil.Admin, Perfil.Representante)]
         public IActionResult DeletarConfirmar(int id)
         {
             EmpresaModel empresa = _empresaService.BuscarPorId(id); //
@@ -173,6 +179,7 @@ namespace ProjetoEstagio.Controllers
             return View(empresa);
         }
 
+        [Autorizacao(Perfil.Admin, Perfil.Representante)]
         public IActionResult Deletar(int id)
         {
             try
@@ -189,8 +196,8 @@ namespace ProjetoEstagio.Controllers
             }
         }
 
-        // Coloque este método dentro do seu EmpresaController.cs
 
+        [Autorizacao(Perfil.Representante)]
         [HttpGet]
         public IActionResult MeuPerfil()
         {
@@ -225,10 +232,11 @@ namespace ProjetoEstagio.Controllers
             }
         }
 
+        [Autorizacao(Perfil.Representante)]
         public IActionResult DetalhesSupervisores(int id)
         {
             if (id == 0) return NotFound();
-            EmpresaModel empresa = _empresaService.BuscarComSupervisores(id); //
+            EmpresaModel empresa = _empresaService.BuscarComSupervisores(id); 
             if (empresa == null) return NotFound("Empresa não encontrada.");
             return View(empresa);
         }
@@ -261,7 +269,7 @@ namespace ProjetoEstagio.Controllers
             return Json(empresas);
         }
 
-        // Em EmpresaController.cs
+        [Autorizacao(Perfil.Representante)]
         [HttpGet]
         public IActionResult PreencherTermo(int solicitacaoId)
         {
@@ -328,6 +336,7 @@ namespace ProjetoEstagio.Controllers
             }
         }
 
+        [Autorizacao(Perfil.Representante)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult SalvarTermo(TermoPreenchimentoViewModel viewModel)
@@ -357,7 +366,6 @@ namespace ProjetoEstagio.Controllers
                     Console.WriteLine($"Erro ao repopular ViewModel: {ex.Message}");
                 }
             };
-            // --- FIM DA CORREÇÃO ---
 
             if (!ModelState.IsValid)
             {
@@ -386,12 +394,11 @@ namespace ProjetoEstagio.Controllers
             }
         }
 
-
+        [Autorizacao(Perfil.Representante)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult RejeitarTermo(TermoPreenchimentoViewModel viewModel)
         {
-            // --- INÍCIO DA CORREÇÃO ---
             Action<TermoPreenchimentoViewModel> repopularViewModel = (vm) => {
                 try
                 {
@@ -408,7 +415,6 @@ namespace ProjetoEstagio.Controllers
                 }
                 catch (Exception ex) { Console.WriteLine($"Erro ao repopular ViewModel: {ex.Message}"); }
             };
-            // --- FIM DA CORREÇÃO ---
 
             try
             {
@@ -431,6 +437,7 @@ namespace ProjetoEstagio.Controllers
             }
         }
 
+        [Autorizacao(Perfil.Representante)]
         [HttpGet]
         public IActionResult DownloadTermo(int termoId)
         {

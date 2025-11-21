@@ -3,29 +3,36 @@ using ProjetoEstagio.Helper;
 using ProjetoEstagio.Models;
 using ProjetoEstagio.Models.Enums;
 using ProjetoEstagio.Repository;
+using ProjetoEstagio.Services;
 
 namespace ProjetoEstagio.Controllers
 {
     public class LoginController : Controller
     {
         private readonly IUsuarioRepository _usuarioRepository;
+        private readonly IUsuarioService _usuarioService;
         private readonly IEmpresaRepository _empresaRepository;
         private readonly IEstagiarioRepository _estagiarioRepository;
         private readonly ISupervisorRepository _supervisorRepository;
         private readonly IOrientadorRepository _orientadorRepository;
+        private readonly IEmail _email;
         private readonly ISessao _sessao;
         public LoginController(IUsuarioRepository usuarioRepository,
+            IUsuarioService usuarioService,
             IEmpresaRepository empresaRepository,
             IEstagiarioRepository estagiarioRepository,
             ISupervisorRepository supervisorRepository,
             IOrientadorRepository orientadorRepository,
+            IEmail email,
             ISessao sessao)
         {
             _usuarioRepository = usuarioRepository;
+            _usuarioService = usuarioService;
             _empresaRepository = empresaRepository;
             _estagiarioRepository = estagiarioRepository;
             _supervisorRepository = supervisorRepository;
             _orientadorRepository = orientadorRepository;
+            _email = email;
             _sessao = sessao;
         }
 
@@ -143,7 +150,6 @@ namespace ProjetoEstagio.Controllers
                             return RedirectToAction("Pendencias", "Orientador");
                         }
 
-                            
                         // --- 5. CORREÇÃO DE LÓGICA ---
                         // Se for Admin (ou outro perfil sem redirect),
                         // salva o nome padrão e vai para a Home.
@@ -178,5 +184,33 @@ namespace ProjetoEstagio.Controllers
             _sessao.RemoverSessaoDoUsuario();
             return RedirectToAction("Index", "Login");
         }
+
+        public IActionResult RedefinirSenha()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult LinkRedefinirSenha(RedefinirSenhaModel redefinirSenha)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // USE O SERVIÇO AQUI
+                    _usuarioService.RedefinirSenha(redefinirSenha.Login);
+                    TempData["MensagemSucesso"] = "Enviamos uma nova senha para o seu e-mail.";
+                    return RedirectToAction("Index", "Login");
+                }
+                return View("Index");
+            }
+            catch (Exception erro)
+            {
+                TempData["MensagemErro"] = erro.Message;
+                return RedirectToAction("Index");
+            }
+        }
+
+
     }
 }

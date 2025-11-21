@@ -1,6 +1,24 @@
 ﻿@{
-    Layout = "_LayoutLogoff";
-    ViewData["Title"] = "Página Restrita";
+    // MUDANÇA AQUI: Usar o novo layout inteligente
+    Layout = "_LayoutRestrito"; 
+    ViewData["Title"] = "Acesso Restrito";
 }
+<div class="d-flex flex-column  " style="min-height: 80vh;">
+    
+    <div class="text-center">
+        <div class="mb-4">
+            <i class="fa-solid fa-user-lock text-secondary opacity-50" style="font-size: 6rem;"></i>
+        </div>
 
-<p>Você não tem permissão para acessar essa funcionalidade<a asp-controller="Home" asp-action="Index">Clique Aqui para retornar</a></p>
+        <h2 class="fw-bold text-dark mb-3">Acesso Restrito</h2>
+
+        <p class="text-muted fs-5 mb-4" style="max-width: 400px; margin: 0 auto;">
+            Ops! Parece que seu perfil não possui as chaves necessárias para entrar nesta página.
+        </p>
+
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-lg px-4 shadow-sm">
+             Voltar ao Início
+        </a>
+    </div>
+
+</div>

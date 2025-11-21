@@ -3,6 +3,7 @@ using ProjetoEstagio.Filters;
 using ProjetoEstagio.Models;
 using ProjetoEstagio.Models.ViewModels;
 using ProjetoEstagio.Repository;
+using ProjetoEstagio.Services;
 
 namespace ProjetoEstagio.Controllers
 {
@@ -11,9 +12,12 @@ namespace ProjetoEstagio.Controllers
     {
 
         private readonly IUsuarioRepository _usuarioRepository;
-        public UsuarioController(IUsuarioRepository usuarioRepository)
+        private readonly IUsuarioService _usuarioService;
+        public UsuarioController(IUsuarioRepository usuarioRepository, IUsuarioService usuarioService)
         {
             _usuarioRepository = usuarioRepository;
+            _usuarioService = usuarioService;
+
         }
         public IActionResult Index()
         {
@@ -109,7 +113,6 @@ namespace ProjetoEstagio.Controllers
         [HttpPost]
         public IActionResult Alterar(UsuarioSemSenhaModel usuarioSemSenhaModel)
         {
-
             try
             {
                 // O ModelState é validado contra o UsuarioSemSenhaModel, o que está correto.
@@ -150,6 +153,30 @@ namespace ProjetoEstagio.Controllers
                 // Considere logar o 'erro.InnerException'
                 TempData["MensagemErro"] = $"Erro ao salvar: {erro.Message}. Tente novamente.";
                 return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AlterarSenha(AlterarSenhaViewModel viewModel)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // Chama o serviço centralizado
+                    _usuarioService.AlterarSenha(viewModel);
+
+                    return Json(new { sucesso = true, mensagem = "Senha alterada com sucesso!" });
+                }
+
+                // Se a validação falhar (ex: senhas não batem), retorna os erros
+                var erros = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return BadRequest(string.Join("<br>", erros));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message); // Retorna erro 500 com a mensagem (ex: "Senha atual incorreta")
             }
         }
 

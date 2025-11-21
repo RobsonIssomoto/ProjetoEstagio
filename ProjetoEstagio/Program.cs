@@ -21,9 +21,12 @@ builder.Services.AddScoped<IEstagiarioService, EstagiarioService>();
 builder.Services.AddScoped<IOrientadorRepository, OrientadorRepository>();
 builder.Services.AddScoped<IOrientadorService, OrientadorService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<ISolicitacaoEstagioRepository, SolicitacaoEstagioRepository>();
 builder.Services.AddScoped<ITermoCompromissoRepository, TermoCompromissoRepository>();
 builder.Services.AddScoped<IArquivoService, ArquivoService>();
+builder.Services.AddScoped<IEmail, Email>();
+
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ISessao, Sessao>();

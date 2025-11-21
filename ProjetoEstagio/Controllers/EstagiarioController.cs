@@ -5,7 +5,7 @@ using ProjetoEstagio.Filters;
 using ProjetoEstagio.Helper;
 using ProjetoEstagio.Models;
 using ProjetoEstagio.Models.Enums;
-using ProjetoEstagio.Models.ViewModels; // <-- Adicionado
+using ProjetoEstagio.Models.ViewModels;
 using ProjetoEstagio.Repository;
 using ProjetoEstagio.Services;
 using System.Linq;
@@ -14,11 +14,12 @@ using System.IO;
 
 namespace ProjetoEstagio.Controllers
 {
+
     public class EstagiarioController : Controller
     {
         private readonly IEstagiarioService _estagiarioService;
         private readonly ISessao _sessao;
-        // Removidas as injeções de repositório
+
 
         public EstagiarioController(
             IEstagiarioService estagiarioService,
@@ -28,23 +29,23 @@ namespace ProjetoEstagio.Controllers
             _sessao = sessao;
         }
 
+        [Autorizacao(Perfil.Admin)]
         public IActionResult Index()
         {
             List<EstagiarioModel> estagiario = _estagiarioService.ListarTodos();
             return View(estagiario);
         }
 
-        // 4. Ação GET atualizada para usar o ViewModel
+
         public IActionResult Cadastrar()
         {
             return View(new EstagiarioCadastroViewModel());
         }
 
-        // 5. Ação POST substituída pela lógica do "Passo 5"
+
         [HttpPost]
         public IActionResult Cadastrar(EstagiarioCadastroViewModel viewModel)
         {
-            // Começa a transação (ou salva os dois, ou falha os dois)
             {
                 try
                 {
@@ -60,17 +61,16 @@ namespace ProjetoEstagio.Controllers
                     TempData["MensagemErro"] = $"Erro ao cadastrar: {erro.Message}";
                 }
             }
-
-            // Se o ModelState for inválido ou a transação falhar,
-            // retorna para a view com os dados que o usuário digitou.
             return View(viewModel);
         }
 
+
+        [Autorizacao(Perfil.Admin, Perfil.Estagiario)]
         [HttpGet]
         public IActionResult Editar(int id)
         {
-             EstagiarioModel estagiario = _estagiarioService.BuscarPorId(id); 
-             if (estagiario == null) return NotFound(); 
+            EstagiarioModel estagiario = _estagiarioService.BuscarPorId(id);
+            if (estagiario == null) return NotFound();
 
             // Mapeia do Model para a ViewModel
             var viewModel = new EstagiarioEditarViewModel
@@ -80,12 +80,15 @@ namespace ProjetoEstagio.Controllers
                 Nome = estagiario.Nome,
                 Email = estagiario.Email,
                 Telefone = estagiario.Telefone,
-                NomeCurso = estagiario.NomeCurso
+                NomeCurso = estagiario.NomeCurso,
+                UsuarioId = estagiario.UsuarioId
             };
 
             return View(viewModel); // Envia a ViewModel para a View
         }
 
+
+        [Autorizacao(Perfil.Admin, Perfil.Estagiario)]
         [HttpPost]
         public IActionResult Alterar(EstagiarioEditarViewModel viewModel) // <-- Recebe a ViewModel
         {
@@ -122,6 +125,8 @@ namespace ProjetoEstagio.Controllers
             return View("Editar", viewModel);
         }
 
+
+        [Autorizacao(Perfil.Admin, Perfil.Estagiario)]
         public IActionResult DeletarConfirmar(int id)
         {
             EstagiarioModel estagiario = _estagiarioService.BuscarPorId(id);
@@ -129,6 +134,7 @@ namespace ProjetoEstagio.Controllers
             return View(estagiario);
         }
 
+        [Autorizacao(Perfil.Admin, Perfil.Estagiario)]
         public IActionResult Deletar(int id)
         {
             try
@@ -146,6 +152,7 @@ namespace ProjetoEstagio.Controllers
             return RedirectToAction("Index");
         }
 
+        [Autorizacao(Perfil.Estagiario)]
         public IActionResult Principal()
         {
             try
@@ -201,6 +208,7 @@ namespace ProjetoEstagio.Controllers
             }
         }
 
+        [Autorizacao(Perfil.Estagiario)]
         [HttpGet]
         public IActionResult MeuPerfil()
         {
@@ -213,7 +221,7 @@ namespace ProjetoEstagio.Controllers
                     return RedirectToAction("Index", "Login");
                 }
 
-                EstagiarioModel estagiario = _estagiarioService.BuscarPorUsuarioId(usuarioLogado.Id); 
+                EstagiarioModel estagiario = _estagiarioService.BuscarPorUsuarioId(usuarioLogado.Id);
                 if (estagiario == null)
                 {
                     TempData["MensagemErro"] = "Nenhum perfil de estagiário encontrado para seu usuário.";
@@ -229,28 +237,10 @@ namespace ProjetoEstagio.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
-        /// Método [Remote] para validar CPF
-        [AcceptVerbs("GET", "POST")]
-        public async Task<IActionResult> VerificarCPFUnico(string cpf)
-        {
-            // Opcional, mas recomendado: Limpar a formatação do CPF (pontos e traços)
-            // var cpfLimpo = cpf.Replace(".", "").Replace("-", "");
-
-            bool cpfJaExiste = await _estagiarioService.VerificarCPFUnico(cpf);
-
-            if (cpfJaExiste)
-            {
-                return Json($"O CPF {cpf} já está cadastrado.");
-            }
-
-            return Json(true);
-        }
 
         public IActionResult Login() => View("Login");
 
-        //
-        // GET: /Estagiario/Processo
-        //
+        [Autorizacao(Perfil.Estagiario)]
         [HttpGet]
         public IActionResult Processo()
         {
@@ -278,9 +268,8 @@ namespace ProjetoEstagio.Controllers
             return View(viewModel);
         }
 
-        //
-        // POST: /Estagiario/CriarSolicitacao
-        //
+
+        [Autorizacao(Perfil.Estagiario)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CriarSolicitacao(SolicitacaoCadastroViewModel viewModel)
@@ -315,6 +304,7 @@ namespace ProjetoEstagio.Controllers
             }
         }
 
+        [Autorizacao(Perfil.Estagiario)]
         [HttpGet]
         public IActionResult DownloadTermo(int termoId)
         {
@@ -339,6 +329,23 @@ namespace ProjetoEstagio.Controllers
                 TempData["MensagemErro"] = $"Erro ao baixar o arquivo: {ex.Message}";
                 return RedirectToAction("Principal");
             }
+        }
+
+
+        [AcceptVerbs("GET", "POST")]
+        public async Task<IActionResult> VerificarCPFUnico(string cpf)
+        {
+            // Opcional, mas recomendado: Limpar a formatação do CPF (pontos e traços)
+            // var cpfLimpo = cpf.Replace(".", "").Replace("-", "");
+
+            bool cpfJaExiste = await _estagiarioService.VerificarCPFUnico(cpf);
+
+            if (cpfJaExiste)
+            {
+                return Json($"O CPF {cpf} já está cadastrado.");
+            }
+
+            return Json(true);
         }
     }
 }

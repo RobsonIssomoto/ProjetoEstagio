@@ -6,6 +6,7 @@ namespace ProjetoEstagio.Models.ViewModels
     {
         // O Id é necessário, mas ficará 'hidden' no formulário
         public int Id { get; set; }
+        public int UsuarioId { get; set; }
 
         [Display(Name = "CPF")]
         public string CPF { get; set; } // Apenas para exibição (readonly)
@@ -24,5 +25,7 @@ namespace ProjetoEstagio.Models.ViewModels
 
         [Display(Name = "Curso")]
         public string? NomeCurso { get; set; }
+
+        
     }
 }
