@@ -11,6 +11,7 @@
     getDataTable('#solicitacoesTable');
     getDataTable('#pendenciasTable');
     getDataTable('#estagiosTable');
+    getDataTable('#adminsTable');
     getDataTable('#meusEstagiosTable');
 
     // ==========================================================
@@ -760,26 +761,77 @@
         $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
         $msgDiv.html('');
 
+        // HTML do botão de fechar (X)
+        var btnFechar = '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+
         $.ajax({
             url: $form.attr('action'),
             type: 'POST',
             data: $form.serialize(),
             success: function (response) {
-                // Sucesso!
-                $msgDiv.html('<div class="alert alert-success">' + response.mensagem + '</div>');
-                $form[0].reset(); // Limpa os campos de senha
+                // Sucesso! Adicionado classes 'alert-dismissible fade show' e o btnFechar
+                $msgDiv.html('<div class="alert alert-success alert-dismissible fade show" role="alert">'
+                    + response.mensagem + btnFechar + '</div>');
 
-                // Remove o alerta após 5 segundos
-                setTimeout(function () { $msgDiv.empty(); }, 5000);
+                $form[0].reset(); // Limpa os campos
+
+                // (Opcional) Remove o alerta automaticamente após 5 segundos
+                // setTimeout(function() { $msgDiv.empty(); }, 5000); 
             },
             error: function (xhr) {
-                // Erro (Senha incorreta ou validação)
+                // Erro! Adicionado classes 'alert-dismissible fade show' e o btnFechar
                 var erroMsg = xhr.responseText || "Erro ao alterar senha.";
-                $msgDiv.html('<div class="alert alert-danger">' + erroMsg + '</div>');
+                $msgDiv.html('<div class="alert alert-danger alert-dismissible fade show" role="alert">'
+                    + erroMsg + btnFechar + '</div>');
             },
             complete: function () {
                 // Restaura o botão
                 $btn.prop('disabled', false).text('Alterar');
+            }
+        });
+    });
+
+    // ===================================================================
+    // ADMIN - CADASTRAR (LOAD)
+    // ===================================================================
+    $(document).on('click', '.btn-cadastrar-admin', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/Usuario/CadastrarAdmin',
+            type: 'GET',
+            success: function (result) {
+                var modalBodySelector = '#cadastrarAdminModal .modal-body';
+                $(modalBodySelector).html(result);
+                setupModalForm(modalBodySelector); // Ativa validação
+
+                var modal = new bootstrap.Modal(document.getElementById('cadastrarAdminModal'));
+                modal.show();
+            },
+            error: function (xhr) {
+                alert("Erro ao carregar formulário: " + xhr.responseText);
+            }
+        });
+    });
+
+    // ===================================================================
+    // ADMIN - SUBMIT CADASTRO
+    // ===================================================================
+    $(document).on('submit', '#form-cadastrar-admin', function (e) {
+        e.preventDefault();
+        var $form = $(this);
+        if (!$form.valid()) { return; }
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: $form.serialize(),
+            success: function (result) {
+                if (result.sucesso) {
+                    window.location.reload();
+                }
+            },
+            error: function (xhr) {
+                alert("Erro ao salvar: " + (xhr.responseText || "Erro desconhecido"));
             }
         });
     });

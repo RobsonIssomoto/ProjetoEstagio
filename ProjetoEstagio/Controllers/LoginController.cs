@@ -147,7 +147,7 @@ namespace ProjetoEstagio.Controllers
                         if (usuario.Perfil == Perfil.Admin)
                         {
                             _sessao.SalvarNomeExibicao(nomeExibicao);
-                            return RedirectToAction("Pendencias", "Orientador");
+                            return RedirectToAction("Principal", "Orientador");
                         }
 
                         // --- 5. CORREÇÃO DE LÓGICA ---

@@ -44,8 +44,6 @@ namespace ProjetoEstagio.Repository
                 .FirstOrDefault(e => e.Id == id);
         }
 
-        // Dentro de EmpresaRepository.cs
-        // Cole isto dentro da classe EmpresaRepository
         public EmpresaModel Atualizar(EmpresaModel empresa)
         {
             // 1. Busca a empresa original no banco de dados

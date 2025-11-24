@@ -16,7 +16,7 @@ namespace ProjetoEstagio.Services
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly ISolicitacaoEstagioRepository _solicitacaoRepository;
         private readonly ITermoCompromissoRepository _termoRepository;
-        private readonly IWebHostEnvironment _webHostEnvironment; //
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ProjetoEstagioContext _context;
 
         public EmpresaService(
@@ -25,7 +25,7 @@ namespace ProjetoEstagio.Services
             ISolicitacaoEstagioRepository solicitacaoRepository,
             ITermoCompromissoRepository termoRepository,
             IWebHostEnvironment webHostEnvironment, 
-        ProjetoEstagioContext context) // Adicionado
+            ProjetoEstagioContext context)
         {
             _empresaRepository = empresaRepository;
             _usuarioRepository = usuarioRepository;

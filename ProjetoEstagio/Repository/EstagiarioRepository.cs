@@ -19,16 +19,12 @@ namespace ProjetoEstagio.Repository
             {
                 estagiario.DataCadastro = DateTime.Now;
                 _projetoEstagioContext.Estagiarios.Add(estagiario);
-                _projetoEstagioContext.SaveChanges(); // <-- A falha ocorre AQUI
+                _projetoEstagioContext.SaveChanges();
                 return estagiario;
             }
             // Esta é a exceção específica para erros de salvamento do EF
             catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
             {
-                // ERRO REAL: Coloque um breakpoint (ponto de depuração) 
-                // AQUI e inspecione a variável 'ex.InnerException.Message'
-
-                // Ou, para ver o erro na tela, jogue a mensagem interna:
                 throw new Exception($"Erro ao salvar no banco: {ex.InnerException?.Message}", ex);
             }
             catch (Exception ex)
@@ -49,7 +45,6 @@ namespace ProjetoEstagio.Repository
             return _projetoEstagioContext.Estagiarios.FirstOrDefault(e => e.Id == id);
         }
 
-        // Substitua o seu método Atualizar por este:
         public EstagiarioModel Atualizar(EstagiarioModel estagiario)
         {
             // 1. Busca o estagiário original do banco
@@ -61,12 +56,9 @@ namespace ProjetoEstagio.Repository
             //    para o objeto "estagiarioDB" (vindo do banco)
             estagiarioDB.Nome = estagiario.Nome;
             estagiarioDB.Email = estagiario.Email;
-
-            // --- LINHAS QUE FALTAVAM ---
             estagiarioDB.Telefone = estagiario.Telefone;
-            estagiarioDB.NomeCurso = estagiario.NomeCurso; // <-- Esta é a linha principal!
+            estagiarioDB.NomeCurso = estagiario.NomeCurso;
             estagiarioDB.DataAtualizacao = DateTime.Now;
-            // --- FIM DAS LINHAS ---
 
             // 3. Salva o objeto "estagiarioDB" que foi modificado
             _projetoEstagioContext.Estagiarios.Update(estagiarioDB);
@@ -87,8 +79,6 @@ namespace ProjetoEstagio.Repository
             return true;
         }
 
-        // MÉTODO CORRETO
-        // em EstagiarioRepository.cs
         public EstagiarioModel BuscarPorUsuarioId(int usuarioId)
         {
             // CORRETO: Compara a Chave Estrangeira (UsuarioId) 

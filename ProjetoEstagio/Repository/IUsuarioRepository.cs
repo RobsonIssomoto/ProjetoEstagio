@@ -7,12 +7,11 @@ namespace ProjetoEstagio.Repository
     {
         UsuarioModel Cadastrar(UsuarioModel usuario);
         List<UsuarioModel> ListarTodos();
+        List<UsuarioModel> ListarAdmins();
         UsuarioModel BuscarPorId(int id);
         UsuarioModel BuscarPorLogin(string login);
         UsuarioModel Atualizar(UsuarioModel usuario);
-
         Task<bool> VerificarEmailUnico(string email);
-
         bool Deletar(int id);
     }
 }

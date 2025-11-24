@@ -38,8 +38,8 @@
 
             /* ======= HOVER FUNCIONAL ======= */
             /* O seletor de hover deve ser aplicado diretamente no link (<a>),
-              pois ele já é o .nav-link. Não precisamos do <li>.
-            */
+                  pois ele já é o .nav-link. Não precisamos do <li>.
+                */
             #bdSidebar .nav-link:hover {
                 background-color: rgba(255, 255, 255, 0.25);
                 transform: translateX(5px);
@@ -61,8 +61,8 @@
 
             /* ======= INDICADOR LATERAL (Opcional) ======= */
             /* Este indicador lateral estava no seu CSS antigo,
-              você pode mantê-lo se gostar do efeito.
-            */
+                  você pode mantê-lo se gostar do efeito.
+                */
             #bdSidebar .nav-link::before {
                 content: "";
                 position: absolute;
@@ -109,13 +109,13 @@
 
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item mb-2">
-            <a asp-controller="Empresa" asp-action="Principal" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-2">
+            <a asp-controller="Orientador" asp-action="Principal" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-2">
                 <i class="fa-solid fa-house"></i> Início
             </a>
         </li>
 
         <li class="nav-item mb-2">
-            <a asp-controller="Empresa" asp-action="MeuPerfil" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-2">
+            <a asp-controller="Usuario" asp-action="MeuPerfil" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-2">
                 <i class="fa-solid fa-user"></i> Perfil
             </a>
         </li>
@@ -141,10 +141,32 @@
                 </ul>
             </div>
         </li>
-        <li class="nav-item mb-2">
-            <a asp-controller="Orientador" asp-action="Index" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-2">
-                <i class="fa-solid fa-graduation-cap"></i> Orientadores
+        
+
+        <li class="nav-item">
+            <a class="nav-link dropdown-toggle" href="#usuarios-submenu" data-bs-toggle="collapse" ...>
+                <i class="fa-solid fa-users me-2"></i> Usuários
             </a>
+
+            <div class="collapse" id="usuarios-submenu">
+                <ul class="nav flex-column ps-4">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Orientador" asp-action="ListarEstagiarios">
+                            <i class="fa-solid fa-user-graduate"></i> Estagiários
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Orientador" asp-action="Index" class="nav-link text-white d-flex align-items-center gap-2 px-3 py-2 rounded-2">
+                            <i class="fa-solid fa-chalkboard-user"></i> Orientadores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Usuario" asp-action="Index">
+                            <i class="fa-solid fa-user-shield me-2"></i> Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </li>
 
         <li class="nav-item mb-2">

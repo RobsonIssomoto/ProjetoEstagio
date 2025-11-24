@@ -18,17 +18,23 @@ namespace ProjetoEstagio.Controllers
     public class OrientadorController : Controller
     {
         private readonly IOrientadorService _orientadorService;
+        private readonly IEstagiarioService _estagiarioService;
+        private readonly IEmpresaService _empresaService;
         private readonly ISessao _sessao;
         private readonly ITermoCompromissoRepository _termoRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
         public OrientadorController(
             IOrientadorService orientadorService, 
+            IEstagiarioService estagiarioService,
+            IEmpresaService empresaService,
             ISessao sessao, 
             ITermoCompromissoRepository termoRepository,
             IWebHostEnvironment webHostEnvironment)
         {
             _orientadorService = orientadorService;
+            _estagiarioService = estagiarioService;
+            _empresaService = empresaService;
             _sessao = sessao;
             _termoRepository = termoRepository;
             _webHostEnvironment = webHostEnvironment;
@@ -349,6 +355,50 @@ namespace ProjetoEstagio.Controllers
 
             // Se o ModelState for inválido (ex: não selecionou um novo orientador)
             return BadRequest(ModelState);
+        }
+
+        [HttpGet]
+        public IActionResult Principal()
+        {
+            // Segurança
+            UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            if (usuarioLogado == null || usuarioLogado.Perfil != Perfil.Admin)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // Coleta os dados (Contadores)
+            // Nota: O ideal seria ter métodos .Contar() nos repositórios para performance,
+            // mas .ListarTodos().Count() funciona bem para o escopo atual.
+
+            var todosTermos = _orientadorService.ListarTodosOsTermos();
+
+            var viewModel = new AdminDashboardViewModel
+            {
+                // Conta Estagiários
+                TotalEstudantes = _estagiarioService.ListarTodos().Count,
+
+                // Conta Empresas
+                TotalEmpresas = _empresaService.ListarTodos().Count,
+
+                // Conta Estágios com status "Em Andamento"
+                EstagiosAtivos = todosTermos.Count(t => t.SolicitacaoEstagio.Status == Status.EmAndamento),
+
+                // Conta Estágios com status "Aprovado" (que precisam de validação do Admin)
+                ValidacoesPendentes = todosTermos.Count(t => t.SolicitacaoEstagio.Status == Status.Aprovado)
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        [Autorizacao(Perfil.Admin)] // Se Orientadores também puderem ver, adicione: , Perfil.Orientador
+        public IActionResult ListarEstagiarios()
+        {
+            // Usa o serviço de estagiário (já injetado) para buscar a lista
+            var estagiarios = _estagiarioService.ListarTodos();
+
+            return View(estagiarios);
         }
 
         // MÉTODO DE VALIDAÇÃO [Remote]

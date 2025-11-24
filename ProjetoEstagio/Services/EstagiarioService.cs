@@ -25,15 +25,15 @@ namespace ProjetoEstagio.Services
             IUsuarioRepository usuarioRepository,
             ProjetoEstagioContext context,
             ISolicitacaoEstagioRepository solicitacaoRepository,
-            ITermoCompromissoRepository termoRepository,     // Adicionado
+            ITermoCompromissoRepository termoRepository,    
             IWebHostEnvironment webHostEnvironment
-            ) // <-- Adicionado
+            ) 
         {
-            _estagiarioRepository = estagiarioRepository; //
-            _usuarioRepository = usuarioRepository; //
-            _context = context; //
-            _solicitacaoRepository = solicitacaoRepository; // <-- Adicionado
-            _termoRepository = termoRepository;         // Adicionado
+            _estagiarioRepository = estagiarioRepository; 
+            _usuarioRepository = usuarioRepository; 
+            _context = context; 
+            _solicitacaoRepository = solicitacaoRepository; 
+            _termoRepository = termoRepository;       
             _webHostEnvironment = webHostEnvironment;
         }
 
@@ -193,7 +193,7 @@ namespace ProjetoEstagio.Services
                 else
                 {
                     // Se nenhum dos dois foi fornecido, lança uma exceção
-                    throw new InvalidOperationException("Você deve selecionar uma empresa ou convidar uma nova por e-mail.");
+                    throw new InvalidOperationException("Você deve selecionar uma empresa.");//ou convidar uma nova por e-mail
                 }
 
                 _solicitacaoRepository.Cadastrar(novaSolicitacao);

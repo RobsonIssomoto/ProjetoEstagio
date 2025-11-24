@@ -19,15 +19,13 @@ namespace ProjetoEstagio.Controllers
 
         public EmpresaController(
             IEmpresaService empresaService,
-            ISessao sessao) // Context removido, Sessao adicionada
+            ISessao sessao) 
         {
             _empresaService = empresaService;
             _sessao = sessao;
         }
 
         // --- LÓGICA DE CADASTRO PÚBLICO ---
-
-        
 
         public IActionResult Cadastrar(string? token) // Aceita o token da URL
         {
@@ -115,37 +113,84 @@ namespace ProjetoEstagio.Controllers
 
         [Autorizacao(Perfil.Admin, Perfil.Representante)]
         [HttpGet]
+        // Se estiver usando seu filtro novo: [Autorizacao(Perfil.Admin, Perfil.Representante)]
         public IActionResult Editar(int id)
         {
-            EmpresaModel empresa = _empresaService.BuscarPorId(id); //
-            if (empresa == null) return NotFound();
+            // 1. Verifica quem está logado
+            UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            if (usuarioLogado == null) return RedirectToAction("Index", "Login");
 
-            // --- MUDANÇA AQUI ---
-            // Mapeia do Model para a ViewModel
+            // 2. Busca a empresa alvo da edição
+            EmpresaModel empresaAlvo = _empresaService.BuscarPorId(id);
+            if (empresaAlvo == null) 
+            {
+                TempData["MensagemErro"] = "Registro não encontrado.";
+
+                // Se for Admin, volta pra lista. Se for Estagiário, volta pro painel.
+                if (usuarioLogado.Perfil == Perfil.Admin)
+                {
+                    return RedirectToAction("Index");
+                }
+                return RedirectToAction("Principal");
+            }
+
+            // --- CORREÇÃO DE SEGURANÇA (IDOR) ---
+            // Se o usuário for uma Empresa, ele só pode editar se o ID bater com o dele!
+            if (usuarioLogado.Perfil == Perfil.Representante)
+            {
+                // Busca a empresa que PERTENCE a este usuário
+                EmpresaModel empresaDoUsuario = _empresaService.BuscarEmpresaPorUsuarioId(usuarioLogado.Id);
+
+                // Se ele tentar acessar uma empresa que não é a dele (IDs diferentes) -> Bloqueia
+                if (empresaDoUsuario == null || empresaDoUsuario.Id != empresaAlvo.Id)
+                {
+                    // Redireciona para a tela de "Acesso Negado"
+                    return RedirectToAction("Index", "Restrito");
+                }
+            }
+            // -------------------------------------
+
+            // Mapeia do Model para a ViewModel (Seu código original continua aqui)
             var viewModel = new EmpresaEditarViewModel
             {
-                Id = empresa.Id,
-                CNPJ = empresa.CNPJ,
-                RazaoSocial = empresa.RazaoSocial,
-                Nome = empresa.Nome,
-                Email = empresa.Email,
-                Telefone = empresa.Telefone
+                Id = empresaAlvo.Id,
+                UsuarioId = empresaAlvo.UsuarioId, // Não esqueça de passar o UsuarioId para a senha!
+                CNPJ = empresaAlvo.CNPJ,
+                RazaoSocial = empresaAlvo.RazaoSocial,
+                Nome = empresaAlvo.Nome,
+                Email = empresaAlvo.Email,
+                Telefone = empresaAlvo.Telefone
             };
 
-            return View(viewModel); // Envia a ViewModel para a View
+            return View(viewModel);
         }
-
         [Autorizacao(Perfil.Admin, Perfil.Representante)]
         [HttpPost]
-        public IActionResult Alterar(EmpresaEditarViewModel viewModel) // <-- MUDANÇA 1: Recebe a ViewModel
+        public IActionResult Alterar(EmpresaEditarViewModel viewModel)
         {
             try
             {
-                // MUDANÇA 2: Agora o ModelState.IsValid vai funcionar!
+                // 1. Verifica quem está logado
+                UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+                if (usuarioLogado == null) return RedirectToAction("Index", "Login");
+
+                // --- CORREÇÃO DE SEGURANÇA (IDOR) ---
+                if (usuarioLogado.Perfil == Perfil.Representante)
+                {
+                    // Busca a empresa que este usuário REALMENTE possui
+                    EmpresaModel empresaDoUsuario = _empresaService.BuscarEmpresaPorUsuarioId(usuarioLogado.Id);
+
+                    // Se ele tentar salvar um ID (viewModel.Id) que não é o dele -> Bloqueia
+                    if (empresaDoUsuario == null || empresaDoUsuario.Id != viewModel.Id)
+                    {
+                        return RedirectToAction("Index", "Restrito");
+                    }
+                }
+                // -------------------------------------
+
                 if (ModelState.IsValid)
                 {
-                    // MUDANÇA 3: Mapeia da ViewModel para o Model
-                    // (O Repositório só precisa dos campos que atualiza)
+                    // Seu código de mapeamento e salvamento continua igual
                     EmpresaModel empresaParaAtualizar = new EmpresaModel
                     {
                         Id = viewModel.Id,
@@ -155,19 +200,20 @@ namespace ProjetoEstagio.Controllers
                         Telefone = viewModel.Telefone
                     };
 
-                    _empresaService.Atualizar(empresaParaAtualizar); //
-                    TempData["MensagemSucesso"] = "Dados da empresa alterado com sucesso";
+                    _empresaService.Atualizar(empresaParaAtualizar);
+                    TempData["MensagemSucesso"] = "Dados da empresa alterados com sucesso";
+
+                    // Se for Admin, volta pro Index. Se for Empresa, volta pro Principal.
+                    if (usuarioLogado.Perfil == Perfil.Admin) return RedirectToAction("Index");
                     return RedirectToAction("Principal");
                 }
             }
             catch (System.Exception erro)
             {
-                TempData["MensagemErro"] = $"Erro {erro.Message} na alteração dos dados da empresa. Tente novamente";
+                TempData["MensagemErro"] = $"Erro {erro.Message} na alteração dos dados. Tente novamente";
                 return RedirectToAction("Principal");
             }
 
-            // MUDANÇA 4: Se o ModelState for inválido, retorna a ViewModel
-            // (Isso fará as mensagens de erro [Required] aparecerem)
             return View("Editar", viewModel);
         }
 

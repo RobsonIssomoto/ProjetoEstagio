@@ -1,17 +1,21 @@
 ﻿using ProjetoEstagio.Models;
 using ProjetoEstagio.Repository;
 using ProjetoEstagio.Helper;
-using ProjetoEstagio.Models.ViewModels; // Para o IEmail
+using ProjetoEstagio.Models.Enums;
+using ProjetoEstagio.Models.ViewModels;
+using ProjetoEstagio.Data;
 
 namespace ProjetoEstagio.Services
 {
     public class UsuarioService : IUsuarioService
     {
+        private readonly ProjetoEstagioContext _context;
         private readonly IUsuarioRepository _usuarioRepository;
-        private readonly IEmail _email; // Injetamos o Email aqui, não no Controller
+        private readonly IEmail _email;
 
-        public UsuarioService(IUsuarioRepository usuarioRepository, IEmail email)
+        public UsuarioService(ProjetoEstagioContext context, IUsuarioRepository usuarioRepository, IEmail email)
         {
+            _context = context;
             _usuarioRepository = usuarioRepository;
             _email = email;
         }
@@ -74,6 +78,52 @@ namespace ProjetoEstagio.Services
             else
             {
                 throw new Exception("Não conseguimos enviar o e-mail. Tente novamente mais tarde.");
+            }
+        }
+
+        public void CadastrarAdmin(AdminCadastroViewModel viewModel)
+        {
+            // Validações de Negócio
+            if (_usuarioRepository.VerificarEmailUnico(viewModel.Email).Result)
+            {
+                throw new InvalidOperationException("O e-mail informado já está em uso.");
+            }
+
+            // Transação (Unit of Work)
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    // A. Criar o Usuário (Acesso)
+                    var usuario = new UsuarioModel
+                    {
+                        Login = viewModel.Email,
+                        Email = viewModel.Email,
+                        Perfil = Perfil.Admin
+                    };
+                    usuario.SetSenhaHash(viewModel.Senha);
+
+                    _usuarioRepository.Cadastrar(usuario); // Salva e gera o ID
+
+                    // B. Criar o Admin (Dados Pessoais)
+                    var admin = new AdminModel
+                    {
+                        Nome = viewModel.Nome,
+                        CPF = viewModel.CPF,
+                        UsuarioId = usuario.Id // Vincula ao usuário criado acima
+                    };
+
+                    _context.Administradores.Add(admin);
+                    _context.SaveChanges();
+
+                    // C. Confirma tudo
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw; // Relança o erro para o Controller exibir
+                }
             }
         }
     }

@@ -6,6 +6,7 @@ namespace ProjetoEstagio.Models.ViewModels
     {
         // Precisamos do Id para saber quem atualizar
         public int Id { get; set; }
+        public int UsuarioId { get; set; }
 
         [Display(Name = "CNPJ")]
         public string CNPJ { get; set; } // Apenas para exibir (readonly)

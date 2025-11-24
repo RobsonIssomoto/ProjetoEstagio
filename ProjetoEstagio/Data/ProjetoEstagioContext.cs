@@ -12,10 +12,10 @@ namespace ProjetoEstagio.Data
         public DbSet<SupervisorModel> Supervisores { get; set; }
         public DbSet<EstagiarioModel> Estagiarios { get; set; }
         public DbSet<OrientadorModel> Orientadores { get; set; }
+        public DbSet<AdminModel> Administradores { get; set; }
         public DbSet<SolicitacaoEstagioModel> SolicitacoesEstagio { get; set; }
         public DbSet<TermoCompromissoModel> TermosCompromisso { get; set; }
 
-        // Em: Data/ProjetoEstagioContext.cs
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

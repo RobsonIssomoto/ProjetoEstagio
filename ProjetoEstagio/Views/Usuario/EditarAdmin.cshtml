@@ -1,0 +1,62 @@
+﻿@model ProjetoEstagio.Models.ViewModels.AdminEditarViewModel
+@{
+    ViewData["Title"] = "Meu Perfil (Administrador)";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mb-4">
+    <div class="row d-flex justify-content-center" style="font-size: .9em">
+
+        <div class="col-12 col-md-8 col-lg-6 bg-white my-3 p-4 rounded shadow" style="min-width: 380px">
+
+            <div class="text-center mb-4">
+                <h4 class="text-uppercase fw-bold text-secondary mb-1">Meu Perfil</h4>
+                <span class="badge bg-danger rounded-pill">Administrador / Coordenador</span>
+            </div>
+
+            <form asp-controller="Usuario" asp-action="AlterarAdmin" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group mb-3">
+                    <label asp-for="Email" class="fw-bold"></label>
+                    <input type="email" class="form-control bg-light" asp-for="Email" readonly />
+                    <small class="text-muted" style="font-size: 0.8em">
+                        <i class="fa-solid fa-info-circle me-1"></i>O Login/E-mail não pode ser alterado por segurança.
+                    </small>
+                </div>
+
+                <div class="row g-2 mt-4">
+                    <div class="col-6">
+                        <a asp-controller="Orientador" asp-action="Pendencias" class="btn btn-outline-secondary w-100">Voltar</a>
+                    </div>
+                    <div class="col-6">
+                        <button type="submit" class="btn btn-primary w-100" disabled>Salvar Dados</button>
+                    </div>
+                </div>
+            </form>
+
+            <hr class="my-5 border-secondary opacity-25">
+
+            <h4 class="text-center mb-4 text-uppercase fw-bold text-secondary">Segurança</h4>
+
+            @{
+                // Como o Admin é o próprio Usuario, o ID é direto
+                var dadosParaSenha = new ProjetoEstagio.Models.ViewModels.AlterarSenhaViewModel
+            {
+                Id = Model.Id
+            };
+            }
+
+            <partial name="_AlterarSenha" model="dadosParaSenha" />
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

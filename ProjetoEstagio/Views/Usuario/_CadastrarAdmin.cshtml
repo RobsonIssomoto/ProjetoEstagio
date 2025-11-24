@@ -1,0 +1,58 @@
+﻿@model ProjetoEstagio.Models.ViewModels.AdminCadastroViewModel
+
+<form id="form-cadastrar-admin" asp-controller="Usuario" asp-action="CadastrarAdmin" method="post">
+
+    @Html.AntiForgeryToken()
+
+    <div class="modal-body p-4">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Nome" class="form-label fw-bold">Nome Completo</label>
+                <input type="text" class="form-control nome" asp-for="Nome" />
+                <span asp-validation-for="Nome" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="CPF" class="form-label fw-bold">CPF</label>
+                <input type="text" class="form-control cpf" asp-for="CPF" />
+                <span asp-validation-for="CPF" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label fw-bold">E-mail (Login)</label>
+            <input type="email" class="form-control" asp-for="Email" placeholder="email@fatec.sp.gov.br" />
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Senha" class="form-label fw-bold">Senha</label>
+                <input type="password" class="form-control" asp-for="Senha" />
+                <span asp-validation-for="Senha" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="ConfirmarSenha" class="form-label fw-bold">Confirmar Senha</label>
+                <input type="password" class="form-control" asp-for="ConfirmarSenha" />
+                <span asp-validation-for="ConfirmarSenha" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-success fw-bold">Cadastrar</button>
+    </div>
+</form>
+
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+
+<script>
+    $(document).ready(function() {
+        // Ativa a máscara de CPF dentro do modal
+        $('.cpf').mask('000.000.000-00');
+    });
+</script>

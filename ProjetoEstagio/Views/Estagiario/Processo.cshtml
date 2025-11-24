@@ -52,9 +52,9 @@
                             <div id="busca-empresa-resultados" class="list-group">
                             </div>
                             <input type="hidden" asp-for="EmpresaId" id="empresa-id-selecionada" /> 
-                            <a href="#" class="small mt-2 d-block" id="btn-convidar-empresa">
-                                Enviar convite para cadastro de empresa
-                            </a>
+                            @* <a href="#" class="small mt-2 d-block" id="btn-convidar-empresa"> *@
+                            @*     Enviar convite para cadastro de empresa *@
+                            @* </a> *@
                         </div>
                     </div>
                 </div>
@@ -74,11 +74,16 @@
                 </div>
             </div>
 
-            <div class="d-flex flex-column gap-2 my-2">
-                <button type="submit" class="btn btn-primary w-100">Enviar</button>
-                <a class="btn btn-outline-secondary w-100" asp-controller="Home" asp-action="Index">Cancelar</a>
-            </div>
+           
 
+            <div class="row g-2 mt-4">
+                <div class="col-6">
+                    <a asp-controller="Estagiario" asp-action="Principal" class="btn btn-outline-secondary w-100">Voltar</a>
+                </div>
+                <div class="col-6">
+                    <button type="submit" class="btn btn-primary w-100">Salvar Dados</button>
+                </div>
+            </div>
         </div>
     </div>
 </form>

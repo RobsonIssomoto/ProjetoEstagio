@@ -7,91 +7,90 @@
 <style>
     /* Estilo dos cards do dashboard (que você já tinha) */
     .dashboard-card {
-    transition: all 0.2s ease-in-out;
+        transition: all 0.2s ease-in-out;
     }
 
-    .dashboard-card:hover {
-    transform: translateY(-5px);
-    filter: brightness(1.1);
-    }
+        .dashboard-card:hover {
+            
+        }
 
     /* --- LÓGICA DO STEPPER CORRIGIDA --- */
     .stepper-wrapper {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
     }
 
     .stepper-item {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
     }
 
-    /* --- LINHA (::after) --- */
-    /* Desenha a linha DEPOIS da bolha */
-    .stepper-item::after {
-    content: "";
-    position: absolute;
-    top: 12px; /* Alinha no centro da bolha */
-    left: 50%; /* Começa no centro da bolha */
-    width: 100%; /* Vai até a próxima bolha */
-    height: 3px;
-    background-color: #e0e0e0; /* Cinza padrão */
-    z-index: 1; /* Fica atrás da bolha */
-    }
+        /* --- LINHA (::after) --- */
+        /* Desenha a linha DEPOIS da bolha */
+        .stepper-item::after {
+            content: "";
+            position: absolute;
+            top: 12px; /* Alinha no centro da bolha */
+            left: 50%; /* Começa no centro da bolha */
+            width: 100%; /* Vai até a próxima bolha */
+            height: 3px;
+            background-color: #e0e0e0; /* Cinza padrão */
+            z-index: 1; /* Fica atrás da bolha */
+        }
 
-    /* Remove a linha do ÚLTIMO item */
-    .stepper-item:last-child::after {
-    content: none;
-    }
+        /* Remove a linha do ÚLTIMO item */
+        .stepper-item:last-child::after {
+            content: none;
+        }
 
     /* --- BOLHA (Dot) --- */
     .stepper-dot {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background-color: #e0e0e0; /* Cinza padrão */
-    z-index: 2; /* Fica na frente da linha */
-    transition: all 0.3s ease;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: #e0e0e0; /* Cinza padrão */
+        z-index: 2; /* Fica na frente da linha */
+        transition: all 0.3s ease;
     }
 
     /* --- RÓTULO (Label) --- */
     .stepper-label {
-    text-align: center;
-    margin-top: 0.75rem;
-    font-size: 0.9rem;
-    color: #6c757d;
-    font-weight: 500;
+        text-align: center;
+        margin-top: 0.75rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+        font-weight: 500;
     }
 
     /* --- CLASSES DINÂMICAS --- */
 
     /* Etapa Concluída (Verde) */
     .stepper-item.completed .stepper-dot {
-    background-color: var(--bs-success);
+        background-color: var(--bs-success);
     }
 
     .stepper-item.completed .stepper-label {
-    color: var(--bs-success);
-    font-weight: 500; /* Alterado para peso normal */
+        color: var(--bs-success);
+        font-weight: 500; /* Alterado para peso normal */
     }
     /* A LINHA *DEPOIS* de um item completo fica verde */
     .stepper-item.completed::after {
-    background-color: var(--bs-success);
+        background-color: var(--bs-success);
     }
 
     /* Etapa Ativa (Verde) */
     .stepper-item.active .stepper-dot {
-    background-color: var(--bs-success);
-    transform: scale(1.2);
+        background-color: var(--bs-success);
+        transform: scale(1.2);
     }
 
     .stepper-item.active .stepper-label {
-    color: var(--bs-success);
-    font-weight: 700;
+        color: var(--bs-success);
+        font-weight: 700;
     }
 </style>
 
@@ -108,6 +107,8 @@
         <div class="col-12 col-md-4">
             <div class="card text-bg-primary h-100 dashboard-card shadow-sm">
                 <div class="card-body pb-0">
+                    
+
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             @if (Model.ProcessosPendentesCount <= 1)
@@ -155,7 +156,7 @@
 </div>
 <div class="card shadow mt-4 p-3">
     <div class="card-header p-3" id="tabela-solicitacoes">
-            <h5 class="mb-0 fw-bold">Meus Processos</h5>
+        <h5 class="mb-0 fw-bold">Meus Processos</h5>
 
         <div class="table-responsive g-3 py-3">
             <table id="" class="table table-striped table-bordered table-hover align-middle mb-0" style="width:100%">
@@ -228,38 +229,38 @@
                 </tbody>
             </table>
 
-@* <div class="card shadow my-4"> *@
-@*     <div class="card-header bg-white border-0 p-4"> *@
-@*         <h5 class="mb-0 fw-bold">Visão Geral do Estágio</h5> *@
-@*         <p class="text-muted mb-4">Gerencie seu pedido de estágio e monitore o andamento dele.</p> *@
-@*     </div> *@
+            @* <div class="card shadow my-4"> *@
+            @*     <div class="card-header bg-white border-0 p-4"> *@
+            @*         <h5 class="mb-0 fw-bold">Visão Geral do Estágio</h5> *@
+            @*         <p class="text-muted mb-4">Gerencie seu pedido de estágio e monitore o andamento dele.</p> *@
+            @*     </div> *@
 
-@*     <div class="card-body"> *@
-@*         <h6 class="fw-semibold text-center mb-4">Status Atual do Processo</h6> *@
-@*         <div class="stepper-wrapper"> *@
-@*             <div class="stepper-item active"> *@
-@*                 <div class="stepper-dot"></div> *@
-@*                 <div class="stepper-label">Processo Iniciado</div> *@
-@*             </div> *@
-@*         </div> *@
+            @*     <div class="card-body"> *@
+            @*         <h6 class="fw-semibold text-center mb-4">Status Atual do Processo</h6> *@
+            @*         <div class="stepper-wrapper"> *@
+            @*             <div class="stepper-item active"> *@
+            @*                 <div class="stepper-dot"></div> *@
+            @*                 <div class="stepper-label">Processo Iniciado</div> *@
+            @*             </div> *@
+            @*         </div> *@
 
-@*         @if (!Model.PossuiProcessoAtivoOuPendente) *@
-@*         { *@
-@*             <div class="d-flex py-3 "> *@
-@*                 <a asp-controller="Estagiario" asp-action="Processo" class="btn btn-success shadow-sm py-3 px-5"> *@
-@*                     <i class="fas fa-plus-circle me-2"></i> Iniciar Processo de Estágio *@
-@*                 </a> *@
-@*             </div> *@
-@*         } *@
-@*         else *@
-@*         { *@
-@*             <div class="alert alert-info alert-dismissible fade show" role="alert"> *@
-@*                 Você já possui um processo de estágio em andamento ou pendente. *@
-@*                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> *@
-@*             </div> *@
-@*         } *@
-@*     </div> *@
-@* </div> *@
+            @*         @if (!Model.PossuiProcessoAtivoOuPendente) *@
+            @*         { *@
+            @*             <div class="d-flex py-3 "> *@
+            @*                 <a asp-controller="Estagiario" asp-action="Processo" class="btn btn-success shadow-sm py-3 px-5"> *@
+            @*                     <i class="fas fa-plus-circle me-2"></i> Iniciar Processo de Estágio *@
+            @*                 </a> *@
+            @*             </div> *@
+            @*         } *@
+            @*         else *@
+            @*         { *@
+            @*             <div class="alert alert-info alert-dismissible fade show" role="alert"> *@
+            @*                 Você já possui um processo de estágio em andamento ou pendente. *@
+            @*                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> *@
+            @*             </div> *@
+            @*         } *@
+            @*     </div> *@
+            @* </div> *@
 
 
         </div>

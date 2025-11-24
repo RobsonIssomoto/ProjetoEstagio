@@ -39,7 +39,6 @@ namespace ProjetoEstagio.Services
             _solicitacaoRepository = solicitacaoRepository;
         }
 
-        // --- SEUS MÉTODOS EXISTENTES (COPIADOS DO SEU ARQUIVO) ---
 
         public void RegistrarNovoOrientador(OrientadorCadastroViewModel viewModel)
         {

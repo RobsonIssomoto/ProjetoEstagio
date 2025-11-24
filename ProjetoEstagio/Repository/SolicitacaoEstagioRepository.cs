@@ -43,14 +43,12 @@ namespace ProjetoEstagio.Repository
                            .ToList();
         }
 
-        // --- IMPLEMENTAÇÃO DO MÉTODO NOVO ---
         public SolicitacaoEstagioModel BuscarPorToken(string token)
         {
             // Busca a solicitação que corresponde ao token
             return _context.SolicitacoesEstagio.FirstOrDefault(s => s.Token == token);
         }
 
-        // --- IMPLEMENTAÇÃO DO MÉTODO NOVO ---
         public SolicitacaoEstagioModel Atualizar(SolicitacaoEstagioModel solicitacao)
         {
             // Busca a versão do banco de dados

@@ -29,11 +29,15 @@ namespace ProjetoEstagio.Controllers
             _sessao = sessao;
         }
 
+
         [Autorizacao(Perfil.Admin)]
-        public IActionResult Index()
+        public IActionResult ListaEstagiarios()
         {
-            List<EstagiarioModel> estagiario = _estagiarioService.ListarTodos();
-            return View(estagiario);
+            // Usa o serviço existente para buscar todos
+            List<EstagiarioModel> estagiarios = _estagiarioService.ListarTodos();
+
+            // Retorna a View "ListaEstagiarios.cshtml"
+            return View(estagiarios);
         }
 
 
@@ -67,37 +71,82 @@ namespace ProjetoEstagio.Controllers
 
         [Autorizacao(Perfil.Admin, Perfil.Estagiario)]
         [HttpGet]
+        // [Autorizacao(Perfil.Admin, Perfil.Estagiario)] <--- Se estiver usando
         public IActionResult Editar(int id)
         {
-            EstagiarioModel estagiario = _estagiarioService.BuscarPorId(id);
-            if (estagiario == null) return NotFound();
+            // 1. Verifica quem está logado
+            UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            if (usuarioLogado == null) return RedirectToAction("Index", "Login");
+
+            // 2. Busca o estagiário alvo
+            EstagiarioModel estagiarioAlvo = _estagiarioService.BuscarPorId(id);
+            if (estagiarioAlvo == null)
+            {
+                TempData["MensagemErro"] = "Registro não encontrado.";
+
+                // Se for Admin, volta pra lista. Se for Estagiário, volta pro painel.
+                if (usuarioLogado.Perfil == Perfil.Admin)
+                {
+                    return RedirectToAction("Index");
+                }
+                return RedirectToAction("Principal");
+            }
+
+            // --- CORREÇÃO DE SEGURANÇA (IDOR) ---
+            // Se quem está logado é um Estagiário...
+            if (usuarioLogado.Perfil == Perfil.Estagiario)
+            {
+                // ...ele só pode ver se o ID do usuário dele bater com o do estagiário alvo
+                if (estagiarioAlvo.UsuarioId != usuarioLogado.Id)
+                {
+                    return RedirectToAction("Index", "Restrito"); // Bloqueia
+                }
+            }
+            // -------------------------------------
 
             // Mapeia do Model para a ViewModel
             var viewModel = new EstagiarioEditarViewModel
             {
-                Id = estagiario.Id,
-                CPF = estagiario.CPF,
-                Nome = estagiario.Nome,
-                Email = estagiario.Email,
-                Telefone = estagiario.Telefone,
-                NomeCurso = estagiario.NomeCurso,
-                UsuarioId = estagiario.UsuarioId
+                Id = estagiarioAlvo.Id,
+                UsuarioId = estagiarioAlvo.UsuarioId, // Importante para a senha!
+                CPF = estagiarioAlvo.CPF,
+                Nome = estagiarioAlvo.Nome,
+                Email = estagiarioAlvo.Email,
+                Telefone = estagiarioAlvo.Telefone,
+                NomeCurso = estagiarioAlvo.NomeCurso
             };
 
-            return View(viewModel); // Envia a ViewModel para a View
+            return View(viewModel);
         }
 
 
         [Autorizacao(Perfil.Admin, Perfil.Estagiario)]
         [HttpPost]
-        public IActionResult Alterar(EstagiarioEditarViewModel viewModel) // <-- Recebe a ViewModel
+        public IActionResult Alterar(EstagiarioEditarViewModel viewModel)
         {
             try
             {
-                // Agora o ModelState.IsValid vai funcionar!
+                // 1. Verifica quem está logado
+                UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+                if (usuarioLogado == null) return RedirectToAction("Index", "Login");
+
+                // --- CORREÇÃO DE SEGURANÇA (IDOR) ---
+                if (usuarioLogado.Perfil == Perfil.Estagiario)
+                {
+                    // Busca o estagiário que está tentando ser alterado
+                    // (Poderíamos buscar pelo ID do usuário logado para ser mais seguro ainda,
+                    // mas validar se o alvo pertence ao logado já resolve)
+                    EstagiarioModel estagiarioAlvo = _estagiarioService.BuscarPorId(viewModel.Id);
+
+                    if (estagiarioAlvo == null || estagiarioAlvo.UsuarioId != usuarioLogado.Id)
+                    {
+                        return RedirectToAction("Index", "Restrito"); // Bloqueia
+                    }
+                }
+                // -------------------------------------
+
                 if (ModelState.IsValid)
                 {
-                    // Mapeia da ViewModel para o Model
                     EstagiarioModel estagiarioParaAtualizar = new EstagiarioModel
                     {
                         Id = viewModel.Id,
@@ -110,18 +159,20 @@ namespace ProjetoEstagio.Controllers
                     _estagiarioService.Atualizar(estagiarioParaAtualizar);
                     TempData["MensagemSucesso"] = "Dados alterados com sucesso";
 
-                    // Redireciona para o Dashboard do Estagiário
+                    // Redireciona conforme o perfil
+                    if (usuarioLogado.Perfil == Perfil.Admin) return RedirectToAction("Index");
                     return RedirectToAction("Principal");
                 }
             }
             catch (System.Exception erro)
             {
                 TempData["MensagemErro"] = $"Erro {erro.Message} na alteração. Tente novamente";
+
+                // Ajuste o redirecionamento de erro também
+                if (_sessao.BuscarSessaoDoUsuario()?.Perfil == Perfil.Admin) return RedirectToAction("Index");
                 return RedirectToAction("Principal");
             }
 
-            // Se o ModelState for inválido, retorna a ViewModel
-            // As mensagens de erro [Required] etc. vão aparecer
             return View("Editar", viewModel);
         }
 

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProjetoEstagio.Data;
 using ProjetoEstagio.Models;
+using ProjetoEstagio.Models.Enums;
 
 namespace ProjetoEstagio.Repository
 {
@@ -70,6 +71,15 @@ namespace ProjetoEstagio.Repository
         {
             return await _projetoEstagioContext.Usuarios
                              .AnyAsync(u => u.Email.ToUpper() == email.ToUpper());
+        }
+
+        public List<UsuarioModel> ListarAdmins()
+        {
+            // Retorna apenas usuários com perfil Admin, ordenados por nome/login
+            return _projetoEstagioContext.Usuarios
+                .Where(u => u.Perfil == Perfil.Admin)
+                .OrderBy(u => u.Login)
+                .ToList();
         }
 
     }

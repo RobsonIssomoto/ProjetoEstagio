@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProjetoEstagio.Filters;
+using ProjetoEstagio.Helper;
 using ProjetoEstagio.Models;
+using ProjetoEstagio.Models.Enums;
 using ProjetoEstagio.Models.ViewModels;
 using ProjetoEstagio.Repository;
 using ProjetoEstagio.Services;
@@ -13,27 +16,32 @@ namespace ProjetoEstagio.Controllers
 
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IUsuarioService _usuarioService;
-        public UsuarioController(IUsuarioRepository usuarioRepository, IUsuarioService usuarioService)
+        private readonly ISessao _sessao;
+        public UsuarioController(IUsuarioRepository usuarioRepository, IUsuarioService usuarioService, ISessao sessao)
         {
             _usuarioRepository = usuarioRepository;
             _usuarioService = usuarioService;
+            _sessao = sessao;
 
         }
+        [Autorizacao(Perfil.Admin)]
         public IActionResult Index()
         {
-            List<UsuarioModel> usuarios = _usuarioRepository.ListarTodos();
-            return View(usuarios);
+            // Usa o método novo do repositório
+            List<UsuarioModel> admins = _usuarioRepository.ListarAdmins();
+            return View(admins);
         }
 
-        // --- MÉTODO GET ATUALIZADO ---
-        // (Ele agora usa o ViewModel)
+        public IActionResult Principal()
+        {
+            return View();
+        }
+
         public IActionResult Cadastrar()
         {
             return View(new UsuarioCadastroViewModel()); // <-- MUDANÇA
         }
 
-        // --- MÉTODO POST ATUALIZADO ---
-        // (Ele recebe o ViewModel e CRIPTOGRAFA a senha)
         [HttpPost]
         public IActionResult Cadastrar(UsuarioCadastroViewModel viewModel) // <-- MUDANÇA
         {
@@ -178,6 +186,107 @@ namespace ProjetoEstagio.Controllers
             {
                 return StatusCode(500, ex.Message); // Retorna erro 500 com a mensagem (ex: "Senha atual incorreta")
             }
+        }
+
+        [HttpGet]
+        public IActionResult MeuPerfil()
+        {
+            // 1. Busca o usuário da sessão
+            UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+
+            // 2. Segurança: Só Admin entra aqui
+            if (usuarioLogado == null || usuarioLogado.Perfil != Perfil.Admin)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            // 3. Busca os dados frescos do banco
+            UsuarioModel admin = _usuarioRepository.BuscarPorId(usuarioLogado.Id);
+            if (admin == null) return RedirectToAction("Index", "Login");
+
+            // 4. Monta o ViewModel
+            var viewModel = new AdminEditarViewModel
+            {
+                Id = admin.Id,
+                Email = admin.Email
+            };
+
+            return View("EditarAdmin", viewModel);
+        }
+
+        [HttpGet]
+        [Autorizacao(Perfil.Admin)]
+        public IActionResult CadastrarAdmin()
+        {
+            // Retorna o formulário dentro do modal (Partial)
+            return PartialView("_CadastrarAdmin", new AdminCadastroViewModel());
+        }
+
+        // 3. POST CADASTRAR: Agora retorna JSON para o AJAX
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        //[Autorizacao(Perfil.Admin)]
+        public IActionResult CadastrarAdmin(AdminCadastroViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _usuarioService.CadastrarAdmin(viewModel);
+
+                    // Sucesso: Retorna JSON para o site.js fechar o modal e recarregar
+                    return Json(new { sucesso = true });
+                }
+                catch (Exception ex)
+                {
+                    // Erro do servidor (ex: email duplicado)
+                    return StatusCode(500, $"Erro ao cadastrar: {ex.Message}");
+                }
+            }
+
+            // Erro de validação: Retorna os erros para exibir no modal
+            return BadRequest(ModelState);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AlterarAdmin(AdminEditarViewModel viewModel)
+        {
+            UsuarioModel usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            if (usuarioLogado == null || usuarioLogado.Perfil != Perfil.Admin) return RedirectToAction("Index", "Login");
+
+            // Segurança: O Admin só pode editar a SI MESMO nesta tela
+            if (usuarioLogado.Id != viewModel.Id)
+            {
+                return RedirectToAction("Index", "Restrito");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    UsuarioModel adminDB = _usuarioRepository.BuscarPorId(viewModel.Id);
+
+                    // Atualiza Email e Login (mantendo sincronizados)
+                    adminDB.Email = viewModel.Email;
+                    adminDB.Login = viewModel.Email;
+                    adminDB.DataAtualizacao = DateTime.Now;
+
+                    _usuarioRepository.Atualizar(adminDB);
+
+                    // Atualiza a sessão com o novo nome/email
+                    _sessao.SalvarNomeExibicao(adminDB.Login);
+
+                    TempData["MensagemSucesso"] = "Perfil atualizado com sucesso!";
+                    return RedirectToAction("Pendencias", "Orientador"); // Volta para o painel principal
+                }
+                catch (Exception ex)
+                {
+                    TempData["MensagemErro"] = $"Erro ao atualizar: {ex.Message}";
+                }
+            }
+
+            return View("EditarAdmin", viewModel);
         }
 
         // Método [Remote] para validar Email

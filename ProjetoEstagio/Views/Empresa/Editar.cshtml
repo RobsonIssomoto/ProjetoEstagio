@@ -3,65 +3,76 @@
     ViewData["Title"] = "Editar Perfil da Empresa";
     Layout = "_LayoutEmpresa";
 }
+
 <div class="container mb-4">
-    <form asp-controller="Empresa" asp-action="Alterar" method="post" class="row d-flex justify-content-center" style="font-size: .9em">
-        <div class="col-6 bg-white my-3 p-4 rounded shadow" style="min-width: 380px">
-            <h3 class="text-center mb-4">EDITAR PERFIL DA EMPRESA</h3>
+    <div class="row d-flex justify-content-center" style="font-size: .9em">
 
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <div class="col-12 col-md-8 col-lg-6 bg-white my-3 p-4 rounded shadow" style="min-width: 380px">
 
+            <h4 class="text-center mb-4 text-uppercase fw-bold text-secondary">Dados da Empresa</h4>
 
-            <input type="hidden" asp-for="Id" />
+            <form asp-controller="Empresa" asp-action="Alterar" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-            <div class="form-group mb-3">
-                <label asp-for="CNPJ" class=" fw-bold">CNPJ</label>
-                <input type="text" class="form-control bg-light" asp-for="CNPJ" readonly />
-                <small class="form-text text-muted">O CNPJ não pode ser alterado após o cadastro.</small>
-            </div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="UsuarioId" />
 
-            <div class="form-group mb-3">
-                <label asp-for="Email" class=" fw-bold">Email de Contato</label>
-                <input type="email" class="form-control" asp-for="Email">
-                <small class="form-text text-muted">O E-mail não pode ser alterado após o cadastro.</small>
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="RazaoSocial" class=" fw-bold">Razão Social</label>
-                <input type="text" class="form-control" asp-for="RazaoSocial" />
-                <span asp-validation-for="RazaoSocial" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Nome" class=" fw-bold">Nome Representante</label>
-                <input type="text" class="form-control" asp-for="Nome" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
-            </div>
-
-            
-
-            <div class="form-group mb-3">
-                <label asp-for="Telefone" class=" fw-bold">Telefone</label>
-                <input type="text" class="form-control" asp-for="Telefone" placeholder="(XX) XXXXX-XXXX">
-                <span asp-validation-for="Telefone" class="text-danger"></span>
-            </div>
-
-
-            
-            <hr class="my-4" />
-            
-            <div class="row g-2 justify-content-end">
-
-                <div class="col-6 col-md-3">
-                    <a asp-controller="Empresa" asp-action="Principal" class="btn btn-outline-secondary w-100">Cancelar</a>
+                <div class="form-group mb-3">
+                    <label asp-for="CNPJ" class="fw-bold"></label>
+                    <input type="text" class="form-control bg-light" asp-for="CNPJ" readonly />
+                    <small class="text-muted" style="font-size: 0.8em">O CNPJ não pode ser alterado.</small>
                 </div>
 
-                <div class="col-6 col-md-3">
-                    <button type="submit" class="btn btn-primary w-100">Salvar</button>
+                <div class="form-group mb-3">
+                    <label asp-for="Email" class="fw-bold"></label>
+                    <input type="email" class="form-control bg-light" asp-for="Email" readonly>
+                    <small class="text-muted" style="font-size: 0.8em">O E-mail (Login) não pode ser alterado.</small>
+                    <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
-            </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="RazaoSocial" class="fw-bold"></label>
+                    <input type="text" class="form-control" asp-for="RazaoSocial" />
+                    <span asp-validation-for="RazaoSocial" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Nome" class="fw-bold">Representante</label>
+                    <input type="text" class="form-control nome" asp-for="Nome" />
+                    <span asp-validation-for="Nome" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Telefone" class="fw-bold"></label>
+                    <input type="phone" class="form-control telefone_com_ddd" asp-for="Telefone" placeholder="(XX) XXXXX-XXXX">
+                    <span asp-validation-for="Telefone" class="text-danger"></span>
+                </div>
+
+                <div class="row g-2 mt-4">
+                    <div class="col-6">
+                        <a asp-controller="Empresa" asp-action="Principal" class="btn btn-outline-secondary w-100">Voltar</a>
+                    </div>
+                    <div class="col-6">
+                        <button type="submit" class="btn btn-primary w-100">Salvar Dados</button>
+                    </div>
+                </div>
+            </form>
+
+            <hr class="my-5 border-secondary opacity-25">
+
+            <h4 class="text-center mb-4 text-uppercase fw-bold text-secondary">Alterar Senha</h4>
+
+            @{
+                var dadosParaSenha = new ProjetoEstagio.Models.ViewModels.AlterarSenhaViewModel
+            {
+                Id = Model.UsuarioId
+            };
+            }
+
+            <partial name="_AlterarSenha" model="dadosParaSenha" />
+
         </div>
-    </form>
+    </div>
 </div>
 
 @section Scripts {
