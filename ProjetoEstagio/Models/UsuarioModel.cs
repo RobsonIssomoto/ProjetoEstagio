@@ -19,7 +19,6 @@ namespace ProjetoEstagio.Models
         public DateTime DataCadastro { get; set; }
         public DateTime? DataAtualizacao { get; set; }
 
-        // Construtor vazio para o EF Core
         public UsuarioModel() { }
 
         // --- 3. MÉTODO NOVO PARA CRIAR O HASH ---

@@ -327,7 +327,6 @@ namespace ProjetoEstagio.Controllers
             return PartialView("_AlterarOrientador", viewModel);
         }
 
-        // POST: /Orientador/AlterarOrientador
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult AlterarOrientador(OrientadorAlterarViewModel viewModel) // Recebe o ViewModel correto

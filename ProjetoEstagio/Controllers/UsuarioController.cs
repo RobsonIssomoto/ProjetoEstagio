@@ -13,7 +13,6 @@ namespace ProjetoEstagio.Controllers
 
     public class UsuarioController : Controller
     {
-
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IUsuarioService _usuarioService;
         private readonly ISessao _sessao;
@@ -24,10 +23,10 @@ namespace ProjetoEstagio.Controllers
             _sessao = sessao;
 
         }
-        [Autorizacao(Perfil.Admin)]
+
+        //[Autorizacao(Perfil.Admin)]
         public IActionResult Index()
         {
-            // Usa o método novo do repositório
             List<UsuarioModel> admins = _usuarioRepository.ListarAdmins();
             return View(admins);
         }
@@ -39,11 +38,11 @@ namespace ProjetoEstagio.Controllers
 
         public IActionResult Cadastrar()
         {
-            return View(new UsuarioCadastroViewModel()); // <-- MUDANÇA
+            return View(new UsuarioCadastroViewModel());
         }
 
         [HttpPost]
-        public IActionResult Cadastrar(UsuarioCadastroViewModel viewModel) // <-- MUDANÇA
+        public IActionResult Cadastrar(UsuarioCadastroViewModel viewModel) //
         {
             try
             {
@@ -215,7 +214,7 @@ namespace ProjetoEstagio.Controllers
         }
 
         [HttpGet]
-        [Autorizacao(Perfil.Admin)]
+        //[Autorizacao(Perfil.Admin)]
         public IActionResult CadastrarAdmin()
         {
             // Retorna o formulário dentro do modal (Partial)
@@ -285,7 +284,6 @@ namespace ProjetoEstagio.Controllers
                     TempData["MensagemErro"] = $"Erro ao atualizar: {ex.Message}";
                 }
             }
-
             return View("EditarAdmin", viewModel);
         }
 

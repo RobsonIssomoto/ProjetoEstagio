@@ -46,13 +46,4 @@
     </div>
 </form>
 
-@{
-    await Html.RenderPartialAsync("_ValidationScriptsPartial");
-}
 
-<script>
-    $(document).ready(function() {
-        // Ativa a máscara de CPF dentro do modal
-        $('.cpf').mask('000.000.000-00');
-    });
-</script>
