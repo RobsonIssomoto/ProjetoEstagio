@@ -15,6 +15,8 @@ Camada	Tecnologias
 Back-end	C#, ASP.NET Core
 Front-end	HTML5, CSS3, Bootstrap
 Arquitetura	MVC (Model-View-Controller)
+
+
 ⚙️ Funcionalidades
 Cadastro de estagiários
 Cadastro de empresas
@@ -22,12 +24,15 @@ Cadastro de supervisores e orientadores
 Registro de estágios
 Sistema de autenticação (login)
 Geração de termo de compromisso
+
+
 🔗 Próximos Passos / Roadmap
  Implementar módulo de relatórios de acompanhamento
  Adicionar validações mais robustas nos formulários
  Melhorar interface do usuário (UI/UX)
  Integração com banco de dados persistente
  Exportação de documentos em PDF
+ 
 📌 Status do Projeto
 
 🚧 Em desenvolvimento
